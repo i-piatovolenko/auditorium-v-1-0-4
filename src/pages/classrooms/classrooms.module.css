@@ -1,0 +1,15 @@
+.classroomsPage {
+  background-color: #eeeeee;
+  height: 100vh;
+  width: 100%;
+  overflow: auto;
+}
+
+.classroomsList {
+  list-style-type: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-gap: 16px;
+  margin: 16px;
+  padding: 0;
+}

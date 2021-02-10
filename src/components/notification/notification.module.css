@@ -1,0 +1,107 @@
+@media (min-width: 320px) {
+  .notificationWrapper {
+    position: fixed;
+    width: 100%;
+    z-index: 200;
+    user-select: none;
+  }
+  .notification {
+    background-color: #fff;
+    margin-bottom: 2px;
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    position: relative;
+  }
+}
+@media (min-width: 1024px) {
+  .notificationWrapper {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 300px;
+    z-index: 200;
+    user-select: none;
+  }
+  .notification {
+    background-color: #fff;
+    border-radius: 8px;
+    margin: 8px 0;
+    box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    position: relative;
+  }
+}
+
+.notification p {
+  padding: 8px 16px;
+}
+
+.exit {
+  animation: slide-out-right 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+}
+
+.notificationHeader {
+  font-family: "Roboto Medium";
+  font-size: 1rem;
+  color: #2e287c;
+  padding-left: 32px;
+  padding-top: 2px;
+}
+
+.notificationHeader::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  background-color: #5def0e;
+  border-radius: 24px;
+  position: absolute;
+  left: 16px;
+  top: 16px;
+}
+
+.notificationBody {
+  margin-top: 8px;
+  padding-left: 32px;
+}
+
+.notificationClose::before {
+  display: block;
+  content: "x";
+  cursor: pointer;
+  color: rgba(46, 40, 124, 0.5);
+  font-family: "Calibri";
+  font-size: 1.2rem;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #fff;
+  transition: all 0.1s ease-in-out;
+  border-radius: 8px;
+  padding: 0 8px 2px 8px;
+  margin: 0;
+}
+
+.notificationClose:hover::before {
+  color: #fff;
+  background-color: #f91354;
+}
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(1000px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-right {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(1000px);
+  }
+}
