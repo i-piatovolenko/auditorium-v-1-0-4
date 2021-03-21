@@ -11,11 +11,11 @@ import Instruments from "../instruments/Instruments";
 import { usePopupWindow } from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
-import Button from "../button/Button";
+import Footer from "../footer/Footer";
 
 interface PropTypes {
   classroom: ClassroomType;
-  dispatchNotification: (value: string) => void;
+  dispatchNotification: (value: any) => void;
 }
 
 const Classroom: React.FC<PropTypes> = ({
@@ -25,9 +25,11 @@ const Classroom: React.FC<PropTypes> = ({
   const { id, name, occupied, instruments, isWing, isOperaStudio } = classroom;
   const occupiedStyle = {
     background: "#fff",
+    transition: "all 3s cubic-bezier(0.25, 0.8, 0.25, 1)"
   };
   const vacantStyle = {
     background: "#4bfd63",
+    transition: "all 3s cubic-bezier(0.25, 0.8, 0.25, 1)"
   };
   const occupationInfo = occupied ? "Зайнято" : "Вільно";
   const header = (
@@ -38,23 +40,14 @@ const Classroom: React.FC<PropTypes> = ({
     </>
   );
   const dispatchPopupWindow = usePopupWindow();
-
-  const onClick = () => {
+  const handleClick = () => {
     dispatchPopupWindow({
       header: header,
-      body: (
-        <ClassroomInfo
+      body: <ClassroomInfo
           classroom={classroom}
           dispatchNotification={dispatchNotification}
-        />
-      ),
-      footer: (
-        <div>
-          <Button type="submit" form="userSearchForm">
-            Записати в аудиторію
-          </Button>
-        </div>
-      ),
+        />,
+      footer: <Footer classroomName={name} occupied={occupied} dispatchNotification={dispatchNotification}/>,
     });
   };
 
@@ -64,7 +57,7 @@ const Classroom: React.FC<PropTypes> = ({
         key={id}
         className={styles.classroomsListItem}
         style={occupied ? occupiedStyle : vacantStyle}
-        onClick={onClick}
+        onClick={handleClick}
       >
         <div className={styles.header}>
           <h1>{name}</h1>

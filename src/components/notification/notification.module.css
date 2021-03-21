@@ -7,7 +7,7 @@
   }
   .notification {
     background-color: #fff;
-    margin-bottom: 2px;
+    margin-bottom: 0;
     box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.07);
     overflow: hidden;
     animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
@@ -26,6 +26,7 @@
   .notification {
     background-color: #fff;
     border-radius: 8px;
+    padding: 8px;
     margin: 8px 0;
     box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.07);
     overflow: hidden;
@@ -34,31 +35,57 @@
   }
 }
 
-.notification p {
-  padding: 8px 16px;
-}
-
 .exit {
   animation: slide-out-right 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
 }
 
-.notificationHeader {
-  font-family: "Roboto Medium";
-  font-size: 1rem;
-  color: #2e287c;
-  padding-left: 32px;
-  padding-top: 2px;
-}
-
-.notificationHeader::before {
-  content: "";
-  width: 24px;
-  height: 24px;
+.ok::before {
+  display: block;
+  content: url("./../../assets/images/tick.svg");
+  width: 12px;
+  height: 20px;
+  padding: 2px 6px;
   background-color: #5def0e;
   border-radius: 24px;
   position: absolute;
-  left: 16px;
-  top: 16px;
+  left: 8px;
+  top: 6px;
+}
+
+.alert::before {
+  display: block;
+  content: "!";
+  text-align: center;
+  font-weight: bold;
+  line-height: 1rem;
+  color: #fff;
+  width: 16px;
+  height: 16px;
+  padding: 3px;
+  background-color: #f91354;
+  border-radius: 24px;
+  position: absolute;
+  left: 8px;
+  top: 6px;
+}
+
+.default:before {
+  display: block;
+  content: "i";
+  font-family: Georgia;
+  font-style: italic;
+  text-align: center;
+  font-weight: bold;
+  line-height: 1rem;
+  color: #fff;
+  width: 16px;
+  height: 16px;
+  padding: 3px;
+  background-color: #2b5dff;
+  border-radius: 24px;
+  position: absolute;
+  left: 8px;
+  top: 6px;
 }
 
 .notificationBody {
@@ -66,26 +93,57 @@
   padding-left: 32px;
 }
 
-.notificationClose::before {
-  display: block;
-  content: "x";
-  cursor: pointer;
-  color: rgba(46, 40, 124, 0.5);
-  font-family: "Calibri";
-  font-size: 1.2rem;
+.notificationClose {
   position: absolute;
+  width: 20px;
+  height: 20px;
   top: 8px;
   right: 8px;
-  background-color: #fff;
+  z-index: 202;
+  border-radius: 4px;
   transition: all 0.1s ease-in-out;
+}
+
+.notificationClose::before {
+  display: flex;
+  justify-content: center;
+  content: "x";
+  font-family: "Roboto Thin";
+  transform: scaleY(0.8);
+  font-size: 1.5rem;
+  line-height: 1rem;
+  position: absolute;
+  width: 20px;
+  height: 20px;
   border-radius: 8px;
-  padding: 0 8px 2px 8px;
+  margin: 0;
+  user-select: none;
+  z-index: 201;
+}
+
+.notificationClose:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: #f91354;
+}
+
+.notificationClose:active {
+  cursor: pointer;
+  color: #fff;
+  background-color: #ff477a;
+}
+
+.header {
+  font-family: "Roboto Medium";
+  padding: 8px 32px 0 40px;
+  position: relative;
   margin: 0;
 }
 
-.notificationClose:hover::before {
-  color: #fff;
-  background-color: #f91354;
+.message {
+  padding: 8px 32px 8px 40px;
+  font-family: "Roboto Light";
+  margin: 0;
 }
 
 @keyframes slide-in-right {

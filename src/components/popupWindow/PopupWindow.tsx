@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactElement, useState } from "react";
 import styles from "./popupWindow.module.css";
 
 interface PropTypes {
@@ -23,6 +23,14 @@ const PopupWindow: React.FC<PropTypes> = ({
       });
     }, 300);
   };
+  const footerWithProps = React.Children.map(footer, (child: ReactElement) => {
+    if (React.isValidElement(child)) {
+      // @ts-ignore
+      return React.cloneElement(child, { dispatch: dispatch });
+    }
+    return child;
+  });
+
   return (
     <div
       className={[
@@ -42,7 +50,7 @@ const PopupWindow: React.FC<PropTypes> = ({
           <span className={styles.modalClose} onClick={onClose} />
         </div>
         <div className={styles.modalBody}>{body}</div>
-        <div className={styles.modalFooter}>{footer}</div>
+        <div className={styles.modalFooter}>{footerWithProps}</div>
       </div>
     </div>
   );

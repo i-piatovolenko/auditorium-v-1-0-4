@@ -3,10 +3,16 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: space-between;
   padding: 0;
   margin: 16px 14px 0 16px;
   font-family: "Roboto Light";
   background-color: #eeeeee;
+}
+
+.caviar::after {
+  content: "";
+  flex: auto;
 }
 
 .caviar li {

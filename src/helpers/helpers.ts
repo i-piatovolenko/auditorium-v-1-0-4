@@ -52,7 +52,7 @@ export const getPossiblyOccupied = (schedule: Array<any>) => {
 };
 
 export const getTimeHHMM = (date: Date) => {
-  return date.getHours() + ":" + date.getMinutes();
+  return date.getHours() + ":" + formatMinutesToMM(date.getMinutes());
 };
 
 export const getScheduleUnitRowLength = (
@@ -149,4 +149,25 @@ export const getScheduleUnitSize = (
   }
 
   return items.map((item) => `${item}fr`).join(" ");
+};
+
+export const ISODateString = (d: Date) => {
+  function pad(n: any) {
+    return n < 10 ? "0" + n : n;
+  }
+  return (
+    d.getUTCFullYear() +
+    "-" +
+    pad(d.getUTCMonth() + 1) +
+    "-" +
+    pad(d.getUTCDate())
+    // +
+    // "T" +
+    // pad(d.getUTCHours()) +
+    // ":" +
+    // pad(d.getUTCMinutes()) +
+    // ":" +
+    // pad(d.getUTCSeconds()) +
+    // "Z"
+  );
 };

@@ -3,11 +3,19 @@ import styles from "./notification.module.css";
 
 interface PropTypes {
   message: string;
+  header: string;
   dispatch: (value: any) => void;
   id: string;
+  type?: "ok" | "alert";
 }
 
-const Notification: React.FC<PropTypes> = ({ message, dispatch, id }) => {
+const Notification: React.FC<PropTypes> = ({
+  message,
+  type = "default",
+  dispatch,
+  id,
+  header,
+}) => {
   const [exit, setExit] = useState(false);
   const [opacity, setOpacity] = useState(100);
   const [intervalId, setIntervalId]: any = useState(null);
@@ -53,6 +61,7 @@ const Notification: React.FC<PropTypes> = ({ message, dispatch, id }) => {
   useEffect(() => {
     handleStartTimer();
   }, []);
+
   return (
     <div
       onMouseEnter={handlePauseTimer}
@@ -64,7 +73,18 @@ const Notification: React.FC<PropTypes> = ({ message, dispatch, id }) => {
         className={styles.notificationClose}
         onClick={handleCloseNotification}
       />
-      <p>{message}</p>
+      <p
+        className={[
+          type === "ok"
+            ? styles.ok
+            : type === "alert"
+            ? styles.alert
+            : styles.default
+        , styles.header].join(" ")}
+      >
+        {header}
+      </p>
+      <p className={styles.message}>{message}</p>
     </div>
   );
 };

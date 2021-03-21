@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./scheduleUnit.module.css";
 import { useQuery } from "@apollo/client";
 import { GET_SCHEDULE_UNIT } from "../../api/operations/queries/schedule";
-import { fullName, getScheduleUnitSize } from "../../helpers/helpers";
+import {fullName, getScheduleUnitSize, ISODateString} from "../../helpers/helpers";
 import { ScheduleUnitType } from "../../models/models";
 import Button from "../button/Button";
 
@@ -14,7 +14,7 @@ const ScheduleUnit: React.FC<PropTypes> = ({ classroomName }) => {
   const { data, loading, error } = useQuery(GET_SCHEDULE_UNIT, {
     variables: {
       classroomName: classroomName,
-      date: new Date().toString(),
+      date: ISODateString(new Date()),
     },
   });
   if (!loading && !error)

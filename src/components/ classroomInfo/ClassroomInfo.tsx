@@ -24,9 +24,9 @@ const ClassroomInfo: React.FC<PropTypes> = ({
   );
 
   return (
-    <>
+    <div>
       <p className={styles.description}>
-        {chair ? chair + ". " + description : description}
+        {chair ? chair.name + ". " + description : description}
       </p>
       <Title title="Розклад на сьогодні" />
       <ScheduleUnit classroomName={name} />
@@ -44,7 +44,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({
           <OccupantRegistration dispatchNotification={dispatchNotification} />
         </>
       )}
-    </>
+    </div>
   );
 };
 

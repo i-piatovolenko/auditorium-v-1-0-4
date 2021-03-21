@@ -4,12 +4,16 @@ import { ClassroomType } from "../../models/models";
 import { usePopupWindow } from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
+import Button from "../button/Button";
+import { gridUpdate } from "../../api/client";
+import {useMutation} from "@apollo/client";
+import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
 interface PropTypes {
   classrooms: Array<ClassroomType>;
-  dispatchNotification: (value: string)=> void;
+  dispatchNotification: (value: string) => void;
 }
 
-const Caviar: React.FC<PropTypes> = ({ classrooms , dispatchNotification}) => {
+const Caviar: React.FC<PropTypes> = ({ classrooms, dispatchNotification }) => {
   const dispatchPopupWindow = usePopupWindow();
   const occupiedStyle = {
     background: "#fff",
@@ -18,7 +22,12 @@ const Caviar: React.FC<PropTypes> = ({ classrooms , dispatchNotification}) => {
     background: "#4bfd63",
   };
 
-  function onClick(classroom: ClassroomType) {
+
+  const handleFreeClassroom = () => {
+    // freeClassroom().then(() => gridUpdate(!gridUpdate()));
+  };
+
+  function handleClick(classroom: ClassroomType) {
     dispatchPopupWindow({
       header: (
         <>
@@ -27,7 +36,28 @@ const Caviar: React.FC<PropTypes> = ({ classrooms , dispatchNotification}) => {
           {classroom.isOperaStudio && <Tag body="Оперна студія" />}
         </>
       ),
-      body: <ClassroomInfo dispatchNotification={dispatchNotification} classroom={classroom} />,
+      body: (
+        <ClassroomInfo
+          dispatchNotification={dispatchNotification}
+          classroom={classroom}
+        />
+      ),
+      footer: (
+        <div className={styles.footer}>
+          {classroom.occupied ? (
+            <>
+              <Button color="orange">Передати аудиторію</Button>
+              <Button color="red" onClick={handleFreeClassroom}>
+                Звільнити аудиторію
+              </Button>
+            </>
+          ) : (
+            <Button type="submit" form="userSearchForm">
+              Записати в аудиторію
+            </Button>
+          )}
+        </div>
+      ),
     });
   }
 
@@ -35,7 +65,7 @@ const Caviar: React.FC<PropTypes> = ({ classrooms , dispatchNotification}) => {
     <ul className={styles.caviar}>
       {classrooms.map((classroom) => (
         <li
-          onClick={() => onClick(classroom)}
+          onClick={() => handleClick(classroom)}
           style={classroom.occupied ? occupiedStyle : vacantStyle}
         >
           {classroom.name}

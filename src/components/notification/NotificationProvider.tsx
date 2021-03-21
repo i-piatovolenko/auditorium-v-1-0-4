@@ -25,7 +25,9 @@ const NotificationProvider = ({ children }: any) => {
             dispatch={dispatch}
             key={note.id}
             message={note.message}
+            header={note.header}
             id={note.id}
+            type={note.type}
           />
         ))}
       </div>

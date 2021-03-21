@@ -1,7 +1,7 @@
 .button {
     border-radius: 8px;
     cursor: pointer;
-    transition: all .3s ease-in-out;
+    transition: color .3s linear;
 }
 
 .sizes {
@@ -67,6 +67,25 @@
     background-size: 200% 200%;
     animation: AnimationName 2s ease both;
 }
+
+.orange {
+    border: 1px solid #ffc000;
+    background-color: #ffc000;
+    color: #fff;
+}
+
+.orange:focus {
+    box-shadow: 0px 0px 10px 0px rgba(255, 192, 0,0.65);
+}
+
+.orange:hover {
+    border: 1px solid #ffe851;
+    background: #ffc000;
+    background: linear-gradient(270deg, #ff8c00, #ffc000);
+    background-size: 200% 200%;
+    animation: AnimationName 2s ease both;
+}
+
 
 .button:active {
     background: white;

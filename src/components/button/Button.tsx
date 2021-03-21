@@ -5,7 +5,7 @@ interface PropTypes {
   onClick?: () => void;
   kind?: "default" | "primary";
   type?: "button" | "submit" | "reset"
-  color?: "white" | "blue" | "red";
+  color?: "white" | "blue" | "red" | "orange";
   disabled?: boolean
   style?: CSSProperties | undefined,
   form?: string

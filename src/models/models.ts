@@ -47,6 +47,12 @@ export enum userTypeColors {
   OTHER = "#ffa200",
 }
 
+export enum notificationsTypes {
+  OK = "ok",
+  ALERT = "alert",
+  DEFAULT = "default",
+}
+
 export type User = {
   id: number;
   firstName: string;
@@ -104,7 +110,7 @@ export type ScheduleUnitType = {
 export type ClassroomType = {
   id: number;
   name: string;
-  chair: string | null;
+  chair: Department | null;
   special: string | null;
   floor: number;
   isWing: boolean;

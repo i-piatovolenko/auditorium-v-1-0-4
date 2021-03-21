@@ -18,6 +18,10 @@
   font-family: Roboto;
 }
 
+.footer > button{
+  margin-left: 8px;
+}
+
 .header h1 {
   font-family: "Roboto Medium";
   min-width: 2.4rem;
