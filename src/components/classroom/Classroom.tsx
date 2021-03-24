@@ -43,6 +43,7 @@ const Classroom: React.FC<PropTypes> = ({
   const handleClick = () => {
     dispatchPopupWindow({
       header: header,
+      //@ts-ignore
       body: <ClassroomInfo
           classroom={classroom}
           dispatchNotification={dispatchNotification}

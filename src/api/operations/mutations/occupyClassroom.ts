@@ -7,7 +7,9 @@ export const OCCUPY_CLASSROOM = gql`
                 id
                 name
                 special
-                chair
+                chair {
+                    name
+                }
                 occupied {
                     user {
                         id
@@ -15,7 +17,9 @@ export const OCCUPY_CLASSROOM = gql`
                         patronymic
                         lastName
                         type
-                        department
+                        department {
+                            name
+                        }
                     }
                 }
                 instruments {

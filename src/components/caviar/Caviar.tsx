@@ -5,9 +5,7 @@ import { usePopupWindow } from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
 import Button from "../button/Button";
-import { gridUpdate } from "../../api/client";
-import {useMutation} from "@apollo/client";
-import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
+
 interface PropTypes {
   classrooms: Array<ClassroomType>;
   dispatchNotification: (value: string) => void;
@@ -37,6 +35,7 @@ const Caviar: React.FC<PropTypes> = ({ classrooms, dispatchNotification }) => {
         </>
       ),
       body: (
+        //@ts-ignore
         <ClassroomInfo
           dispatchNotification={dispatchNotification}
           classroom={classroom}

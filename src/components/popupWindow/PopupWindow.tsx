@@ -31,6 +31,14 @@ const PopupWindow: React.FC<PropTypes> = ({
     return child;
   });
 
+  const bodyWithProps = React.Children.map(body, (child: ReactElement) => {
+    if (React.isValidElement(child)) {
+      // @ts-ignore
+      return React.cloneElement(child, { dispatch: dispatch });
+    }
+    return child;
+  });
+
   return (
     <div
       className={[
@@ -49,7 +57,7 @@ const PopupWindow: React.FC<PropTypes> = ({
           {header}
           <span className={styles.modalClose} onClick={onClose} />
         </div>
-        <div className={styles.modalBody}>{body}</div>
+        <div className={styles.modalBody}>{bodyWithProps}</div>
         <div className={styles.modalFooter}>{footerWithProps}</div>
       </div>
     </div>

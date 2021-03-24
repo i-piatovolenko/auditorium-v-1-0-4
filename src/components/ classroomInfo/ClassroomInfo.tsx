@@ -10,13 +10,15 @@ import OccupantRegistration from "./occupantRegistration/OccupantRegistration";
 interface PropTypes {
   classroom: ClassroomType;
   dispatchNotification: (value: string) => void;
+  dispatch: (value: any) => void;
 }
 
 const ClassroomInfo: React.FC<PropTypes> = ({
   classroom,
   dispatchNotification,
+  dispatch
 }) => {
-  const { name, instruments, description, chair, occupied } = classroom;
+  const { name, instruments, description, chair, occupied, id } = classroom;
   const occupiedInfo = (
     <>
       <OccupantInfo occupied={occupied} />
@@ -41,7 +43,11 @@ const ClassroomInfo: React.FC<PropTypes> = ({
       ) : (
         <>
           <Title title="Запис в аудиторію" />
-          <OccupantRegistration dispatchNotification={dispatchNotification} />
+          <OccupantRegistration
+            dispatchNotification={dispatchNotification}
+            classroomId={id}
+            classroomName={name}
+            dispatch={dispatch}/>
         </>
       )}
     </div>

@@ -1,22 +1,33 @@
 import React, {FormEvent, useEffect, useState,} from "react";
 import styles from "./occupantRegistration.module.css";
-import {useQuery} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
 import {fullName} from "../../../helpers/helpers";
 import Title from "../../title/Title";
 import Select from 'react-select';
 import {User, userTypesUa, userTypes} from "../../../models/models";
+import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
+import {gridUpdate} from "../../../api/client";
 
 interface PropTypes {
-  dispatchNotification: (value: string) => void;
+  dispatchNotification: (value: any) => void;
+  classroomId: number;
+  classroomName: string;
+  dispatch: (value: any) => void;
 }
 
-const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification}) => {
+const OccupantRegistration: React.FC<PropTypes> = ({
+   dispatchNotification,
+   classroomId,
+   classroomName,
+   dispatch
+}) => {
   const [value, setValue] = useState();
-  const [chosenUser, setChosenUser] = useState("");
+  const [chosenUserId, setChosenUserId] = useState(-1);
   const [chosenUserType, setChosenUserType] = useState(userTypes.STUDENT);
   const [chosenUserName, setChosenUserName] = useState("");
   const {data, loading, error} = useQuery(GET_USERS);
+  const [occupyClassroom] = useMutation(OCCUPY_CLASSROOM)
   const [users, setUsers] = useState();
   const newUserTypes: any = [
     {value: userTypes.STUDENT, label: userTypesUa.STUDENT},
@@ -30,18 +41,59 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification}) => {
   }, [data]);
 
   const handleChange = (e: any) => {
-    console.log('chosen user: ', e.value);
+    setChosenUserId(e.value)
     setChosenUserName(fullName((data.users as unknown as Array<User>).find(user => user.id === e.value)));
   };
 
   const handleChangeNewUser = (e: any) => {
+    setChosenUserId(-1)
     setValue(e.target.value);
     setChosenUserName(e.target.value)
   }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const existingUser = {
+      userId: chosenUserId,
+    };
+    const newUser = {
+      userId: -1,
+      tempUser: {
+        name: chosenUserName,
+        type: chosenUserType
+      }
+    };
+    const occupant = chosenUserId === -1 ? newUser : existingUser;
+
     e.preventDefault();
-    // dispatchNotification(value);
+
+    if(chosenUserName !== "") {
+      occupyClassroom({
+        variables: {
+          input: {
+            classroomName: classroomId.toString(),
+            until: new Date(),
+            ...occupant
+          }
+        }
+      }).then(() => {
+        dispatch({
+          type: "POP_POPUP_WINDOW",
+        });
+        gridUpdate(!gridUpdate());
+        dispatchNotification({
+          header: "Успішно!",
+          message: `Аудиторія ${classroomName} зайнята.`,
+          type: "ok",
+        });
+      });
+    } else {
+      dispatchNotification({
+        header: "Помилка",
+        message: `Виберіть користувача.`,
+        type: "alert",
+      });
+    }
+
   };
 
   return (
