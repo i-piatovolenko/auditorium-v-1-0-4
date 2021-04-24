@@ -1,0 +1,38 @@
+@media (min-width: 320px) {
+  .registration {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 8px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .registration {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: flex-end;
+    grid-gap: 16px;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputError {
+  border: 1px solid #fff;
+  display: flex;
+  align-items: center;
+  height: 2.5rem;
+  padding-left: 16px;
+  border-radius: 8px;
+  background: rgba(249, 19, 84, 0.1);
+  background: linear-gradient(
+    90deg,
+    rgba(249, 19, 84, 0.1) 0%,
+    rgba(0, 212, 255, 0) 100%
+  );
+  color: #f91354;
+  font-family: "Roboto Light";
+}

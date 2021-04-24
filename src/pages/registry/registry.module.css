@@ -1,0 +1,68 @@
+.wrapper {
+    overflow: scroll;
+    height: calc(100vh - 100px);
+    padding: 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: 120px 120px;
+    width: 100%;
+    justify-content: flex-end;
+    grid-gap: 8px;
+    padding-right: 8px;
+}
+
+.container {
+    list-style-type: none;
+    padding: 60px 0 0 0;
+    margin: 0;
+    width: 80vw;
+}
+
+.container li:nth-child(odd) {
+    background-color: rgba(0, 166, 255, .05);
+}
+
+.listHeader {
+    display: grid;
+    grid-template-columns: 60px auto 100px 100px;
+    width: 80vw;
+    margin-top: -16px;
+    padding-right: 16px;
+    box-sizing: border-box;
+    position: fixed;
+    background-color: #fff;
+    box-shadow: 0px 5px 5px -5px rgba(34, 60, 80, 0.2);
+}
+
+.listHeader p:not(.listHeader p:nth-child(2)) {
+    text-align: center;
+}
+
+.unit {
+    display: grid;
+    grid-template-columns: 60px auto 100px 100px;
+    border: 1px solid #fff;
+    padding: 16px;
+}
+
+.unit span:nth-child(3), .unit span:nth-child(4) {
+    text-align: center;
+}
+
+.unit:hover {
+    border: 1px solid #00a6ff;
+}
+
+.active {
+    color: #00a6ff;
+    cursor: pointer;
+}
+
+.noItemsText {
+    text-align: center;
+}

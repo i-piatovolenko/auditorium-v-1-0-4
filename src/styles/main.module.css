@@ -1,0 +1,56 @@
+.headerInput {
+    box-sizing: border-box;
+    background-color: #2e287c;
+    border: 1px solid #fff;
+    outline: none;
+    color: #fff;
+    font-family: Roboto;
+    padding: 8px;
+    border-radius: 8px;
+    width: 160px;
+    height: 38px;
+}
+
+.headerInput::placeholder {
+    color: #fff;
+}
+
+.headerDateInput {
+    background-color: #2e287c;
+    border: 1px solid #fff;
+    outline: none;
+    color: #fff;
+    font-family: Roboto;
+    padding: 8px;
+    border-radius: 8px;
+    width: 160px;
+}
+
+.headerDateInput::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+.input {
+    box-sizing: border-box;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #2e287c;
+    font-family: Roboto;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.required {
+    color: #ff003e;
+    margin: 8px 0 4px 0;
+    animation: fade-in .2s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

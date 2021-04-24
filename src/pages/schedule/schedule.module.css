@@ -1,0 +1,48 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 60px auto;
+}
+
+.row span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+
+.scheduleHeader {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.space {
+    width: 60px
+}
+
+.timeline {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(11, 9.09%);
+}
+
+.timeline span {
+    position: relative;
+    margin-left: 2px;
+}
+
+.timeline span:before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 3px;
+    height: 100vh;
+    border-left: 1px solid rgba(204, 204, 204, .3);
+}

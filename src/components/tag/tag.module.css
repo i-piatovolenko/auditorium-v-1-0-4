@@ -1,0 +1,23 @@
+.tagContainer {
+    position: relative;
+}
+
+.tag {
+    cursor: pointer;
+    min-width: 1.2rem;
+    display: inline-block;
+    text-align: center;
+    padding: 8px;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 8px;
+    font-family: "Roboto Medium";
+    margin-right: 8px;
+}
+
+.tagContainer > div {
+    display: none;
+}
+
+.tagContainer:hover > div {
+    display: block;
+}

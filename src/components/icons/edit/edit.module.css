@@ -1,0 +1,17 @@
+.editIcon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.dark {
+    filter: invert(0);
+}
+
+.light {
+    filter: invert(1);
+}
+
+.editIcon:hover {
+    filter: invert(57%) sepia(50%) saturate(5894%) hue-rotate(176deg) brightness(103%) contrast(107%);
+}

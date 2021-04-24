@@ -1,0 +1,9 @@
+.deleteIcon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.deleteIcon:hover {
+    filter: invert(9%) sepia(88%) saturate(7490%) hue-rotate(0deg) brightness(117%) contrast(105%);
+}

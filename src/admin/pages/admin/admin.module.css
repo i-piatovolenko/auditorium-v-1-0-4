@@ -1,0 +1,39 @@
+.list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+}
+
+.list li {
+    padding: 16px;
+    border: 1px solid transparent;
+}
+
+.list li a {
+    padding-left: 16px;
+    color: #00a6ff;
+    text-decoration: none;
+}
+
+.list li:nth-child(odd) {
+    background-color: rgba(0, 166, 255, .05);
+}
+
+.list li:hover {
+    border: 1px solid #00a6ff;
+}
+
+.serverURL {
+    width: 300px;
+    margin-right: 16px;
+    margin-top: 8px;
+}
+
+.settings {
+    margin-top: 32px;
+    margin-left: 32px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
