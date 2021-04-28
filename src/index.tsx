@@ -7,11 +7,11 @@ import { ApolloProvider } from "@apollo/client";
 import { client } from "./api/client";
 import PopupWindowProvider from "./components/popupWindow/PopupWindowProvider";
 import NotificationProvider from "./components/notification/NotificationProvider";
-import { BrowserRouter } from "react-router-dom";
+import {BrowserRouter, HashRouter} from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <ApolloProvider client={client}>
         <PopupWindowProvider>
           <NotificationProvider>
@@ -19,7 +19,7 @@ ReactDOM.render(
           </NotificationProvider>
         </PopupWindowProvider>
       </ApolloProvider>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );
