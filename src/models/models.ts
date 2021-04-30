@@ -1,14 +1,26 @@
-export enum errorCodesUa {
+export enum ErrorCodesUa {
   INVALID_PASSWORD = "Невірний пароль",
   USER_NOT_FOUND = "Користувача не знайдено",
 }
 
-export enum errorCodes {
+export enum ErrorCodes {
   INVALID_PASSWORD = "INVALID_PASSWORD",
   USER_NOT_FOUND = "USER_NOT_FOUND",
 }
 
-export enum userTypes {
+export enum EmploymentTypes {
+  FULL_TIME = 'FULL_TIME',
+  PART_TIME = 'PART_TIME',
+  HOURLY = 'HOURLY',
+}
+
+export enum EmploymentTypesUa {
+  FULL_TIME = 'Штатний співробітник',
+  PART_TIME = 'Часткова',
+  HOURLY = 'Погодинна',
+}
+
+export enum UserTypes {
   STUDENT = "STUDENT",
   TEACHER = "TEACHER",
   POST_GRADUATE = "POST_GRADUATE",
@@ -21,7 +33,7 @@ export enum userTypes {
   OTHER = "OTHER",
 }
 
-export enum userTypesUa {
+export enum UserTypesUa {
   STUDENT = "Студент",
   TEACHER = "Викладач",
   POST_GRADUATE = "Асистент/аспірант",
@@ -31,10 +43,10 @@ export enum userTypesUa {
   STAFF = "Співробітник",
   CONCERTMASTER = "Концертмейстер",
   ILLUSTRATOR = "Іллюстратор",
-  OTHER = "Інше",
+  OTHER = "Користувач",
 }
 
-export enum userTypeColors {
+export enum UserTypeColors {
   STUDENT = "#1e2c4f",
   TEACHER = "#ffa200",
   POST_GRADUATE = "#1e2c4f",
@@ -47,12 +59,12 @@ export enum userTypeColors {
   OTHER = "#ffa200",
 }
 
-export enum activityTypes {
+export enum ActivityTypes {
   LECTURE = '#ffa200',
   INDIVIDUAL_LESSON = '#2b5dff'
 }
 
-export enum notificationsTypes {
+export enum NotificationsTypes {
   OK = "ok",
   ALERT = "alert",
   DEFAULT = "default",
@@ -60,18 +72,32 @@ export enum notificationsTypes {
 
 export type User = {
   id: number;
+  createdAt: Date;
   firstName: string;
   patronymic: string | null;
   lastName: string;
   type: string;
-  department: string;
+  department: Department;
   email: string;
   phoneNumber: string;
   extraPhoneNumbers: string | null;
   nameTemp: string | null;
   startYear: number;
-  degree: string;
+  studentInfo: StudentInfo;
+  employeeInfo: EmployeeInfo;
   verified: boolean;
+  expireDate: Date | null;
+};
+
+export type StudentInfo = {
+  degree: Degree;
+  startYear: number;
+  accountStatus: string;
+};
+
+export type EmployeeInfo = {
+  employmentType: EmploymentTypes;
+  accountStatus: string;
 };
 
 export type OccupiedInfo = {

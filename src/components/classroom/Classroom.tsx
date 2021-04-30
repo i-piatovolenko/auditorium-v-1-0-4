@@ -3,8 +3,8 @@ import styles from "./classroom.module.css";
 import {
   ClassroomType,
   OccupiedInfo,
-  userTypes,
-  userTypesUa,
+  UserTypes,
+  UserTypesUa,
 } from "../../models/models";
 import {fullName, typeStyle} from "../../helpers/helpers";
 import Instruments from "../instruments/Instruments";
@@ -86,7 +86,7 @@ const Classroom: React.FC<PropTypes> = ({
               style={typeStyle(occupied as OccupiedInfo)}
               className={styles.occupantType}
             >
-              {userTypesUa[occupied?.user.type as userTypes]}
+              {UserTypesUa[occupied?.user.type as UserTypes]}
             </p>
           </div>
         </div>

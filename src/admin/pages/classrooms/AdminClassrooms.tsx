@@ -89,6 +89,7 @@ const AdminClassrooms = () => {
 
   const handleItemClick = (id: number) => {
     const classroom = classrooms?.find(item => item.id === id);
+
     dispatchPopupWindow({
       header: <h1>{`Аудиторія ${classroom?.name}`}</h1>,
       body: <BrowseClassroomPopupBody classroom={classroom as ClassroomType}/>,

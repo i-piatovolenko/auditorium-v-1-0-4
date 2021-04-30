@@ -40,3 +40,7 @@
 .list li > * {
   margin-right: 8px;
 }
+
+.alignText {
+  text-align: center;
+}

@@ -3,7 +3,7 @@ import styles from "./scheduleUnit.module.css";
 import { useQuery } from "@apollo/client";
 import { GET_SCHEDULE_UNIT } from "../../api/operations/queries/schedule";
 import {fullName, getScheduleUnitSize, ISODateString} from "../../helpers/helpers";
-import {activityTypes, ScheduleUnitType} from "../../models/models";
+import {ActivityTypes, ScheduleUnitType} from "../../models/models";
 import Button from "../button/Button";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import UserProfile from "../userProfile/UserProfile";
@@ -60,9 +60,9 @@ const ScheduleUnit: React.FC<PropTypes> = ({ classroomName }) => {
                   height: "2rem",
                   width: "100%",
                 //@ts-ignore
-                  backgroundColor: activityTypes[unit.activity],
+                  backgroundColor: ActivityTypes[unit.activity],
                   //@ts-ignore
-                  border: `1px solid ${activityTypes[unit.activity]}`
+                  border: `1px solid ${ActivityTypes[unit.activity]}`
                 }}
               >
                 {unit.from + " - " + unit.to + " " + fullName(unit.user, true)}

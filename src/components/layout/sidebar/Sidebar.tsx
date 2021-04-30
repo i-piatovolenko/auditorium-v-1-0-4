@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./sidebar.module.css";
 import Logo from "../../logo/Logo";
 import { NavLink, Route, Switch } from "react-router-dom";
@@ -10,11 +10,29 @@ import scheduleIcon from "../../../assets/images/schedule.svg";
 import profileIcon from "../../../assets/images/profile.svg";
 import usersIcon from "../../../assets/images/users.svg";
 import controlIcon from "../../../assets/images/settings.svg";
+import {useQuery} from "@apollo/client";
+import {GET_USERS} from "../../../api/operations/queries/users";
+import {User} from "../../../models/models";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(true);
+  const {data} = useQuery(GET_USERS);
+  const [unverifiedCounter, setUnverifiedCounter] = useState(0);
+
+  useEffect(() => {
+    setUnverifiedCounter(0);
+    if (data) {
+      data.users.forEach((user: User) => {
+        !user.verified && setUnverifiedCounter(prevState => prevState+1);
+      });
+    }
+  }, [data]);
+
   const onMenuClick = () => setCollapsed((prevState) => !prevState);
-  const onClick = () =>
+
+  const onClick = () => {
+    const screenWidth = window.screen.width;
+
     setCollapsed((prevState) => {
       if (screenWidth < 1024) {
         return !prevState;
@@ -22,7 +40,8 @@ const Sidebar = () => {
         return prevState;
       }
     });
-  const screenWidth = window.screen.width;
+  }
+
   return (
     <div
       className={[styles[collapsed.toString()], styles.navigation].join(" ")}
@@ -134,6 +153,7 @@ const Sidebar = () => {
           </NavLink>
         </li>
         <li>
+          {unverifiedCounter !== 0 && <span className={styles.alert}>!</span>}
           <NavLink
             activeClassName={styles.linkActive}
             className={styles.link}
