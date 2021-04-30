@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import styles from "./users.module.css";
 import mainStyles from "./../../styles/main.module.css";
 import Header from "../../components/header/Header";
-import {User, userTypeColors, userTypes, userTypesUa} from "../../models/models";
+import {User, UserTypeColors, UserTypes, UserTypesUa} from "../../models/models";
 import {fullName} from "../../helpers/helpers";
 import {usePopupWindow} from "../../components/popupWindow/PopupWindowProvider";
 import UserProfile from "../../components/userProfile/UserProfile";
@@ -18,23 +18,23 @@ const categories: CategoryType[] = [
     label: 'Всі',
   },
   {
-    value: userTypes.TEACHER,
+    value: UserTypes.TEACHER,
     label: 'Викладачі'
   },
   {
-    value: userTypes.STUDENT,
+    value: UserTypes.STUDENT,
     label: 'Студенти'
   },
   {
-    value: userTypes.POST_GRADUATE,
+    value: UserTypes.POST_GRADUATE,
     label: 'Аистенти/Аспіранти'
   },
   {
-    value: userTypes.CONCERTMASTER,
+    value: UserTypes.CONCERTMASTER,
     label: 'Концертмейстери'
   },
   {
-    value: userTypes.ILLUSTRATOR,
+    value: UserTypes.ILLUSTRATOR,
     label: 'Іллюстратори'
   }
 ];
@@ -82,8 +82,8 @@ const Users = () => {
   const listData = filteredUsers?.map((user: User) => <>
       <span>{user.id}</span>
       <span onClick={() => handleClick(user)}>{fullName(user)}</span>
-      <span className={styles.userType} style={{backgroundColor: userTypeColors[user.type as userTypes]}}>
-        {userTypesUa[user.type as userTypes]}
+      <span className={styles.userType} style={{backgroundColor: UserTypeColors[user.type as UserTypes]}}>
+        {UserTypesUa[user.type as UserTypes]}
       </span>
     </>);
 

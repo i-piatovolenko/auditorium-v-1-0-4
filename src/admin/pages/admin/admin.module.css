@@ -37,3 +37,14 @@
     flex-direction: row;
     align-items: center;
 }
+
+.unverified {
+    position: relative;
+    top: -8px;
+    left: 4px;
+    color: #fff;
+    background-color: #ff003b;
+    border-radius: 8px;
+    padding: 1px 4px;
+    font-size: .7rem;
+}

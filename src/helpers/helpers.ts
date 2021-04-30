@@ -9,7 +9,7 @@ import {
   OccupiedInfo,
   ScheduleUnitType,
   User,
-  userTypes,
+  UserTypes,
 } from "../models/models";
 
 export const getScheduleTimeline = (start: number, end: number): string[] => {
@@ -94,9 +94,9 @@ export const typeStyle = (occupied: OccupiedInfo) => {
   };
   if (occupied !== null) {
     switch (occupied.user.type) {
-      case userTypes.STUDENT:
+      case UserTypes.STUDENT:
         return student;
-      case userTypes.POST_GRADUATE:
+      case UserTypes.POST_GRADUATE:
         return student;
       default:
         return employee;

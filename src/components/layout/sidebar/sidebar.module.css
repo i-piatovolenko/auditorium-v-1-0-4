@@ -111,3 +111,21 @@
 .linkActive:hover {
   background-color: #2b5dff;
 }
+
+.alert {
+  position: absolute;
+  z-index: 100;
+  left: 28px;
+  top: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-family: "Arial Black";
+  line-height: .5;
+  background-color: #ff003b;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 20px;
+}

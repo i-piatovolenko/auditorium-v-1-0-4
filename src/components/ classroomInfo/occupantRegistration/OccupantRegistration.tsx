@@ -5,7 +5,7 @@ import {GET_USERS} from "../../../api/operations/queries/users";
 import {fullName} from "../../../helpers/helpers";
 import Title from "../../title/Title";
 import Select from 'react-select';
-import {User, userTypesUa, userTypes} from "../../../models/models";
+import {User, UserTypesUa, UserTypes} from "../../../models/models";
 import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
 import {gridUpdate} from "../../../api/client";
 
@@ -30,14 +30,14 @@ const OccupantRegistration: React.FC<PropTypes> = ({
   const [occupyClassroom] = useMutation(OCCUPY_CLASSROOM);
   const [users, setUsers] = useState();
   const newUserTypes: any = [
-    {value: userTypes.STUDENT, label: userTypesUa.STUDENT},
-    {value: userTypes.POST_GRADUATE, label: userTypesUa.POST_GRADUATE},
-    {value: userTypes.TEACHER, label: userTypesUa.TEACHER},
-    {value: userTypes.ILLUSTRATOR, label: userTypesUa.ILLUSTRATOR},
-    {value: userTypes.CONCERTMASTER, label: userTypesUa.CONCERTMASTER},
-    {value: userTypes.PIANO_TUNER, label: userTypesUa.PIANO_TUNER},
-    {value: userTypes.STAFF, label: userTypesUa.STAFF},
-    {value: userTypes.OTHER, label: userTypesUa.OTHER},
+    {value: UserTypes.STUDENT, label: UserTypesUa.STUDENT},
+    {value: UserTypes.POST_GRADUATE, label: UserTypesUa.POST_GRADUATE},
+    {value: UserTypes.TEACHER, label: UserTypesUa.TEACHER},
+    {value: UserTypes.ILLUSTRATOR, label: UserTypesUa.ILLUSTRATOR},
+    {value: UserTypes.CONCERTMASTER, label: UserTypesUa.CONCERTMASTER},
+    {value: UserTypes.PIANO_TUNER, label: UserTypesUa.PIANO_TUNER},
+    {value: UserTypes.STAFF, label: UserTypesUa.STAFF},
+    {value: UserTypes.OTHER, label: UserTypesUa.OTHER},
   ];
   const [chosenUserType, setChosenUserType] = useState(newUserTypes[0]);
   const existingUserInput = useRef(null);
@@ -60,7 +60,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
 
     setChosenUserId(e.value);
     setChosenUserName(fullName(chosenUser as User));
-    setChosenUserType({value: (chosenUser as User).type, label: userTypesUa[(chosenUser?.type as userTypes)]});
+    setChosenUserType({value: (chosenUser as User).type, label: UserTypesUa[(chosenUser?.type as UserTypes)]});
     setValue('');
     setExistingUserValue(e);
   };
@@ -156,7 +156,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
           {value && <Select
             options={newUserTypes}
             value={chosenUserType}
-            placeholder={userTypesUa.STUDENT}
+            placeholder={UserTypesUa.STUDENT}
             onChange={handleTypeSelect}
             menuPortalTarget={document.body}
             styles={{menuPortal: base => ({...base, zIndex: 9999})}}
@@ -166,7 +166,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
       <Title title="Вибраний користувач"/>
       <p>П.І.Б.: {chosenUserName}</p>
       {/*@ts-ignore*/}
-      <p>Статус: { chosenUserType && chosenUserName?.length !== 0 && userTypesUa[chosenUserType.value]}</p>
+      <p>Статус: { chosenUserType && chosenUserName?.length !== 0 && UserTypesUa[chosenUserType.value]}</p>
     </div>
   );
 };
