@@ -14,7 +14,6 @@ import Delete from "../../../components/icons/delete/Delete";
 import DataList from "../../../components/dataList/DataList";
 import Button from "../../../components/button/Button";
 import BrowseClassroomPopupBody from "./browseClassroomPopupBody/BrowseClassroomPopupBody";
-import Loader from "../../../components/loader/Loader";
 
 const listHeader = ['ID', 'Назва', 'Кафедра', 'Спец.', 'Оп. студія', 'Флігель'];
 
