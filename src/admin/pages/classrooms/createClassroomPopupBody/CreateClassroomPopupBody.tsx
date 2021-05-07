@@ -53,7 +53,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
     if (item && item.instruments) {
       const itemInstruments = item.instruments
         .map(({id, name, type, persNumber}) => ({
-          value: id, label: name + ', ' + type + ' - ' + persNumber
+          value: id, label: name + ', ' + type + (persNumber ? ' - ' + persNumber :  '')
         }));
       setSelectedInstruments(itemInstruments);
     }

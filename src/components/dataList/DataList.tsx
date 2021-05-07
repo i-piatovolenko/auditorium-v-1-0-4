@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styles from './dataList.module.css';
+import Loader from "../loader/Loader";
 
 interface PropTypes {
   header: string[];
@@ -44,7 +45,7 @@ const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
           {header?.map((item, index) => <span
             onClick={() => handleClick(index)}>{item}</span>)}
         </li>
-        {sortedData?.map(item => <li
+        {!data.length ? <Loader/> : sortedData?.map(item => <li
           onClick={() => handleItemClick && handleItemClick(item.props.children[0].props.children)}
           className={styles.row} style={{gridTemplateColumns: columns}}>{item}</li>)}
       </ul>

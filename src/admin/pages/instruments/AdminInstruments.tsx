@@ -12,7 +12,9 @@ import CreateInstrumentPopupBody from "./createInstrumentPopupBody/CreateInstrum
 import Button from "../../../components/button/Button";
 import {useMutation} from "@apollo/client";
 import {DELETE_INSTRUMENT} from "../../../api/operations/mutations/deleteInstrument";
-import {InstrumentType} from "../../../models/models";
+import {ClassroomType, InstrumentType} from "../../../models/models";
+import BrowseClassroomPopupBody from "../classrooms/browseClassroomPopupBody/BrowseClassroomPopupBody";
+import BrowseInstrumentPopupBody from "./browseInstrumentPopupBody/BrowseInstrumentPopupBody";
 
 const dataHeader = ['ID', 'Назва', 'Рейтинг', 'Ауд.', 'Інв. номер'];
 
@@ -87,6 +89,15 @@ const AdminInstruments = () => {
     });
   };
 
+  const handleItemClick = (id: number) => {
+    const instrument = instruments?.find(item => item.id === id);
+    dispatchPopupWindow({
+      header: <h1>{instrument?.name}</h1>,
+      body: <BrowseInstrumentPopupBody instrument={instrument as InstrumentType}/>,
+      footer: ''
+    });
+  };
+
   const addInstrument = (item: InstrumentType) => {
     setListData(prevState => [...prevState, instrument(item)]);
   };
@@ -99,6 +110,7 @@ const AdminInstruments = () => {
       </Header>
       <DataList header={dataHeader} data={listData}
                 gridTemplateColumns={'40px 250px 100px 100px 1fr 30px 30px'}
+                handleItemClick={handleItemClick}
       />
     </div>
   );
