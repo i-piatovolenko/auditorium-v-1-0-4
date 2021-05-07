@@ -1,0 +1,16 @@
+.list > div > span:first-child {
+    display: inline-block;
+    min-width: 150px;
+}
+
+.list > div > span:nth-child(2) {
+    display: inline-block;
+    color: #656565;
+}
+
+.list div {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #eee;
+    padding: 8px 8px 16px 8px;
+}

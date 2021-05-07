@@ -3,7 +3,7 @@ import styles from "./userProfile.module.css";
 import { useQuery } from "@apollo/client";
 import { GET_USER_BY_ID } from "../../api/operations/queries/users";
 import Title from "../title/Title";
-import { userTypes, userTypesUa } from "../../models/models";
+import { UserTypes, UserTypesUa } from "../../models/models";
 import Button from "../button/Button";
 
 interface PropTypes {
@@ -26,7 +26,7 @@ const UserProfile: React.FC<PropTypes> = ({ userId }) => {
         <Title title="Персональний номер" />
         <p>{data.user.id}</p>
         <Title title="Статус" />
-        <p>{userTypesUa[data.user.type as userTypes]}</p>
+        <p>{UserTypesUa[data.user.type as UserTypes]}</p>
         <Title title="Кафедра" />
         <p>{data.user.department}</p>
         <Title title="E-mail" />

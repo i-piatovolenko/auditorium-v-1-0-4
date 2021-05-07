@@ -3,8 +3,8 @@ import styles from "./occupantInfo.module.css";
 import {
   OccupiedInfo,
   User,
-  userTypes,
-  userTypesUa,
+  UserTypes,
+  UserTypesUa,
 } from "../../../models/models";
 import Title from "../../title/Title";
 import { fullName, getTimeHHMM, typeStyle } from "../../../helpers/helpers";
@@ -39,7 +39,7 @@ const OccupantInfo: React.FC<PropTypes> = ({ occupied }) => {
           style={typeStyle(occupied as OccupiedInfo)}
           className={styles.occupantType}
         >
-          {userTypesUa[occupied?.user.type as userTypes]}
+          {UserTypesUa[occupied?.user.type as UserTypes]}
         </p>
         <p className={styles.occupiedUntil}>
           Зайнято до {getTimeHHMM(new Date((occupied as OccupiedInfo)?.until))}
