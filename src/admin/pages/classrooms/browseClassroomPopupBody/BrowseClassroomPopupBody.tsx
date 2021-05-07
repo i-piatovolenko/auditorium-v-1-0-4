@@ -17,7 +17,7 @@ const BrowseClassroomPopupBody: React.FC<PropTypes> = ({classroom}) => {
       <div><span>Спеціалізована: </span><span>{classroom.special ? 'так' : 'ні'}</span></div>
       <div><span>Флігель: </span><span>{classroom.isWing ? 'так' : 'ні'}</span></div>
       <div><span>Оперна студія: </span><span>{classroom.isOperaStudio ? 'так' : 'ні'}</span></div>
-      <div><span>Інструменти: </span>{classroom.instruments?.length > 0 ? <ul>
+      <div><span>Інструменти: </span>{classroom.instruments?.length > 0 ? <ul className={styles.instruments}>
         {classroom.instruments.map(item => <li key={item.id}>{item.name}</li>)}
       </ul> : '-'}</div>
     </div>
