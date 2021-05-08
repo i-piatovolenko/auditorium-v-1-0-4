@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/auditorium-v-1-0-4/static/css/main.0237bfc3.chunk.css",
-    "main.js": "/auditorium-v-1-0-4/static/js/main.0b9c355b.chunk.js",
-    "main.js.map": "/auditorium-v-1-0-4/static/js/main.0b9c355b.chunk.js.map",
-    "runtime-main.js": "/auditorium-v-1-0-4/static/js/runtime-main.b965ef61.js",
-    "runtime-main.js.map": "/auditorium-v-1-0-4/static/js/runtime-main.b965ef61.js.map",
-    "static/js/2.739b2ae4.chunk.js": "/auditorium-v-1-0-4/static/js/2.739b2ae4.chunk.js",
-    "static/js/2.739b2ae4.chunk.js.map": "/auditorium-v-1-0-4/static/js/2.739b2ae4.chunk.js.map",
-    "static/js/3.a11b4e77.chunk.js": "/auditorium-v-1-0-4/static/js/3.a11b4e77.chunk.js",
-    "static/js/3.a11b4e77.chunk.js.map": "/auditorium-v-1-0-4/static/js/3.a11b4e77.chunk.js.map",
+    "main.css": "/auditorium-v-1-0-4/static/css/main.19b94ab9.chunk.css",
+    "main.js": "/auditorium-v-1-0-4/static/js/main.4ac98db2.chunk.js",
+    "main.js.map": "/auditorium-v-1-0-4/static/js/main.4ac98db2.chunk.js.map",
+    "runtime-main.js": "/auditorium-v-1-0-4/static/js/runtime-main.88788e91.js",
+    "runtime-main.js.map": "/auditorium-v-1-0-4/static/js/runtime-main.88788e91.js.map",
+    "static/js/2.f315f6d2.chunk.js": "/auditorium-v-1-0-4/static/js/2.f315f6d2.chunk.js",
+    "static/js/2.f315f6d2.chunk.js.map": "/auditorium-v-1-0-4/static/js/2.f315f6d2.chunk.js.map",
+    "static/js/3.dd1f48bc.chunk.js": "/auditorium-v-1-0-4/static/js/3.dd1f48bc.chunk.js",
+    "static/js/3.dd1f48bc.chunk.js.map": "/auditorium-v-1-0-4/static/js/3.dd1f48bc.chunk.js.map",
     "index.html": "/auditorium-v-1-0-4/index.html",
-    "static/css/main.0237bfc3.chunk.css.map": "/auditorium-v-1-0-4/static/css/main.0237bfc3.chunk.css.map",
-    "static/js/2.739b2ae4.chunk.js.LICENSE.txt": "/auditorium-v-1-0-4/static/js/2.739b2ae4.chunk.js.LICENSE.txt",
+    "static/css/main.19b94ab9.chunk.css.map": "/auditorium-v-1-0-4/static/css/main.19b94ab9.chunk.css.map",
+    "static/js/2.f315f6d2.chunk.js.LICENSE.txt": "/auditorium-v-1-0-4/static/js/2.f315f6d2.chunk.js.LICENSE.txt",
     "static/media/index.css": "/auditorium-v-1-0-4/static/media/Roboto-Thin.c38fab23.ttf",
     "static/media/add.876027ca.svg": "/auditorium-v-1-0-4/static/media/add.876027ca.svg",
     "static/media/addLined.6de27fe6.svg": "/auditorium-v-1-0-4/static/media/addLined.6de27fe6.svg",
@@ -33,9 +33,9 @@
     "static/media/users.20e4c9d2.svg": "/auditorium-v-1-0-4/static/media/users.20e4c9d2.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.b965ef61.js",
-    "static/js/2.739b2ae4.chunk.js",
-    "static/css/main.0237bfc3.chunk.css",
-    "static/js/main.0b9c355b.chunk.js"
+    "static/js/runtime-main.88788e91.js",
+    "static/js/2.f315f6d2.chunk.js",
+    "static/css/main.19b94ab9.chunk.css",
+    "static/js/main.4ac98db2.chunk.js"
   ]
 }
