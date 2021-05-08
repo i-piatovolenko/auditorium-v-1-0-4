@@ -8,6 +8,7 @@ import {useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
 import {User} from "../../../models/models";
 import CountUp from "react-countup";
+import {conjugate} from "../../../helpers/conjugate";
 
 const Admin = () => {
   const serverURL = localStorage.getItem('serverURL');
@@ -41,9 +42,22 @@ const Admin = () => {
     localStorage.setItem('serverURL', value);
   };
 
+  const [inputValue, setInputValue] = useState('')
+  const [conjugated, setConjugated] = useState('');
+  const handleChangeInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  }
+
+  const handleConjugate = () => {
+    setConjugated(conjugate(inputValue));
+  }
+
   return (
     <div>
       <Header><h1>Налаштування</h1></Header>
+      <input type="text" value={inputValue} onChange={handleChangeInputValue}/>
+      <button onClick={handleConjugate}>Conjugate</button>
+      <h1>{conjugated}</h1>
       <ul className={styles.list}>
         <li><NavLink to='/adminClassrooms'>Аудиторії</NavLink></li>
         <li><NavLink to='/adminUsers'>Користувачі

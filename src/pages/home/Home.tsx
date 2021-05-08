@@ -1,15 +1,22 @@
 import React from "react";
 import styles from "./home.module.css";
 import Logo from "../../components/logo/Logo";
+import {useMe} from "../../hooks/useMe";
+import Loader from "../../components/loader/Loader";
+import Header from "../../components/header/Header";
+import {conjugate} from "../../helpers/conjugate";
 
 const Home = () => {
+  const me = useMe();
+
   return (
     <div className={styles.home}>
-      <Logo
+      <Header/>
+      {!me ? <Loader/> : <><Logo
         title="Auditorium"
         description="Система управління видачею аудиторій"
       />
-      <h1 className={styles.welcome}>Гість, вітаємо в Auditorium!</h1>
+      <h1 className={styles.welcome}>{conjugate(me?.firstName)}, вітаємо в Auditorium!</h1>
       <div className={styles.about}>
         <ul>
           <p>В цій програмі Ви можете:</p>
@@ -42,7 +49,7 @@ const Home = () => {
           </li>
           <li>Створення та редагування розкладу</li>
         </ul>
-      </div>
+      </div></>}
     </div>
   );
 };

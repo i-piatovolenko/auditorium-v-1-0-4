@@ -11,6 +11,7 @@ import {
   User,
   UserTypes,
 } from "../models/models";
+import useUsers from "../hooks/useUsers";
 
 export const getScheduleTimeline = (start: number, end: number): string[] => {
   let timeSnippets: string[] = [];

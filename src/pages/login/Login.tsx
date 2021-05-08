@@ -38,7 +38,7 @@ const Login = () => {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log(e)
+
     let result: any;
 
     if (e.target.login.value && e.target.password.value) {

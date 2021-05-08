@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import styles from "./profile.module.css";
 import Header from "../../components/header/Header";
 import useUsers from "../../hooks/useUsers";
@@ -7,12 +7,13 @@ import {fullName} from "../../helpers/helpers";
 import Button from "../../components/button/Button";
 import {isLoggedVar} from "../../api/client";
 import {useHistory} from "react-router-dom";
+import {useMe} from "../../hooks/useMe";
+import Edit from "../../components/icons/edit/Edit";
 
 const Profile = () => {
-  const currentUser = JSON.parse(localStorage.getItem('user') as string);
-  const users = useUsers();
-  const me: User | undefined = users?.find(item => item.id === currentUser?.id);
+  const me = useMe();
   const history = useHistory();
+  const [editMode, setEditMode] = useState(false);
 
   const handleLogout = () => {
     // eslint-disable-next-line no-restricted-globals
@@ -22,9 +23,17 @@ const Profile = () => {
     }
   };
 
+  const handleEdit = () => {
+
+  };
+
   return (
     <div>
-      <Header><h1>Мій профіль</h1><Button color='red' onClick={handleLogout}>Вийти</Button></Header>
+      <Header>
+        <h1>Мій профіль</h1>
+        <Button color='red' onClick={handleLogout}>Вийти</Button>
+        {!editMode && <Edit onClick={handleEdit}/>}
+      </Header>
       <div className={styles.wrapper}>
         {me && <div className={styles.profileData}>
             <div><span>П.І.Б.:</span><span>{fullName(me)}</span></div>
