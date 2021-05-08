@@ -8,15 +8,12 @@ interface PropTypes {
   placeholder?: string;
   type?: string;
   theme?: "dark" | "light";
+  value?: string;
+  onChange?: (value: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const CustomInput: React.FC<PropTypes> = ({
-  label,
-  name,
-  id,
-  placeholder,
-  type = "text",
-  theme = "light",
+const CustomInput: React.FC<PropTypes> = ({label, name, id, placeholder,
+    type = "text", theme = "light", value, onChange
 }) => {
   return (
     <>
@@ -27,6 +24,8 @@ const CustomInput: React.FC<PropTypes> = ({
         {label}
       </label>
       <input
+        value={value}
+        onChange={onChange}
         name={name}
         id={id}
         className={[

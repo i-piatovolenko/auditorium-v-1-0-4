@@ -1,0 +1,32 @@
+@media (max-width: 1024px) {
+    .wrapper {
+        justify-content: center;
+        padding: 16px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .wrapper {
+        justify-content: center;
+        padding: 16px 25%;
+    }
+}
+
+.profileData {
+    display: flex;
+    flex-direction: column;
+}
+
+.profileData div {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    padding: 10px;
+}
+
+.profileData div:nth-child(odd) {
+    background-color: rgba(0, 166, 255, .1);
+}
+
+.profileData span:first-child {
+    font-weight: 600;
+}

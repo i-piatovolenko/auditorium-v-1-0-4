@@ -77,7 +77,7 @@ const Sidebar = () => {
             Користувачі
           </Route>
           <Route exact path="/profile">
-            Профіль
+            Мій профіль
           </Route>
           <Route exact path="/admin">
             Налаштування
@@ -149,7 +149,7 @@ const Sidebar = () => {
             to="/profile"
           >
             <img className={styles.icon} src={profileIcon} alt="profile" />
-            Профіль
+            Мій профіль
           </NavLink>
         </li>
         <li>

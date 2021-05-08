@@ -146,10 +146,8 @@ const AdminUsers = () => {
           styles={selectStyles}/>
         <Add onClick={handleCreate}/>
       </Header>
-      <div className={styles.wrapper}>
         <DataList header={listHeader} data={listData} handleItemClick={handleItemClick}
                   gridTemplateColumns='40px 1fr 100px 200px 40px 40px'/>
-      </div>
     </div>
   );
 }

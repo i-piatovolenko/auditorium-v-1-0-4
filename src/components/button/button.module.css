@@ -4,6 +4,17 @@
     transition: color .3s linear;
 }
 
+.button:disabled {
+    background-color: #a2a2a2;
+    border: 1px solid #656565;
+    color: #656565;
+}
+
+.button:disabled:hover {
+    background: #cccccc;
+    border: 1px solid #656565;
+}
+
 .sizes {
     height: 2.5rem;
 }

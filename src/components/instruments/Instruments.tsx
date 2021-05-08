@@ -37,7 +37,7 @@ const Instruments: React.FC<PropTypes> = ({
                 <img className={styles.star} src={star} alt="star" />
               </>
             )}
-            <p>{item.rate}</p>
+            <p>{item.rate.toFixed(1)}</p>
           </li>
         ))}
       </ul>

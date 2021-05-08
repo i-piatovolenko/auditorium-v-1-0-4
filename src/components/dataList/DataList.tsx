@@ -39,13 +39,13 @@ const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
   };
 
   return (
-    <div className={styles.container}>
+    !data?.length ? <Loader/> : <div className={styles.container}>
       <ul className={styles.list}>
         <li className={styles.headerRow} style={{gridTemplateColumns: columns}}>
           {header?.map((item, index) => <span
             onClick={() => handleClick(index)}>{item}</span>)}
         </li>
-        {!data.length ? <Loader/> : sortedData?.map(item => <li
+        {sortedData?.map(item => <li
           onClick={() => handleItemClick && handleItemClick(item.props.children[0].props.children)}
           className={styles.row} style={{gridTemplateColumns: columns}}>{item}</li>)}
       </ul>

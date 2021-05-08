@@ -10,6 +10,7 @@ import HeaderSelect from "../../components/headerSelect/HeaderSelect";
 import useClassrooms from "../../hooks/useClassrooms";
 import {filterClassrooms} from "../../helpers/filterClassrooms";
 import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
+import Loader from "../../components/loader/Loader";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -52,7 +53,9 @@ const Classrooms = () => {
         />
         <Edit path='/adminClassrooms'/>
       </Header>
-      {classrooms && <><Caviar dispatchNotification={dispatchNotification} classrooms={filteredClassrooms}/>
+      {!classrooms.length
+        ? <Loader/>
+        : <><Caviar dispatchNotification={dispatchNotification} classrooms={filteredClassrooms}/>
           <ul className={styles.classroomsList}>
             {filteredClassrooms.map((classroom) => (
               <Classroom

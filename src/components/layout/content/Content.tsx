@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./content.module.css";
 import Home from "../../../pages/home/Home";
 import { Route, Switch } from "react-router-dom";
@@ -6,19 +6,29 @@ import Registry from "../../../pages/registry/Registry";
 import Schedule from "../../../pages/schedule/Schedule";
 import Users from "../../../pages/users/Users";
 import Profile from "../../../pages/profile/Profile";
-import AdminClassrooms from "../../../admin/pages/classrooms/AdminClassrooms";
-import AdminUsers from "../../../admin/pages/users/AdminUsers";
-import Admin from "../../../admin/pages/admin/Admin";
+import AdminClassrooms from "../../../pages/admin/classrooms/AdminClassrooms";
+import AdminUsers from "../../../pages/admin/users/AdminUsers";
+import Admin from "../../../pages/admin/admin/Admin";
 import Classrooms from "../../../pages/classrooms/Classrooms";
-import AdminInstruments from "../../../admin/pages/instruments/AdminInstruments";
-import AdminDepartments from "../../../admin/pages/departments/AdminDepartments";
-import AdminFaculties from "../../../admin/pages/faculties/AdminFaculties";
-import AdminDegrees from "../../../admin/pages/degrees/AdminDegrees";
+import AdminInstruments from "../../../pages/admin/instruments/AdminInstruments";
+import AdminDepartments from "../../../pages/admin/departments/AdminDepartments";
+import AdminFaculties from "../../../pages/admin/faculties/AdminFaculties";
+import AdminDegrees from "../../../pages/admin/degrees/AdminDegrees";
+import Login from "../../../pages/login/Login";
 
-const Content = () => {
+interface PropTypes {
+  isLogged: boolean;
+}
+
+const Content: React.FC<PropTypes> = ({isLogged}) => {
+
   return (
     <div className={styles.content}>
-      <Switch>
+      {!isLogged
+      ? <Switch>
+          <Route path="/" component={Login} />
+        </Switch>
+      : <Switch>
         <Route exact path="/" component={Home} />
         <Route path="/classrooms/:classroomName?" component={Classrooms} />
         <Route path="/registry/:userId?" component={Registry} />
@@ -33,6 +43,7 @@ const Content = () => {
         <Route path="/adminFaculties" component={AdminFaculties} />
         <Route path="/adminDegrees" component={AdminDegrees} />
       </Switch>
+      }
     </div>
   );
 };
