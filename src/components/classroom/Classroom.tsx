@@ -42,10 +42,15 @@ const Classroom: React.FC<PropTypes> = ({
   );
   const [isPassed, setIsPassed] = useState(false);
   const dispatchPopupWindow = usePopupWindow();
+  const [disableOccupyButton, setDisableOccupyButton] = useState(false);
 
   const handlePassed = (value: boolean) => {
     setIsPassed(value);
   }
+
+  const setDisableOccupy = (value: boolean) => {
+    setDisableOccupyButton(value);
+  };
 
   const handleClick = () => {
     dispatchPopupWindow({
@@ -55,6 +60,7 @@ const Classroom: React.FC<PropTypes> = ({
         classroom={classroom}
         dispatchNotification={dispatchNotification}
         isPassed={isPassed}
+        setDisableOccupy={setDisableOccupy}
       />,
       footer: <Footer
         classroomName={name}
@@ -62,6 +68,7 @@ const Classroom: React.FC<PropTypes> = ({
         dispatchNotification={dispatchNotification}
         setIsPassed={handlePassed}
         isPassed={isPassed}
+        disableOccupyButton={disableOccupyButton}
       />,
     });
   };

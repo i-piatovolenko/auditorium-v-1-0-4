@@ -14,13 +14,11 @@ interface PropTypes {
   classroomId: number;
   classroomName: string;
   dispatch: (value: any) => void;
+  setDisableOccupy: (value: boolean) => void;
 }
 
-const OccupantRegistration: React.FC<PropTypes> = ({
-   dispatchNotification,
-   classroomId,
-   classroomName,
-   dispatch
+const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classroomId,
+   classroomName, dispatch, setDisableOccupy
 }) => {
   const [value, setValue] = useState<string>();
   const [existingUserValue, setExistingUserValue] = useState(null);
@@ -81,6 +79,8 @@ const OccupantRegistration: React.FC<PropTypes> = ({
   };
 
   const handleOccupy = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setDisableOccupy(true);
     const existingUser = {
       userId: chosenUserId,
     };
@@ -92,8 +92,6 @@ const OccupantRegistration: React.FC<PropTypes> = ({
       }
     };
     const occupant = chosenUserId === -1 ? newUser : existingUser;
-
-    e.preventDefault();
 
     if(chosenUserName !== "") {
       occupyClassroom({
@@ -114,6 +112,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
           message: `Аудиторія ${classroomName} зайнята.`,
           type: "ok",
         });
+        setDisableOccupy(false);
       });
     } else {
       dispatchNotification({
@@ -121,6 +120,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         message: `Виберіть користувача.`,
         type: "alert",
       });
+      setDisableOccupy(false);
     }
 
   };

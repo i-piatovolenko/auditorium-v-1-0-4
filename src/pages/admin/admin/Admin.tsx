@@ -29,7 +29,7 @@ const Admin = () => {
     if (serverURL) {
       setValue(serverURL);
     } else {
-      setValue('http://localhost:4000/');
+      setValue('http://3.141.103.67:4000/');
       localStorage.setItem('serverURL', value);
     }
   }, [serverURL]);

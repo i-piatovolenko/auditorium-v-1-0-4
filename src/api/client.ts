@@ -3,7 +3,7 @@ import { ApolloClient, InMemoryCache, makeVar } from "@apollo/client";
 const serverURL = localStorage.getItem('serverURL');
 
 export const client = new ApolloClient({
-  uri: serverURL ? serverURL as string : 'http://localhost:4000/',
+  uri: serverURL ? serverURL as string : 'http://3.141.103.67:4000/',
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

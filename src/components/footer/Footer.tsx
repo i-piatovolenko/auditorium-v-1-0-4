@@ -12,15 +12,11 @@ interface PropTypes {
   dispatchNotification: (value: any) => void;
   setIsPassed: (value: boolean) => void;
   isPassed: boolean;
+  disableOccupyButton: boolean;
 }
 
-const   Footer: React.FC<PropTypes> = ({
-  classroomName,
-  occupied,
-  dispatchNotification,
-  setIsPassed,
-  isPassed,
-  ...props
+const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotification,
+  setIsPassed, isPassed, disableOccupyButton, ...props
 }) => {
   const [freeClassroom] = useMutation(FREE_CLASSROOM, {
     variables: {
@@ -61,7 +57,7 @@ const   Footer: React.FC<PropTypes> = ({
           </Button>
         </>
       ) : (
-        <Button type="submit" form="userSearchForm">
+        <Button type="submit" form="userSearchForm" disabled={disableOccupyButton}>
           Записати в аудиторію
         </Button>
       )}

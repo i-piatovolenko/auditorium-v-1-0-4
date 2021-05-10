@@ -12,13 +12,11 @@ interface PropTypes {
   dispatchNotification: (value: string) => void;
   dispatch: (value: any) => void;
   isPassed: boolean;
+  setDisableOccupy: (value: boolean) => void;
 }
 
-const ClassroomInfo: React.FC<PropTypes> = ({
-  classroom,
-  dispatchNotification,
-  dispatch,
-  isPassed
+const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, dispatch,
+  isPassed, setDisableOccupy
 }) => {
   const { name, instruments, description, chair, occupied, id } = classroom;
   const occupiedInfo = (
@@ -49,7 +47,9 @@ const ClassroomInfo: React.FC<PropTypes> = ({
             dispatchNotification={dispatchNotification}
             classroomId={id}
             classroomName={name}
-            dispatch={dispatch}/>
+            dispatch={dispatch}
+            setDisableOccupy={setDisableOccupy}
+          />
         </>
       )}
     </div>

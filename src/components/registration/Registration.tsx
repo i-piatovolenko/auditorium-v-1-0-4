@@ -7,12 +7,7 @@ import eyeIcon from './../../assets/images/eye.svg';
 import {useMutation} from "@apollo/client";
 import {SIGN_UP} from "../../api/operations/mutations/signUp";
 
-interface PropTypes {
-}
-
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-
-
 
 const schema = yup.object().shape({
   lastName: yup.string().required(),
@@ -28,7 +23,7 @@ const schema = yup.object().shape({
   startYear: yup.number().required(),
 });
 
-const Registration: React.FC<PropTypes> = () => {
+const Registration = () => {
   const [showPassword, setShowPassword] = useState(false);
   const {register, handleSubmit, watch, formState: {errors}} = useForm({
     resolver: yupResolver(schema)
