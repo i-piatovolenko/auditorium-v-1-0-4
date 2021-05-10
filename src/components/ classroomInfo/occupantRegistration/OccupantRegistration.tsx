@@ -7,7 +7,7 @@ import Title from "../../title/Title";
 import Select from 'react-select';
 import {User, UserTypesUa, UserTypes} from "../../../models/models";
 import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
-import {gridUpdate, isOccupyButtonDisabled} from "../../../api/client";
+import {gridUpdate, isButtonDisabled} from "../../../api/client";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
@@ -92,7 +92,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
     const occupant = chosenUserId === -1 ? newUser : existingUser;
 
     if(chosenUserName !== "") {
-      isOccupyButtonDisabled(true);
+      isButtonDisabled(true);
       occupyClassroom({
         variables: {
           input: {
@@ -111,7 +111,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
           message: `Аудиторія ${classroomName} зайнята.`,
           type: "ok",
         });
-        isOccupyButtonDisabled(false);
+        isButtonDisabled(false);
       });
     } else {
       dispatchNotification({
@@ -119,7 +119,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
         message: `Виберіть користувача.`,
         type: "alert",
       });
-      isOccupyButtonDisabled(false);
+      isButtonDisabled(false);
     }
   };
 

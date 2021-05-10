@@ -1,10 +1,11 @@
-import React, {useEffect} from "react";
+import React from "react";
 import Button from "../button/Button";
 import styles from "../classroom/classroom.module.css";
-import {gridUpdate, isOccupyButtonDisabled} from "../../api/client";
+import {gridUpdate, isButtonDisabled} from "../../api/client";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import { FREE_CLASSROOM } from "../../api/operations/mutations/freeClassroom";
 import { OccupiedInfo } from "../../models/models";
+import spinner from './../../assets/images/spinner.svg';
 
 interface PropTypes {
   classroomName: string;
@@ -24,31 +25,40 @@ const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotific
       },
     },
   });
-  const { data: {isOccupyButtonDisabled} } = useQuery(gql`
-    query isOccupyButtonDisabled {
-      isOccupyButtonDisabled @client
+  const { data: {isButtonDisabled: disabled} } = useQuery(gql`
+    query isButtonDisabled {
+      isButtonDisabled @client
     }
   `);
 
   const handleFreeClassroom = () => {
-
-    freeClassroom().then(() => {
+    isButtonDisabled(true);
+    try {
+      freeClassroom().then(() => {
+        dispatchNotification({
+          header: "Успішно!",
+          message: `Аудиторія ${classroomName} звільнена.`,
+          type: "ok",
+        });
+        isButtonDisabled(false);
+        // @ts-ignore
+        props.dispatch({
+          type: "POP_POPUP_WINDOW",
+        });
+        gridUpdate(!gridUpdate());
+      });
+    } catch (e: any) {
       dispatchNotification({
-        header: "Успішно!",
-        message: `Аудиторія ${classroomName} звільнена.`,
-        type: "ok",
+        header: "Помилка!",
+        message: e.message,
+        type: "alert",
       });
-      // @ts-ignore
-      props.dispatch({
-        type: "POP_POPUP_WINDOW",
-      });
-      gridUpdate(!gridUpdate());
-    });
+      isButtonDisabled(false);
+    }
   };
 
   const handlePassClassroom = () => {
     setIsPassed(true);
-    console.log(isPassed)
   };
 
   return (
@@ -56,14 +66,18 @@ const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotific
       {occupied || (occupied && isPassed) ? (
         <>
           <Button color="orange" onClick={handlePassClassroom}>Передати аудиторію</Button>
-          <Button color="red" onClick={handleFreeClassroom}>
+          {disabled && <img className={styles.spinner}src={spinner} alt="wait"/>}
+          <Button color="red" onClick={handleFreeClassroom} disabled={disabled}>
             Звільнити аудиторію
           </Button>
         </>
       ) : (
-        <Button type="submit" form="userSearchForm" disabled={isOccupyButtonDisabled}>
-          Записати в аудиторію
-        </Button>
+        <>
+          {disabled && <img className={styles.spinner}src={spinner} alt="wait"/>}
+          <Button type="submit" form="userSearchForm" disabled={disabled}>
+            Записати в аудиторію
+          </Button>
+        </>
       )}
     </div>
   );

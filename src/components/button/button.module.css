@@ -6,13 +6,14 @@
 
 .button:disabled {
     background-color: #a2a2a2;
-    border: 1px solid #656565;
-    color: #656565;
+    border: none;
+    color: #eee;
 }
 
 .button:disabled:hover {
-    background: #cccccc;
-    border: 1px solid #656565;
+    background: #bababa;
+    border: none;
+    cursor: not-allowed;
 }
 
 .sizes {

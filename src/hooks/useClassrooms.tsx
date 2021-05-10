@@ -18,7 +18,7 @@ const useClassrooms = (props?: any): Array<ClassroomType> => {
       .query({
         query: GET_CLASSROOMS,
         variables: { date: ISODateString(props?.date ? props.date : new Date()) },
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
       .then((data) => {
         setClassrooms(

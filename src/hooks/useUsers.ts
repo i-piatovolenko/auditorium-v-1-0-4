@@ -10,7 +10,7 @@ const useUsers = (): Array<User> => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    client.query({query: GET_USERS}).then((data) => {
+    client.query({query: GET_USERS, fetchPolicy: "cache-first"}).then((data) => {
         setUsers(data.data.users.slice().sort((a: User, b: User) => a.id - b.id));
       });
   }, []);
