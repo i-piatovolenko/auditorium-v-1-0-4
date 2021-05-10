@@ -21,6 +21,20 @@
     display: flex;
     flex-direction: row;
     width: 100%;
+    background-color: #fff;
+    padding-bottom: 4px;
+}
+
+.scheduleHeader:after {
+    content: '';
+    display: block;
+    left: 75px;
+    right: 20px;
+    top: 97px;
+    height: 6px;
+    background: rgb(0,0,0);
+    background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(255,255,255,0) 100%);
+    position: absolute;
 }
 
 .space {
@@ -45,4 +59,11 @@
     width: 3px;
     height: 100vh;
     border-left: 1px solid rgba(204, 204, 204, .3);
+}
+
+.scheduleUnits {
+    padding-top: 4px;
+    height: calc(100vh - 100px);
+    overflow-x: hidden;
+    overflow-y: scroll;
 }

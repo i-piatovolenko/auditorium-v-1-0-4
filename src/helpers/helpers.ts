@@ -174,26 +174,26 @@ export const ISODateString = (d: Date) => {
   );
 };
 
+export const scheduleUnitToDate = (item: ScheduleUnitType) => {
+  const from = item.from.split(':');
+  const to = item.to.split(':');
+  const fromHours = +from[0];
+  const fromMinutes = +from[1];
+  const toHours = +to[0];
+  const toMinutes = +to[1];
+  const fromDate = moment({hours: fromHours, minutes: fromMinutes, seconds: 0, milliseconds: 0});
+  const toDate = moment({hours: toHours, minutes: toMinutes, seconds: 0, milliseconds: 0});
+
+  return {
+    from: fromDate,
+    to: toDate
+  };
+};
+
 export const isOccupiedOnSchedule = (scheduleUnits: ScheduleUnitType[]) => {
   const result: any = [];
 
-  scheduleUnits.forEach(item => {
-    const from = item.from.split(':');
-    const to = item.to.split(':');
-    const fromHours = +from[0];
-    const fromMinutes = +from[1];
-    const toHours = +to[0];
-    const toMinutes = +to[1];
-
-    const fromDate = moment({hours: fromHours, minutes: fromMinutes, seconds: 0, milliseconds: 0});
-    const toDate = moment({hours: toHours, minutes: toMinutes, seconds: 0, milliseconds: 0});
-    const dates = {
-      from: fromDate,
-      to: toDate
-    };
-
-    result.push(dates);
-  });
+  scheduleUnits.forEach(item => result.push(scheduleUnitToDate(item)));
 
   return result.some((item: { from: Date, to: Date }) => {
     const current = moment();

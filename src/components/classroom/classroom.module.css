@@ -54,6 +54,10 @@
   font-size: 1.2rem;
   display: inline-block;
   margin: 0 0 4px 0;
+  width: 185px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .occupantType {
@@ -85,6 +89,7 @@
   position: relative;
   top: 25px;
   left: 14px;
+  margin-left: -20px;
 }
 
 .isDepartment {

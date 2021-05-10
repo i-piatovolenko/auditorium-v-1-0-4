@@ -22,6 +22,8 @@ interface PropTypes {
 
 const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   const {id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair} = classroom;
+  const userFullName = occupied?.user.nameTemp === null ? fullName(occupied?.user, true) :
+    occupied?.user.nameTemp;
   const dispatchPopupWindow = usePopupWindow();
   const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
   const occupiedStyle = {
@@ -70,10 +72,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
           {special === 'PIANO' && <img className={styles.special} src={specialPiano} alt="Special Piano"/>}
           <h1 className={chair ? styles.isDepartment : ''}>{name}</h1>
           <div className={styles.occupantInfo}>
-            <p className={styles.occupantName}>
-              {occupied?.user.nameTemp === null ? fullName(occupied?.user, true) :
-                occupied?.user.nameTemp}
-            </p>
+            <p className={styles.occupantName} title={userFullName}>{userFullName}</p>
             <p
               style={typeStyle(occupied as OccupiedInfo)}
               className={styles.occupantType}

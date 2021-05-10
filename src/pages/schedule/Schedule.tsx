@@ -41,6 +41,7 @@ const Schedule = () => {
             {timePeriods.map(el => <span>{el}</span>)}
           </div>
         </div>
+        <div className={styles.scheduleUnits}>
         {!loading && !error && data.classrooms.slice().sort((a: ClassroomType, b: ClassroomType) => {
           return parseInt(a.name) - parseInt(b.name)
         })
@@ -48,6 +49,7 @@ const Schedule = () => {
             <span>{classroom.name}</span>
             <ScheduleUnit classroomName={classroom.name}/>
           </div>)}
+        </div>
       </div>
     </div>
   );
