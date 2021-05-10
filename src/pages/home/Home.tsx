@@ -16,7 +16,7 @@ const Home = () => {
         title="Auditorium"
         description="Система управління видачею аудиторій"
       />
-      <h1 className={styles.welcome}>{conjugate(me?.firstName)}, вітаємо в Auditorium!</h1>
+      <h1 className={styles.welcome}>{me?.firstName}, вітаємо в Auditorium!</h1>
       <div className={styles.about}>
         <ul>
           <p>В цій програмі Ви можете:</p>

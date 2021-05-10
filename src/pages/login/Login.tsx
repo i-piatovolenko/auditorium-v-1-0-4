@@ -31,8 +31,9 @@ const Login = () => {
 
   const handleSignup = () => {
     dispatchPopupWindow({
-      header: "Реєстрація",
+      header: <h1>Реєстрація</h1>,
       body: <Registration />,
+      footer: <Button form="signupForm" type='submit'>Реєстрація</Button>
     });
   };
 

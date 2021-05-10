@@ -49,15 +49,15 @@ const Admin = () => {
   }
 
   const handleConjugate = () => {
-    setConjugated(conjugate(inputValue));
+    setConjugated(conjugate(inputValue) as string);
   }
 
   return (
     <div>
       <Header><h1>Налаштування</h1></Header>
-      <input type="text" value={inputValue} onChange={handleChangeInputValue}/>
-      <button onClick={handleConjugate}>Conjugate</button>
-      <h1>{conjugated}</h1>
+      {/*<input type="text" value={inputValue} onChange={handleChangeInputValue}/>*/}
+      {/*<button onClick={handleConjugate}>Conjugate</button>*/}
+      {/*<h1>{conjugated}</h1>*/}
       <ul className={styles.list}>
         <li><NavLink to='/adminClassrooms'>Аудиторії</NavLink></li>
         <li><NavLink to='/adminUsers'>Користувачі

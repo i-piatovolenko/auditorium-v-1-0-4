@@ -19,6 +19,7 @@ const Profile = () => {
     // eslint-disable-next-line no-restricted-globals
     if (confirm('Ви бажаете вийти?')) {
       isLoggedVar(false);
+      localStorage.removeItem('user');
       history.push('/');
     }
   };

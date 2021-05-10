@@ -14,7 +14,7 @@ interface PropTypes {
 
 const CustomInput: React.FC<PropTypes> = ({label, name, id, placeholder,
     type = "text", theme = "light", value, onChange
-}) => {
+, ...props}) => {
   return (
     <>
       <label
@@ -34,6 +34,7 @@ const CustomInput: React.FC<PropTypes> = ({label, name, id, placeholder,
         ].join(" ")}
         type={type}
         placeholder={placeholder}
+        {...props}
       />
     </>
   );
