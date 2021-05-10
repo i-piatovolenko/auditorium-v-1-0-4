@@ -6,13 +6,11 @@ import { gql, useQuery } from "@apollo/client";
 import {isLoggedVar} from "../../api/client";
 
 const Layout = () => {
-
   const { data: isBlurred } = useQuery(gql`
     query isBlurred {
       isBlurred @client
     }
   `);
-
   const { data: isLogged } = useQuery(gql`
     query isLogged {
       isLogged @client

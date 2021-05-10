@@ -1,8 +1,8 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Button from "../button/Button";
 import styles from "../classroom/classroom.module.css";
-import { gridUpdate } from "../../api/client";
-import { useMutation } from "@apollo/client";
+import {gridUpdate, isOccupyButtonDisabled} from "../../api/client";
+import {gql, useMutation, useQuery} from "@apollo/client";
 import { FREE_CLASSROOM } from "../../api/operations/mutations/freeClassroom";
 import { OccupiedInfo } from "../../models/models";
 
@@ -12,11 +12,10 @@ interface PropTypes {
   dispatchNotification: (value: any) => void;
   setIsPassed: (value: boolean) => void;
   isPassed: boolean;
-  disableOccupyButton: boolean;
 }
 
 const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotification,
-  setIsPassed, isPassed, disableOccupyButton, ...props
+  setIsPassed, isPassed, ...props
 }) => {
   const [freeClassroom] = useMutation(FREE_CLASSROOM, {
     variables: {
@@ -25,6 +24,11 @@ const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotific
       },
     },
   });
+  const { data: {isOccupyButtonDisabled} } = useQuery(gql`
+    query isOccupyButtonDisabled {
+      isOccupyButtonDisabled @client
+    }
+  `);
 
   const handleFreeClassroom = () => {
 
@@ -57,7 +61,7 @@ const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotific
           </Button>
         </>
       ) : (
-        <Button type="submit" form="userSearchForm" disabled={disableOccupyButton}>
+        <Button type="submit" form="userSearchForm" disabled={isOccupyButtonDisabled}>
           Записати в аудиторію
         </Button>
       )}

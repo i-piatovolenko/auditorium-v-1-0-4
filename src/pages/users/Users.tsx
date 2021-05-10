@@ -46,9 +46,11 @@ const Users = () => {
   const dispatchPopupWindow = usePopupWindow();
   const [searchValue, setSearchValue] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
-    setFilteredUsers(users);
+    const onlyExisting = users.filter(user => !user.nameTemp);
+    setFilteredUsers(onlyExisting);
   }, [users]);
 
   const handleClick = (user: User) => {
@@ -61,12 +63,14 @@ const Users = () => {
   const handleSearch = (e: any) => {
     setSearchValue(e.target.value);
     if (e.target.value) {
-      const filter = users
+      const filter = users.filter(user => !user.nameTemp)
         .filter((user: User) => (fullName(user) + user.id).includes(e.target.value));
 
       setFilteredUsers(filter);
+      setIsSearching(true);
     } else {
       setFilteredUsers(users);
+      setIsSearching(false);
     }
   };
 
@@ -80,7 +84,7 @@ const Users = () => {
   };
 
   const listData = filteredUsers?.map((user: User) => <>
-      <span>{user.id}</span>
+      <span className={styles.centerText}>{user.id}</span>
       <span onClick={() => handleClick(user)}>{fullName(user)}</span>
       <span className={styles.userType} style={{backgroundColor: UserTypeColors[user.type as UserTypes]}}>
         {UserTypesUa[user.type as UserTypes]}
@@ -101,7 +105,8 @@ const Users = () => {
         <HeaderSelect options={categories} onChange={handleSelectCategory}/>
         <Edit path='/adminUsers'/>
       </Header>
-      <DataList header={listHeader} data={listData} gridTemplateColumns={'20px 3fr 200px'}/>
+      <DataList header={listHeader} data={listData} gridTemplateColumns={'auto 3fr 200px'}
+                isSearching={isSearching}/>
     </>
   );
 };

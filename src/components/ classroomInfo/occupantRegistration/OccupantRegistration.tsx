@@ -7,18 +7,17 @@ import Title from "../../title/Title";
 import Select from 'react-select';
 import {User, UserTypesUa, UserTypes} from "../../../models/models";
 import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
-import {gridUpdate} from "../../../api/client";
+import {gridUpdate, isOccupyButtonDisabled} from "../../../api/client";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
   classroomId: number;
   classroomName: string;
   dispatch: (value: any) => void;
-  setDisableOccupy: (value: boolean) => void;
 }
 
 const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classroomId,
-   classroomName, dispatch, setDisableOccupy
+   classroomName, dispatch
 }) => {
   const [value, setValue] = useState<string>();
   const [existingUserValue, setExistingUserValue] = useState(null);
@@ -80,7 +79,6 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
 
   const handleOccupy = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setDisableOccupy(true);
     const existingUser = {
       userId: chosenUserId,
     };
@@ -94,6 +92,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
     const occupant = chosenUserId === -1 ? newUser : existingUser;
 
     if(chosenUserName !== "") {
+      isOccupyButtonDisabled(true);
       occupyClassroom({
         variables: {
           input: {
@@ -112,7 +111,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
           message: `Аудиторія ${classroomName} зайнята.`,
           type: "ok",
         });
-        setDisableOccupy(false);
+        isOccupyButtonDisabled(false);
       });
     } else {
       dispatchNotification({
@@ -120,9 +119,8 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
         message: `Виберіть користувача.`,
         type: "alert",
       });
-      setDisableOccupy(false);
+      isOccupyButtonDisabled(false);
     }
-
   };
 
   return (

@@ -7,10 +7,11 @@ interface PropTypes {
   data: Array<any>;
   gridTemplateColumns?: string;
   handleItemClick?: (id: number) => void;
+  isSearching?: boolean;
 }
 
 const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
-                                         handleItemClick}) => {
+  handleItemClick, isSearching = false}) => {
 
   const [columnIndex, setColumnIndex] = useState(0);
   const [sortedData, setSortedData] = useState(data);
@@ -39,13 +40,15 @@ const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
   };
 
   return (
-    !data?.length ? <Loader/> : <div className={styles.container}>
+    !data?.length && !isSearching ? <Loader/> : <div className={styles.container}>
       <ul className={styles.list}>
         <li className={styles.headerRow} style={{gridTemplateColumns: columns}}>
           {header?.map((item, index) => <span
             onClick={() => handleClick(index)}>{item}</span>)}
         </li>
-        {sortedData?.map(item => <li
+        {isSearching && !data.length
+          ? <li className={styles.emptyResult}>Нічого не знайдено</li>
+          : sortedData?.map(item => <li
           onClick={() => handleItemClick && handleItemClick(item.props.children[0].props.children)}
           className={styles.row} style={{gridTemplateColumns: columns}}>{item}</li>)}
       </ul>

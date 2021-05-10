@@ -28,6 +28,11 @@ export const client = new ApolloClient({
               return meType();
             },
           },
+          isOccupyButtonDisabled: {
+            read() {
+              return isOccupyButtonDisabled();
+            },
+          },
         },
       },
     },
@@ -37,3 +42,4 @@ export const isLoggedVar = makeVar(false);
 export const isBlurredVar = makeVar(false);
 export const gridUpdate = makeVar(false);
 export const meType = makeVar("USER");
+export const isOccupyButtonDisabled = makeVar(false);

@@ -61,3 +61,7 @@
     border-bottom: 1px solid #00a6ff;
     color: #00a6ff;
 }
+
+.emptyResult {
+    text-align: center;
+}
