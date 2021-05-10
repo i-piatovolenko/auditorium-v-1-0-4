@@ -6,13 +6,14 @@ import {
   UserTypes,
   UserTypesUa,
 } from "../../models/models";
-import {fullName, typeStyle} from "../../helpers/helpers";
+import {fullName, isOccupiedOnSchedule, typeStyle} from "../../helpers/helpers";
 import Instruments from "../instruments/Instruments";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
 import Footer from "../footer/Footer";
 import specialPiano from "../../assets/images/specialPiano.svg";
+import moment from "moment";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -20,8 +21,9 @@ interface PropTypes {
 }
 
 const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
-  const {id, name, occupied, instruments, isWing, isOperaStudio, special} = classroom;
+  const {id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair} = classroom;
   const dispatchPopupWindow = usePopupWindow();
+  const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
   const occupiedStyle = {
     background: "#fff",
     transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
@@ -30,7 +32,8 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     background: "#4bfd63",
     transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
   };
-  const occupationInfo = occupied ? "Зайнято" : "Вільно";
+  const occupationInfo = occupied ? "Зайнято"
+    : occupiedOnSchedule ? "Зайнято за розкдадом" : "Вільно";
   const header = (
     <>
       <h1>{`Аудиторія ${name}`}</h1>
@@ -65,7 +68,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       >
         <div className={styles.header}>
           {special === 'PIANO' && <img className={styles.special} src={specialPiano} alt="Special Piano"/>}
-          <h1>{name}</h1>
+          <h1 className={chair ? styles.isDepartment : ''}>{name}</h1>
           <div className={styles.occupantInfo}>
             <p className={styles.occupantName}>
               {occupied?.user.nameTemp === null ? fullName(occupied?.user, true) :

@@ -12,6 +12,7 @@ import {
   UserTypes,
 } from "../models/models";
 import useUsers from "../hooks/useUsers";
+import moment from "moment";
 
 export const getScheduleTimeline = (start: number, end: number): string[] => {
   let timeSnippets: string[] = [];
@@ -171,4 +172,32 @@ export const ISODateString = (d: Date) => {
     // pad(d.getUTCSeconds()) +
     // "Z"
   );
+};
+
+export const isOccupiedOnSchedule = (scheduleUnits: ScheduleUnitType[]) => {
+  const result: any = [];
+
+  scheduleUnits.forEach(item => {
+    const from = item.from.split(':');
+    const to = item.to.split(':');
+    const fromHours = +from[0];
+    const fromMinutes = +from[1];
+    const toHours = +to[0];
+    const toMinutes = +to[1];
+
+    const fromDate = moment({hours: fromHours, minutes: fromMinutes, seconds: 0, milliseconds: 0});
+    const toDate = moment({hours: toHours, minutes: toMinutes, seconds: 0, milliseconds: 0});
+    const dates = {
+      from: fromDate,
+      to: toDate
+    };
+
+    result.push(dates);
+  });
+
+  return result.some((item: { from: Date, to: Date }) => {
+    const current = moment();
+
+    return current.isAfter(item.from) && current.isBefore(item.to);
+  });
 };
