@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useState } from "react";
 import { v4 } from "uuid";
 import PopupWindow from "./PopupWindow";
-import { isBlurredVar } from "../../api/client";
+import {isBlurredVar, isPassedVar} from "../../api/client";
 
 interface PropTypes {}
 
@@ -17,6 +17,7 @@ const PopupWindowProvider: React.FC<PropTypes> = ({ children }) => {
       case "POP_POPUP_WINDOW": {
         if (state.length <= 1) {
           isBlurredVar(false);
+          isPassedVar(false);
         }
         return [...state.slice(0, state.length - 1)];
       }

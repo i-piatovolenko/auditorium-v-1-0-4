@@ -6,16 +6,15 @@ import ScheduleUnit from "../scheduleUnit/ScheduleUnit";
 import Title from "../title/Title";
 import OccupantInfo from "./occupantInfo/OccupantInfo";
 import OccupantRegistration from "./occupantRegistration/OccupantRegistration";
+import {gql, useQuery} from "@apollo/client";
 
 interface PropTypes {
   classroom: ClassroomType;
   dispatchNotification: (value: string) => void;
   dispatch: (value: any) => void;
-  isPassed: boolean;
 }
 
-const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, dispatch,
-  isPassed
+const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, dispatch
 }) => {
   const { name, instruments, description, chair, occupied, id } = classroom;
   const occupiedInfo = (
@@ -23,6 +22,11 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
       <OccupantInfo occupied={occupied} />
     </>
   );
+  const { data: {isPassed} } = useQuery(gql`
+    query isPassed {
+      isPassed @client
+    }
+  `);
 
   return (
     <div>

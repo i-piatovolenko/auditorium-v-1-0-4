@@ -25,12 +25,17 @@ export const client = new ApolloClient({
           },
           meType: {
             read() {
-              return meType();
+              return meTypeVar();
             },
           },
           isButtonDisabled: {
             read() {
-              return isButtonDisabled();
+              return isButtonDisabledVar();
+            },
+          },
+          isPassed: {
+            read() {
+              return isPassedVar();
             },
           },
         },
@@ -41,5 +46,6 @@ export const client = new ApolloClient({
 export const isLoggedVar = makeVar(false);
 export const isBlurredVar = makeVar(false);
 export const gridUpdate = makeVar(false);
-export const meType = makeVar("USER");
-export const isButtonDisabled = makeVar(false);
+export const meTypeVar = makeVar("USER");
+export const isButtonDisabledVar = makeVar(false);
+export const isPassedVar = makeVar(false);

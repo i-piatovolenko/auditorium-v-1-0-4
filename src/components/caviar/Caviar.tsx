@@ -1,10 +1,9 @@
-import React, {useState} from "react";
+import React from "react";
 import styles from "./caviar.module.css";
 import { ClassroomType } from "../../models/models";
 import { usePopupWindow } from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
-import Button from "../button/Button";
 import Footer from "../footer/Footer";
 
 interface PropTypes {
@@ -14,7 +13,6 @@ interface PropTypes {
 
 const Caviar: React.FC<PropTypes> = ({ classrooms, dispatchNotification }) => {
   const dispatchPopupWindow = usePopupWindow();
-  const [isPassed, setIsPassed] = useState(false);
   const occupiedStyle = {
     background: "#fff",
   };
@@ -22,17 +20,8 @@ const Caviar: React.FC<PropTypes> = ({ classrooms, dispatchNotification }) => {
     background: "#4bfd63",
   };
 
-
-  const handleFreeClassroom = () => {
-    // freeClassroom().then(() => gridUpdate(!gridUpdate()));
-  };
-
-  const handlePassed = (value: boolean) => {
-    setIsPassed(value);
-  }
-
   function handleClick(classroom: ClassroomType) {
-    const {id, name, occupied, instruments, isWing, isOperaStudio, special} = classroom;
+    const {name, occupied} = classroom;
     dispatchPopupWindow({
       header: (
         <>
@@ -52,8 +41,6 @@ const Caviar: React.FC<PropTypes> = ({ classrooms, dispatchNotification }) => {
         classroomName={name}
         occupied={occupied}
         dispatchNotification={dispatchNotification}
-        setIsPassed={handlePassed}
-        isPassed={isPassed}
       />,
     });
   }

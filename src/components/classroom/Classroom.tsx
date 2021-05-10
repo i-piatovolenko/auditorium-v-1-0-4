@@ -21,6 +21,7 @@ interface PropTypes {
 
 const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   const {id, name, occupied, instruments, isWing, isOperaStudio, special} = classroom;
+  const dispatchPopupWindow = usePopupWindow();
   const occupiedStyle = {
     background: "#fff",
     transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
@@ -37,13 +38,6 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       {isOperaStudio && <Tag body="Оперна студія"/>}
     </>
   );
-  const [isPassed, setIsPassed] = useState(false);
-  const dispatchPopupWindow = usePopupWindow();
-
-
-  const handlePassed = (value: boolean) => {
-    setIsPassed(value);
-  }
 
   const handleClick = () => {
     dispatchPopupWindow({
@@ -52,14 +46,11 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       body: <ClassroomInfo
         classroom={classroom}
         dispatchNotification={dispatchNotification}
-        isPassed={isPassed}
       />,
       footer: <Footer
         classroomName={name}
         occupied={occupied}
         dispatchNotification={dispatchNotification}
-        setIsPassed={handlePassed}
-        isPassed={isPassed}
       />,
     });
   };

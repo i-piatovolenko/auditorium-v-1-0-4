@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "../button/Button";
 import styles from "../classroom/classroom.module.css";
-import {gridUpdate, isButtonDisabled} from "../../api/client";
+import {gridUpdate, isButtonDisabledVar, isPassedVar} from "../../api/client";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import { FREE_CLASSROOM } from "../../api/operations/mutations/freeClassroom";
 import { OccupiedInfo } from "../../models/models";
@@ -11,12 +11,10 @@ interface PropTypes {
   classroomName: string;
   occupied: OccupiedInfo | null;
   dispatchNotification: (value: any) => void;
-  setIsPassed: (value: boolean) => void;
-  isPassed: boolean;
 }
 
 const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotification,
-  setIsPassed, isPassed, ...props
+  ...props
 }) => {
   const [freeClassroom] = useMutation(FREE_CLASSROOM, {
     variables: {
@@ -30,9 +28,14 @@ const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotific
       isButtonDisabled @client
     }
   `);
+  const { data: {isPassed} } = useQuery(gql`
+    query isPassed {
+      isPassed @client
+    }
+  `);
 
   const handleFreeClassroom = () => {
-    isButtonDisabled(true);
+    isButtonDisabledVar(true);
     try {
       freeClassroom().then(() => {
         dispatchNotification({
@@ -40,7 +43,7 @@ const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotific
           message: `Аудиторія ${classroomName} звільнена.`,
           type: "ok",
         });
-        isButtonDisabled(false);
+        isButtonDisabledVar(false);
         // @ts-ignore
         props.dispatch({
           type: "POP_POPUP_WINDOW",
@@ -53,17 +56,17 @@ const   Footer: React.FC<PropTypes> = ({classroomName, occupied, dispatchNotific
         message: e.message,
         type: "alert",
       });
-      isButtonDisabled(false);
+      isButtonDisabledVar(false);
     }
   };
 
   const handlePassClassroom = () => {
-    setIsPassed(true);
+   isPassedVar(true);
   };
 
   return (
     <div className={styles.footer}>
-      {occupied || (occupied && isPassed) ? (
+      {occupied && !isPassed ? (
         <>
           <Button color="orange" onClick={handlePassClassroom}>Передати аудиторію</Button>
           {disabled && <img className={styles.spinner}src={spinner} alt="wait"/>}

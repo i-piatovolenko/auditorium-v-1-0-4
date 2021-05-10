@@ -6,12 +6,12 @@ import { gql, useQuery } from "@apollo/client";
 import {isLoggedVar} from "../../api/client";
 
 const Layout = () => {
-  const { data: isBlurred } = useQuery(gql`
+  const { data: {isBlurred} } = useQuery(gql`
     query isBlurred {
       isBlurred @client
     }
   `);
-  const { data: isLogged } = useQuery(gql`
+  const { data: {isLogged} } = useQuery(gql`
     query isLogged {
       isLogged @client
     }
@@ -25,14 +25,14 @@ const Layout = () => {
     <div
       className={[
         styles.layout,
-        isBlurred.isBlurred ? styles.blurred : "",
+        isBlurred ? styles.blurred : "",
       ].join(" ")}
     >
-      {isLogged.isLogged && <nav>
+      {isLogged && <nav>
         <Sidebar/>
       </nav>}
       <main>
-        <Content isLogged={isLogged.isLogged}/>
+        <Content isLogged={isLogged}/>
       </main>
     </div>
   );
