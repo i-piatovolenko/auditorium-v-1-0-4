@@ -10,6 +10,10 @@ interface PropTypes {
 const BrowseUserPopupBody: React.FC<PropTypes> = ({user}) => {
   return (
     <div>
+      {!user.verified && <div className={styles.verification}>
+        <h2>Користувача не верифіковано!</h2>
+        <p>Перед верифікацією користувача звірте правильність даних з офіційном документом.</p>
+      </div>}
       <div className={styles.list}>
         <div><span>ID: </span><span>{user.id}</span></div>
         <div><span>П.І.Б.: </span><span>{fullName(user)}</span></div>

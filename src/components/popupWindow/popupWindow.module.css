@@ -16,6 +16,8 @@
     width: 100vw;
     grid-template-rows: 64px 1fr 64px;
     box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.07);
+    overflow-x: hidden;
+    overflow-y: scroll;
   }
   .sider {
     display: none;
@@ -45,9 +47,12 @@
     grid-template-rows: 64px 1fr 64px;
     width: 50vw;
     height: auto;
+    max-height: 90vh;
     border-radius: 16px;
     box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.07);
     overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: scroll;
   }
   .confirm {
     width: 200px !important;

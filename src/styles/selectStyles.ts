@@ -54,3 +54,27 @@ export const selectLightStyles: StylesConfig<CategoryType, isMulti> = ({
   indicatorSeparator: () => ({display: 'none'}),
   menuPortal: base => ({...base, zIndex: 9999})
 });
+
+export const selectSignupStyles: StylesConfig<CategoryType, isMulti> = ({
+  control: (provided, state) => ({
+    ...provided,
+    backgroundColor: '#fff',
+    border: '1px solid #ccc',
+    borderRadius: 8,
+    fontFamily: "Roboto Light"
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: '#2e287c;',
+  }),
+  menuList: (provided) => ({
+    ...provided,
+    color: '#000',
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: '#000',
+  }),
+  indicatorSeparator: () => ({display: 'none'}),
+  menuPortal: base => ({...base, zIndex: 9999})
+});

@@ -13,6 +13,7 @@ import {
 } from "../models/models";
 import useUsers from "../hooks/useUsers";
 import moment from "moment";
+import {ReactElement} from "react";
 
 export const getScheduleTimeline = (start: number, end: number): string[] => {
   let timeSnippets: string[] = [];
@@ -199,5 +200,13 @@ export const isOccupiedOnSchedule = (scheduleUnits: ScheduleUnitType[]) => {
     const current = moment();
 
     return current.isAfter(item.from) && current.isBefore(item.to);
+  });
+};
+
+export const showNotification = (dispatcher: any, data: string[] | HTMLElement[] | ReactElement[]) => {
+  dispatcher({
+    header: data[0],
+    message: data[1],
+    type: data[2],
   });
 };

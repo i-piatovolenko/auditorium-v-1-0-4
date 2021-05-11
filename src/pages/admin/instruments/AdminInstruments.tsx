@@ -28,7 +28,7 @@ const AdminInstruments = () => {
   const instrument = (item: InstrumentType) => <>
     <span className={styles.alignText}>{item.id}</span>
     <span>{item.name}</span>
-    <span className={styles.alignText}>{item.rate}</span>
+    <span className={styles.alignText}>{item.rate.toFixed(1)}</span>
     <span className={styles.alignText}>{item.classroom?.name}</span>
     <span className={styles.alignText}>{item.persNumber}</span>
     <Edit dark onClick={() => handleAdd(item, true)}/>
