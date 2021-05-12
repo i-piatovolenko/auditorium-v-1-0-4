@@ -1,3 +1,9 @@
+export enum ACCESS_RIGHTS {
+  USER,
+  DISPATCHER,
+  ADMIN
+}
+
 export enum ErrorCodesUa {
   INVALID_PASSWORD = "Невірний пароль",
   USER_NOT_FOUND = "Користувача не знайдено",

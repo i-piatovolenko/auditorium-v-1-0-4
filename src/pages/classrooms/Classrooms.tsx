@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Header from "../../components/header/Header";
-import {ClassroomsFilterTypes} from "../../models/models";
+import {ACCESS_RIGHTS, ClassroomsFilterTypes} from "../../models/models";
 import Classroom from "../../components/classroom/Classroom";
 import styles from "./classrooms.module.css";
 import Caviar from "../../components/caviar/Caviar";
@@ -11,6 +11,7 @@ import useClassrooms from "../../hooks/useClassrooms";
 import {filterClassrooms} from "../../helpers/filterClassrooms";
 import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../components/loader/Loader";
+import {useLocal} from "../../hooks/useLocal";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -25,6 +26,7 @@ const Classrooms = () => {
   const [isNoWing, setIsNoWing] = useState(false);
   const [isOperaStudioOnly, setIsOperaStudioOnly] = useState(false);
   const dispatchNotification = useNotification();
+  const { data: {accessRights}} = useLocal('accessRights');
 
   useEffect(() => {
     setFilteredClassrooms(filterClassrooms(classrooms, filter, isOperaStudioOnly, isNoWing));
@@ -51,7 +53,7 @@ const Classrooms = () => {
         <HeaderCheckbox label='Тільки оперна студія' checked={isOperaStudioOnly}
                         setChecked={handleToggleOperaStudio}
         />
-        <Edit path='/adminClassrooms'/>
+        {accessRights === ACCESS_RIGHTS.ADMIN && <Edit path='/adminClassrooms'/>}
       </Header>
       {!classrooms.length
         ? <Loader/>

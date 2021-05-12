@@ -6,14 +6,15 @@ import {
   WORKING_DAY_START,
 } from "./constants";
 import {
+  ACCESS_RIGHTS,
   OccupiedInfo,
   ScheduleUnitType,
   User,
   UserTypes,
 } from "../models/models";
-import useUsers from "../hooks/useUsers";
 import moment from "moment";
 import {ReactElement} from "react";
+import {accessRightsVar} from "../api/client";
 
 export const getScheduleTimeline = (start: number, end: number): string[] => {
   let timeSnippets: string[] = [];
@@ -209,4 +210,23 @@ export const showNotification = (dispatcher: any, data: string[] | HTMLElement[]
     message: data[1],
     type: data[2],
   });
+};
+
+export const setAccessRights = (user: User) => {
+  let accessRights = ACCESS_RIGHTS.USER;
+
+  if (user && user?.type) {
+    switch (user.type) {
+      case UserTypes.ADMIN:
+        accessRights = ACCESS_RIGHTS.ADMIN;
+        break;
+      case UserTypes.DISPATCHER:
+        accessRights = ACCESS_RIGHTS.DISPATCHER;
+        break;
+      default:
+        accessRights = ACCESS_RIGHTS.USER;
+    }
+  }
+
+  accessRightsVar(accessRights);
 };

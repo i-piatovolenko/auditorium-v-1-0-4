@@ -12,12 +12,14 @@ import usersIcon from "../../../assets/images/users.svg";
 import controlIcon from "../../../assets/images/settings.svg";
 import {useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
-import {User} from "../../../models/models";
+import {ACCESS_RIGHTS, User} from "../../../models/models";
+import {useLocal} from "../../../hooks/useLocal";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(true);
   const {data} = useQuery(GET_USERS);
   const [unverifiedCounter, setUnverifiedCounter] = useState(0);
+  const { data: {accessRights}} = useLocal('accessRights');
 
   useEffect(() => {
     setUnverifiedCounter(0);
@@ -67,9 +69,9 @@ const Sidebar = () => {
           <Route exact path="/classrooms">
             Аудиторії
           </Route>
-          <Route exact path="/registry">
+          {accessRights > ACCESS_RIGHTS.USER && <Route exact path="/registry">
             Журнал
-          </Route>
+          </Route>}
           <Route exact path="/schedule">
             Розклад
           </Route>
@@ -108,7 +110,7 @@ const Sidebar = () => {
             Аудиторії
           </NavLink>
         </li>
-        <li>
+        {accessRights > ACCESS_RIGHTS.USER && <li>
           <NavLink
             activeClassName={styles.linkActive}
             className={styles.link}
@@ -118,7 +120,7 @@ const Sidebar = () => {
             <img className={styles.icon} src={registryIcon} alt="registry" />
             Журнал
           </NavLink>
-        </li>
+        </li>}
         <li>
           <NavLink
             activeClassName={styles.linkActive}

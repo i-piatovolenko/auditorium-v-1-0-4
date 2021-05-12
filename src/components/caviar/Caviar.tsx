@@ -1,10 +1,11 @@
 import React from "react";
 import styles from "./caviar.module.css";
-import { ClassroomType } from "../../models/models";
+import {ACCESS_RIGHTS, ClassroomType} from "../../models/models";
 import { usePopupWindow } from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
 import Footer from "../footer/Footer";
+import {useLocal} from "../../hooks/useLocal";
 
 interface PropTypes {
   classrooms: Array<ClassroomType>;
@@ -13,6 +14,7 @@ interface PropTypes {
 
 const Caviar: React.FC<PropTypes> = ({ classrooms, dispatchNotification }) => {
   const dispatchPopupWindow = usePopupWindow();
+  const { data: {accessRights}} = useLocal('accessRights');
   const occupiedStyle = {
     background: "#fff",
   };
@@ -37,7 +39,7 @@ const Caviar: React.FC<PropTypes> = ({ classrooms, dispatchNotification }) => {
           classroom={classroom}
         />
       ),
-      footer: <Footer
+      footer: accessRights >= ACCESS_RIGHTS.DISPATCHER && <Footer
         classroomName={name}
         occupied={occupied}
         dispatchNotification={dispatchNotification}

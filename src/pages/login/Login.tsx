@@ -11,6 +11,7 @@ import {LOGIN} from "../../api/operations/mutations/login";
 import {ErrorCodes, ErrorCodesUa} from "../../models/models";
 import {isLoggedVar} from "../../api/client";
 import {useHistory} from "react-router-dom";
+import {setAccessRights} from "../../helpers/helpers";
 
 const Login = () => {
   const dispatchNotification = useNotification();
@@ -68,6 +69,7 @@ const Login = () => {
             type: 'ok'
           });
           isLoggedVar(true);
+          setAccessRights(user);
           history.push('/');
         }
       } catch (e) {

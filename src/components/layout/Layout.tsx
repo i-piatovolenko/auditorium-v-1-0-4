@@ -1,21 +1,13 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import styles from "./layout.module.css";
 import Sidebar from "./sidebar/Sidebar";
 import Content from "./content/Content";
-import { gql, useQuery } from "@apollo/client";
 import {isLoggedVar} from "../../api/client";
+import {useLocal} from "../../hooks/useLocal";
 
 const Layout = () => {
-  const { data: {isBlurred} } = useQuery(gql`
-    query isBlurred {
-      isBlurred @client
-    }
-  `);
-  const { data: {isLogged} } = useQuery(gql`
-    query isLogged {
-      isLogged @client
-    }
-  `);
+  const { data: {isBlurred}} = useLocal('isBlurred');
+  const { data: {isLogged}} = useLocal('isLogged');
 
   useEffect(()=> {
     isLoggedVar(!!JSON.parse(localStorage.getItem('user') as string));

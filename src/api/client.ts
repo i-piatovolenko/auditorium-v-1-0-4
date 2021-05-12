@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache, makeVar } from "@apollo/client";
+import {ACCESS_RIGHTS} from "../models/models";
 
 const serverURL = localStorage.getItem('serverURL');
 
@@ -23,9 +24,9 @@ export const client = new ApolloClient({
               return gridUpdate();
             },
           },
-          meType: {
+          accessRights: {
             read() {
-              return meTypeVar();
+              return accessRightsVar();
             },
           },
           isButtonDisabled: {
@@ -46,6 +47,6 @@ export const client = new ApolloClient({
 export const isLoggedVar = makeVar(false);
 export const isBlurredVar = makeVar(false);
 export const gridUpdate = makeVar(false);
-export const meTypeVar = makeVar("USER");
+export const accessRightsVar = makeVar(ACCESS_RIGHTS.USER);
 export const isButtonDisabledVar = makeVar(false);
 export const isPassedVar = makeVar(false);

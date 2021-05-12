@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styles from "./classroom.module.css";
 import {
+  ACCESS_RIGHTS,
   ClassroomType,
   OccupiedInfo,
   UserTypes,
@@ -13,7 +14,7 @@ import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
 import Footer from "../footer/Footer";
 import specialPiano from "../../assets/images/specialPiano.svg";
-import moment from "moment";
+import {useLocal} from "../../hooks/useLocal";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -25,6 +26,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   const userFullName = occupied?.user.nameTemp === null ? fullName(occupied?.user, true) :
     occupied?.user.nameTemp;
   const dispatchPopupWindow = usePopupWindow();
+  const { data: {accessRights}} = useLocal('accessRights');
   const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
   const occupiedStyle = {
     background: "#fff",
@@ -52,11 +54,11 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
         classroom={classroom}
         dispatchNotification={dispatchNotification}
       />,
-      footer: <Footer
-        classroomName={name}
-        occupied={occupied}
-        dispatchNotification={dispatchNotification}
-      />,
+      footer: accessRights >= ACCESS_RIGHTS.DISPATCHER && <Footer
+      classroomName={name}
+      occupied={occupied}
+      dispatchNotification={dispatchNotification}
+    />,
     });
   };
 
