@@ -5,8 +5,10 @@ import ScheduleUnit from "../../components/scheduleUnit/ScheduleUnit";
 import {useQuery} from "@apollo/client";
 import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
 import {ISODateString} from "../../helpers/helpers";
-import {ClassroomType} from "../../models/models";
+import {ACCESS_RIGHTS, ClassroomType} from "../../models/models";
 import mainStyles from "../../styles/main.module.css";
+import {useLocal} from "../../hooks/useLocal";
+import Edit from "../../components/icons/edit/Edit";
 
 const timePeriods = [
   '9:00', '10:00', '11:00', '12:00', '13:00', '14:00',
@@ -18,6 +20,7 @@ const Schedule = () => {
   const {data, loading, error} = useQuery(GET_CLASSROOMS, {
     variables: {date: ISODateString(new Date(date))}
   });
+  const { data: {accessRights}} = useLocal('accessRights');
 
   const handleChangeDate = (e: any) => {
     setDate(e.target.value);
@@ -33,6 +36,7 @@ const Schedule = () => {
           onChange={handleChangeDate}
           className={mainStyles.headerDateInput}
         />
+        {accessRights === ACCESS_RIGHTS.ADMIN && <Edit path='/adminSchedule'/>}
       </Header>
       <div className={styles.wrapper}>
         <div className={styles.scheduleHeader}>

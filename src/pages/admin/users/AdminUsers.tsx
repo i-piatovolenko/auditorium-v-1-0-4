@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Header from '../../../components/header/Header';
 import styles from './adminUsers.module.css';
-import {User, UserTypes, UserTypesUa} from "../../../models/models";
+import {ACCESS_RIGHTS, User, UserTypes, UserTypesUa} from "../../../models/models";
 import {usePopupWindow} from "../../../components/popupWindow/PopupWindowProvider";
 import {useNotification} from "../../../components/notification/NotificationProvider";
 import {useMutation, useQuery} from "@apollo/client";
@@ -20,6 +20,7 @@ import BrowseUserPopupBody from "./browseUserPopupBody/BrowseUserPopupBody";
 import Button from "../../../components/button/Button";
 import EditUserPopupBody from "../admin/editUserPopupBody/EditUserPopupBody";
 import {VERIFY_USER} from "../../../api/operations/mutations/verifyUser";
+import {useLocal} from "../../../hooks/useLocal";
 
 const categories: CategoryType[] = [
   {
@@ -59,6 +60,7 @@ const AdminUsers = () => {
   const history = useHistory();
   const [listData, setListData] = useState<any[]>([]);
   const [verifyUser] = useMutation(VERIFY_USER);
+  const {data: {accessRights}} = useLocal('accessRights');
   const user = (item: User) => <>
     <span className={styles.alignText}>{item.id}</span>
     <span>{fullName(item)}</span>
@@ -67,8 +69,8 @@ const AdminUsers = () => {
       : <Button color='red' onClick={() => handleCreate(item)}>Верифікувати</Button>}
     </span>
     <span className={styles.alignText}>{UserTypesUa[item.type as UserTypes]}</span>
-    <Edit dark onClick={() => handleCreate(item)}/>
-    <Delete onClick={() => handleDelete()}/>
+    {accessRights === ACCESS_RIGHTS.ADMIN && <Edit dark onClick={() => handleCreate(item)}/>}
+    {accessRights === ACCESS_RIGHTS.ADMIN && <Delete onClick={() => handleDelete()}/>}
   </>;
 
   useEffect(() => {
@@ -156,7 +158,7 @@ const AdminUsers = () => {
           defaultValue={categories[0]}
           onChange={handleSelectCategory}
           styles={selectStyles}/>
-        <Add onClick={handleCreate}/>
+        {accessRights === ACCESS_RIGHTS.ADMIN && <Add onClick={handleCreate}/>}
       </Header>
       <DataList header={listHeader} data={listData} handleItemClick={handleItemClick}
                 gridTemplateColumns='40px 1fr 100px 200px 40px 40px'/>

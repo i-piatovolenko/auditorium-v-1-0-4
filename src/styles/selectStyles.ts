@@ -1,8 +1,10 @@
 import {StylesConfig} from "react-select";
+import {ACCESS_RIGHTS} from "../models/models";
 
 export type CategoryType = {
   value: string;
   label: string;
+  accessRights?: ACCESS_RIGHTS
 };
 
 type isMulti = false;

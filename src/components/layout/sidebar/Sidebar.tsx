@@ -81,9 +81,9 @@ const Sidebar = () => {
           <Route exact path="/profile">
             Мій профіль
           </Route>
-          <Route exact path="/admin">
+          {accessRights > ACCESS_RIGHTS.USER && <Route exact path="/admin">
             Налаштування
-          </Route>
+          </Route>}
         </Switch>
       </p>
       <ul>
@@ -154,7 +154,7 @@ const Sidebar = () => {
             Мій профіль
           </NavLink>
         </li>
-        <li>
+        {accessRights > ACCESS_RIGHTS.USER && <li>
           {unverifiedCounter !== 0 && <span className={styles.alert}>!</span>}
           <NavLink
             activeClassName={styles.linkActive}
@@ -165,7 +165,7 @@ const Sidebar = () => {
             <img className={[styles.icon, styles.settings].join(' ')} src={controlIcon} alt="control" />
             Налаштування
           </NavLink>
-        </li>
+        </li>}
       </ul>
     </div>
   );
