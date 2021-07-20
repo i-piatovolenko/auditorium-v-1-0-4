@@ -109,7 +109,14 @@ export type EmployeeInfo = {
 export type OccupiedInfo = {
   user: User;
   until: Date;
+  state: OccupiedState | null;
 };
+
+export enum OccupiedState {
+  OCCUPIED = 'OCCUPIED',
+  PENDING = 'PENDING',
+  RESERVED = 'RESERVED'
+}
 
 export type Comment = {
   id: number;
@@ -206,4 +213,23 @@ export enum ClassroomsFilterTypes {
   ALL = 'ALL',
   FREE = 'FREE',
   SPECIAL = 'SPECIAL'
+}
+
+export enum QueueState {
+  ACTIVE = 'ACTIVE',
+  RESERVED = 'RESERVED'
+}
+
+export enum QueueType {
+  MINIMAL = 'MINIMAL',
+  DESIRED = 'DESIRED'
+}
+
+export type QueueRecord = {
+  id: number;
+  user: User;
+  date: string;
+  classroom: ClassroomType;
+  state: QueueState;
+  type: QueueType;
 }

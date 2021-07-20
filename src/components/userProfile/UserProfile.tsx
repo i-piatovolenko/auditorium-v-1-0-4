@@ -23,7 +23,7 @@ const UserProfile: React.FC<PropTypes> = ({ userId }) => {
   const isNoAccess = (): boolean => accessRights === ACCESS_RIGHTS.USER && (
     data.user.type !== UserTypes.TEACHER
     || data.user.type !== UserTypes.ILLUSTRATOR
-    || data.user.type === UserTypes.CONCERTMASTER);
+    || data.user.type !== UserTypes.CONCERTMASTER);
 
   if (!loading && !error)
     return (

@@ -25,6 +25,7 @@ export const GET_CLASSROOMS = gql`
           phoneNumber
         }
         until
+        state
       }
       schedule(date: $date) {
         from
