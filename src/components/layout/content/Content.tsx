@@ -16,6 +16,7 @@ import AdminFaculties from "../../../pages/admin/faculties/AdminFaculties";
 import AdminDegrees from "../../../pages/admin/degrees/AdminDegrees";
 import Login from "../../../pages/login/Login";
 import Dashboard from "../../../pages/dashboard/Dashboard";
+import Queue from "../../../pages/queue/Queue";
 
 interface PropTypes {
   isLogged: boolean;
@@ -44,6 +45,7 @@ const Content: React.FC<PropTypes> = ({isLogged}) => {
         <Route path="/adminFaculties" component={AdminFaculties} />
         <Route path="/adminDegrees" component={AdminDegrees} />
         <Route path="/dashboard" component={Dashboard} />
+        <Route path="/queue" component={Queue} />
       </Switch>
       }
     </div>

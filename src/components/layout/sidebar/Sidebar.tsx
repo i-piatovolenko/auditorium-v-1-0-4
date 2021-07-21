@@ -10,6 +10,7 @@ import scheduleIcon from "../../../assets/images/schedule.svg";
 import profileIcon from "../../../assets/images/profile.svg";
 import usersIcon from "../../../assets/images/users.svg";
 import controlIcon from "../../../assets/images/settings.svg";
+import queueIcon from "../../../assets/images/queue.png";
 import {useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
 import {ACCESS_RIGHTS, User} from "../../../models/models";
@@ -69,6 +70,9 @@ const Sidebar = () => {
           <Route exact path="/classrooms">
             Аудиторії
           </Route>
+          {accessRights > ACCESS_RIGHTS.USER && <Route exact path="/queue">
+              Черга
+          </Route>}
           {accessRights > ACCESS_RIGHTS.USER && <Route exact path="/registry">
             Журнал
           </Route>}
@@ -110,6 +114,18 @@ const Sidebar = () => {
             Аудиторії
           </NavLink>
         </li>
+        {accessRights > ACCESS_RIGHTS.USER && <li>
+            <NavLink
+                activeClassName={styles.linkActive}
+                className={styles.link}
+                onClick={onClick}
+                to="/queue"
+            >
+              {/*TODO change PNG icon to SVG*/}
+                <img className={styles.icon} src={queueIcon} alt="queue" />
+                Черга
+            </NavLink>
+        </li>}
         {accessRights > ACCESS_RIGHTS.USER && <li>
           <NavLink
             activeClassName={styles.linkActive}

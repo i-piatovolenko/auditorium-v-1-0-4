@@ -93,6 +93,7 @@ export type User = {
   employeeInfo: EmployeeInfo;
   verified: boolean;
   expireDate: Date | null;
+  queue: QueueRecord[];
 };
 
 export type StudentInfo = {
