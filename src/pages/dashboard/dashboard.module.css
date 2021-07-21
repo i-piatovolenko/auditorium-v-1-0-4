@@ -10,8 +10,8 @@
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 50% 1fr auto;
     width: 100%;
     padding-right: 20px;
     align-items: center;
@@ -21,25 +21,114 @@
     font-family: Roboto;
     font-weight: 900;
     text-transform: uppercase;
+    animation: swing-in-top-fwd 15s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+    animation-iteration-count: infinite;
 }
 
-.generalQueue {
+.generalQueue, .waitingApprove {
     list-style-type: none;
     padding: 0;
     margin: 0;
 }
 
 .generalQueue li {
+    box-sizing: border-box;
     margin: 16px;
     background-color: #eee;
-    padding: 16px;
+    height: calc((100vh - 240px) / 10);
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
     border-radius: 8px;
     font-size: 24px;
     text-transform: uppercase;
     color: #4e4e4e;
+    animation: swing-in-top-fwd-fast .5s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+}
+
+.generalQueue li span:first-child {
+    width: 40px;
+    text-align: center;
+}
+
+.waitingApprove li {
+    margin: 16px 16px 16px 0;
+    background-color: #4bfd63;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 24px;
+    text-transform: uppercase;
+    color: #1d5d25;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    animation: swing-in-top-fwd-fast .5s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+}
+
+.waitingApprove li .classroomName {
+    background-color: #ffffff77;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    margin-right: 16px;
 }
 
 .fullName {
     font-weight: 900;
     padding-left: 32px;
+}
+
+.rightPart {
+    height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.info {
+    background-color: #eee;
+    padding: 0 10px 10px 20px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.info p {
+    padding: 10px 0 0 0;
+    margin: 0;
+    font-size: 25px;
+    animation: swing-in-top-fwd 15s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+    animation-iteration-count: infinite;
+}
+
+@keyframes swing-in-top-fwd {
+    0% {
+        transform: rotateX(-100deg);
+        transform-origin: top;
+        opacity: 0;
+    }
+    5% {
+        transform: rotateX(0deg);
+        transform-origin: top;
+        opacity: 1;
+    }
+    100% {
+        transform: rotateX(0deg);
+        transform-origin: top;
+        opacity: 1;
+    }
+}
+
+@keyframes swing-in-top-fwd-fast {
+    0% {
+        transform: rotateX(-100deg);
+        transform-origin: top;
+        opacity: 0;
+    }
+    100% {
+        transform: rotateX(0deg);
+        transform-origin: top;
+        opacity: 1;
+    }
 }

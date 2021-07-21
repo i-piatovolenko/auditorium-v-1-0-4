@@ -233,3 +233,5 @@ export type QueueRecord = {
   state: QueueState;
   type: QueueType;
 }
+
+export type LangT = 'ua' | 'en';
