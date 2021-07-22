@@ -1,8 +1,7 @@
 import React from "react";
 import styles from "./occupantInfo.module.css";
 import {
-  OccupiedInfo,
-  User,
+  OccupiedInfo, OccupiedState, OccupiedStateUa,
   UserTypes,
   UserTypesUa,
 } from "../../../models/models";
@@ -40,6 +39,9 @@ const OccupantInfo: React.FC<PropTypes> = ({ occupied }) => {
           className={styles.occupantType}
         >
           {UserTypesUa[occupied?.user.type as UserTypes]}
+        </p>
+        <p className={styles.state}>
+          Статус: {OccupiedStateUa[occupied?.state as OccupiedState].toLowerCase()}
         </p>
         <p className={styles.occupiedUntil}>
           Зайнято до {getTimeHHMM(new Date((occupied as OccupiedInfo)?.until))}

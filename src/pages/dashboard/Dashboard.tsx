@@ -120,7 +120,12 @@ function Dashboard() {
               {
                 freeClassrooms ? freeClassrooms.length > 5
                   ? `${strings[lang].vilnukhAud}${freeClassrooms.length}`
-                  : `${strings[lang].freeClassrooms}${freeClassrooms}`
+                  : (
+                    <>
+                      {strings[lang].freeClassrooms}
+                      {freeClassrooms.map(name => <span>{name}</span>)}
+                    </>
+                    )
                   : strings[lang].noFreeClassrooms
               }
             </p>

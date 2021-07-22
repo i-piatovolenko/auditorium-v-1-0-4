@@ -119,6 +119,12 @@ export enum OccupiedState {
   RESERVED = 'RESERVED'
 }
 
+export enum OccupiedStateUa {
+  OCCUPIED = 'Зайнято',
+  PENDING = 'Очікує підтвердження',
+  RESERVED = 'Зарезервовано'
+}
+
 export type Comment = {
   id: number;
   user: User;
@@ -166,6 +172,7 @@ export type ClassroomType = {
   instruments: Array<InstrumentType>;
   disabled: DisabledInfo | null;
   schedule: Array<ScheduleUnitType>;
+  hidden: boolean;
 };
 
 export type RegisterUnit = {

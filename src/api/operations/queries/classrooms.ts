@@ -8,6 +8,7 @@ export const GET_CLASSROOMS = gql`
       name
       floor
       special
+      hidden
       chair {
           name
       }

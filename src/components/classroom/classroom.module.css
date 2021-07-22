@@ -95,3 +95,8 @@
 .isDepartment {
   color: #ff8c00;
 }
+
+.reserved {
+  background-color: #2b5dff;
+  color: #fff;
+}

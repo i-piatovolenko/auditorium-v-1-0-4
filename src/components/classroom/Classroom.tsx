@@ -1,9 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import styles from "./classroom.module.css";
 import {
   ACCESS_RIGHTS,
   ClassroomType,
   OccupiedInfo,
+  OccupiedState,
+  OccupiedStateUa,
   UserTypes,
   UserTypesUa,
 } from "../../models/models";
@@ -22,7 +24,8 @@ interface PropTypes {
 }
 
 const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
-  const {id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair} = classroom;
+  const { id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
+  hidden } = classroom;
   const userFullName = occupied?.user.nameTemp === null ? fullName(occupied?.user, true) :
     occupied?.user.nameTemp;
   const dispatchPopupWindow = usePopupWindow();
@@ -36,7 +39,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     background: "#4bfd63",
     transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
   };
-  const occupationInfo = occupied ? "Зайнято"
+  const occupationInfo = occupied ? OccupiedStateUa[occupied?.state as OccupiedState]
     : occupiedOnSchedule ? "Зайнято за розкдадом" : "Вільно";
   const header = (
     <>
@@ -67,7 +70,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       <li
         key={id}
         className={styles.classroomsListItem}
-        style={occupied ? occupiedStyle : vacantStyle}
+        style={{...(occupied ? occupiedStyle : vacantStyle), opacity: hidden ? .5 : 1}}
         onClick={handleClick}
       >
         <div className={styles.header}>
@@ -84,7 +87,9 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
           </div>
         </div>
         <div className={styles.occupationInfo}>
-          <p>{occupationInfo}</p>
+          <p className={occupied?.state === OccupiedState.RESERVED ? styles.reserved : ''}>
+            {occupationInfo}
+          </p>
         </div>
         <Instruments instruments={instruments}/>
       </li>

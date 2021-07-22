@@ -54,7 +54,7 @@
 .waitingApprove li {
     margin: 16px 16px 16px 0;
     background-color: #4bfd63;
-    padding: 16px;
+    height: calc((100vh - 240px) / 10);
     border-radius: 8px;
     font-size: 24px;
     text-transform: uppercase;
@@ -63,15 +63,18 @@
     display: flex;
     align-items: center;
     animation: swing-in-top-fwd-fast .5s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .waitingApprove li .classroomName {
     background-color: #ffffff77;
-    padding: 5px;
+    padding: 5px 10px;
     display: flex;
+    height: inherit;
     justify-content: center;
     align-items: center;
-    border-radius: 8px;
+    border-radius: 8px 0 0 8px;
     margin-right: 16px;
 }
 
@@ -88,8 +91,8 @@
 }
 
 .info {
-    background-color: #eee;
-    padding: 0 10px 10px 20px;
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(238,238,238,1) 100%);
+    padding: 0 20px 10px 20px;
     font-weight: 900;
     text-transform: uppercase;
 }
@@ -100,6 +103,19 @@
     font-size: 25px;
     animation: swing-in-top-fwd 15s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
     animation-iteration-count: infinite;
+    text-align: right;
+}
+
+.info p span {
+    border: 1px solid #c1bfbf;
+    border-radius: 8px;
+    padding: 0 5px;
+    margin-left: 5px;
+    min-width: 30px;
+    max-width: fit-content;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
 }
 
 @keyframes swing-in-top-fwd {
