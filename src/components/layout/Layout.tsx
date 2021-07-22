@@ -8,15 +8,11 @@ import {useLocal} from "../../hooks/useLocal";
 const Layout = () => {
   const { data: {isBlurred}} = useLocal('isBlurred');
   const { data: {isLogged}} = useLocal('isLogged');
-  const isDashboard = window.location.pathname.includes('dashboard');
+  const isDashboard = window.location.hash.includes('dashboard');
 
   useEffect(()=> {
     isLoggedVar(!!JSON.parse(localStorage.getItem('user') as string));
   }, []);
-
-  useEffect(() => {
-    console.log(isDashboard)
-  }, [])
 
   return (
     <div

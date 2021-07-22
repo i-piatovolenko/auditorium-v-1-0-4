@@ -11,7 +11,9 @@ import {BrowserRouter, HashRouter} from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter basename='/auditorium-v-1-0-4'>
+    <HashRouter
+      // basename='/auditorium-v-1-0-4'
+    >
       <ApolloProvider client={client}>
         <PopupWindowProvider>
           <NotificationProvider>
@@ -19,7 +21,7 @@ ReactDOM.render(
           </NotificationProvider>
         </PopupWindowProvider>
       </ApolloProvider>
-    </BrowserRouter>
+    </HashRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );

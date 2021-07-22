@@ -61,7 +61,7 @@ function Dashboard() {
         },
         fetchPolicy: 'network-only'
       }).then(data => {
-        // @ts-ignore
+        //@ts-ignore
         setFreeClassrooms(data.data.classrooms.map(({name}) => name));
       });
     }, 5000);
