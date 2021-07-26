@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import Header from "../../components/header/Header";
 import {ACCESS_RIGHTS, ClassroomsFilterTypes, ClassroomType} from "../../models/models";
 import Classroom from "../../components/classroom/Classroom";
@@ -12,9 +12,6 @@ import {filterClassrooms} from "../../helpers/filterClassrooms";
 import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../components/loader/Loader";
 import {useLocal} from "../../hooks/useLocal";
-import {useQuery} from "@apollo/client";
-import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
-import {ISODateString} from "../../helpers/helpers";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},

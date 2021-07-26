@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import styles from "./classroomInfo.module.css";
 import {ACCESS_RIGHTS, ClassroomType} from "../../models/models";
 import Instruments from "../instruments/Instruments";

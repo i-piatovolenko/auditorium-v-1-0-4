@@ -4,7 +4,6 @@ import Logo from "../../components/logo/Logo";
 import {useMe} from "../../hooks/useMe";
 import Loader from "../../components/loader/Loader";
 import Header from "../../components/header/Header";
-import {conjugate} from "../../helpers/conjugate";
 
 const Home = () => {
   const me = useMe();

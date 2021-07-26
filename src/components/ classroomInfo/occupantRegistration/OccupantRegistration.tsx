@@ -7,7 +7,7 @@ import Title from "../../title/Title";
 import Select from 'react-select';
 import {User, UserTypesUa, UserTypes} from "../../../models/models";
 import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
-import {gridUpdate, isButtonDisabledVar} from "../../../api/client";
+import {isButtonDisabledVar} from "../../../api/client";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
@@ -105,7 +105,6 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
         dispatch({
           type: "POP_POPUP_WINDOW",
         });
-        gridUpdate(!gridUpdate());
         dispatchNotification({
           header: "Успішно!",
           message: `Аудиторія ${classroomName} зайнята.`,

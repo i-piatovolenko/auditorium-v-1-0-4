@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import Button from "../button/Button";
 import styles from "../classroom/classroom.module.css";
 import {client, gridUpdate, isButtonDisabledVar, isPassedVar} from "../../api/client";
@@ -9,7 +9,6 @@ import spinner from './../../assets/images/spinner.svg';
 import DisableClassroom from "../DisableClassroom";
 import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom";
 import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
-import {GET_CLASSROOM} from "../../api/operations/queries/classroom";
 
 interface PropTypes {
   classroomName: string;
@@ -50,11 +49,6 @@ const Footer: React.FC<PropTypes> = ({
       isPassed @client
     }
   `);
-  const { data: {gridUpdate: gridUpdateValue} } = useQuery(gql`
-    query gridUpdate {
-      gridUpdate @client
-    }
-  `);
 
   const handleFreeClassroom = () => {
     isButtonDisabledVar(true);
@@ -87,11 +81,6 @@ const Footer: React.FC<PropTypes> = ({
   };
 
   const submitDisable = async (comment: string, until: string) => {
-    const classroomDisableFragment = gql`
-  fragment Disable on Classroom {
-    disable
-  }
-`;
     if (comment && until) {
       try {
         await client.mutate({
@@ -104,23 +93,11 @@ const Footer: React.FC<PropTypes> = ({
             }
           },
         });
-        client.writeFragment({
-          id: `Classroom:${classroomId}`,
-          fragment: gql`
-            fragment MyClassroom on Classroom {
-              occupied
-            }
-          `,
-          data: {
-            occupied: null,
-          },
-        });
         dispatchNotification({
           header: "Успішно!",
           message: `Аудиторія ${classroomName} заблокована.`,
           type: "ok",
         });
-        // gridUpdate(!gridUpdateValue);
         //@ts-ignore
         props.dispatch({
           type: "POP_POPUP_WINDOW",
@@ -143,7 +120,7 @@ const Footer: React.FC<PropTypes> = ({
         type: "alert",
       });
     }
-  }
+  };
 
   const handleDisableClassroom = () => {
     dispatchPopupWindow && dispatchPopupWindow({
@@ -167,20 +144,6 @@ const Footer: React.FC<PropTypes> = ({
         message: `Аудиторія ${classroomName} разблокована.`,
         type: "ok",
       });
-      //  await client.writeQuery({
-      //   query: GET_CLASSROOM,
-      //   data: { // Contains the data to write
-      //     classroom: {
-      //       __typename: 'Classroom',
-      //       id: classroomId,
-      //       disabled: null
-      //     },
-      //   },
-      //   variables: {
-      //     id: classroomId
-      //   }
-      // });
-      gridUpdate(!gridUpdateValue);
       //@ts-ignore
       props.dispatch({
         type: "POP_POPUP_WINDOW",
