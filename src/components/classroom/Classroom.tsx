@@ -17,6 +17,9 @@ import Tag from "../tag/Tag";
 import Footer from "../footer/Footer";
 import specialPiano from "../../assets/images/specialPiano.svg";
 import {useLocal} from "../../hooks/useLocal";
+import {client} from "../../api/client";
+import {gql} from "@apollo/client/core";
+import {GET_DISABLED_CLASSROOMS} from "../../api/operations/queries/disabledClassrooms";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -24,21 +27,16 @@ interface PropTypes {
 }
 
 const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
-  const { id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
-  hidden } = classroom;
+  const {
+    id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
+    isHidden, disabled
+  } = classroom;
   const userFullName = occupied?.user.nameTemp === null ? fullName(occupied?.user, true) :
     occupied?.user.nameTemp;
   const dispatchPopupWindow = usePopupWindow();
-  const { data: {accessRights}} = useLocal('accessRights');
+  const {data: {accessRights}} = useLocal('accessRights');
   const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
-  const occupiedStyle = {
-    background: "#fff",
-    transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
-  };
-  const vacantStyle = {
-    background: "#4bfd63",
-    transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
-  };
+
   const occupationInfo = occupied ? OccupiedStateUa[occupied?.state as OccupiedState]
     : occupiedOnSchedule ? "Зайнято за розкдадом" : "Вільно";
   const header = (
@@ -49,6 +47,31 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     </>
   );
 
+  const defineStyle = () => {
+    const occupiedStyle = {
+      background: "#fff",
+      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
+    };
+    const vacantStyle = {
+      background: "#4bfd63",
+      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
+    };
+    const disableStyle = {
+      background: "#b1b1b1",
+      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
+    };
+
+    if (disabled) return disableStyle;
+    if (occupied) return occupiedStyle;
+    return vacantStyle;
+  };
+
+  const defineStatus = () => {
+    if (disabled) return disabled.comment;
+    if (occupied) return OccupiedStateUa[occupied?.state as OccupiedState];
+    return occupiedOnSchedule ? "Зайнято за розкдадом" : "Вільно";
+  }
+
   const handleClick = () => {
     dispatchPopupWindow({
       header: header,
@@ -58,10 +81,13 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
         dispatchNotification={dispatchNotification}
       />,
       footer: accessRights >= ACCESS_RIGHTS.DISPATCHER && <Footer
-      classroomName={name}
-      occupied={occupied}
-      dispatchNotification={dispatchNotification}
-    />,
+          classroomName={name}
+          classroomId={id}
+          disabled={disabled}
+          occupied={occupied}
+          dispatchNotification={dispatchNotification}
+          dispatchPopupWindow={dispatchPopupWindow}
+      />,
     });
   };
 
@@ -70,7 +96,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       <li
         key={id}
         className={styles.classroomsListItem}
-        style={{...(occupied ? occupiedStyle : vacantStyle), opacity: hidden ? .5 : 1}}
+        style={{...defineStyle(), opacity: isHidden ? .5 : 1}}
         onClick={handleClick}
       >
         <div className={styles.header}>
@@ -88,7 +114,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
         </div>
         <div className={styles.occupationInfo}>
           <p className={occupied?.state === OccupiedState.RESERVED ? styles.reserved : ''}>
-            {occupationInfo}
+            {defineStatus()}
           </p>
         </div>
         <Instruments instruments={instruments}/>

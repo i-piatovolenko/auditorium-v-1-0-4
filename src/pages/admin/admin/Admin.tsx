@@ -31,7 +31,7 @@ const Admin = () => {
     if (serverURL) {
       setValue(serverURL);
     } else {
-      setValue('http://3.141.103.67:4000/');
+      setValue('http://3.142.219.180:4000/');
       localStorage.setItem('serverURL', value);
     }
   }, [serverURL]);
@@ -44,22 +44,9 @@ const Admin = () => {
     localStorage.setItem('serverURL', value);
   };
 
-  const [inputValue, setInputValue] = useState('')
-  const [conjugated, setConjugated] = useState('');
-  const handleChangeInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  }
-
-  const handleConjugate = () => {
-    setConjugated(conjugate(inputValue) as string);
-  }
-
   return (
     <div>
       <Header><h1>Налаштування</h1></Header>
-      {/*<input type="text" value={inputValue} onChange={handleChangeInputValue}/>*/}
-      {/*<button onClick={handleConjugate}>Conjugate</button>*/}
-      {/*<h1>{conjugated}</h1>*/}
       <ul className={styles.list}>
         {accessRights === ACCESS_RIGHTS.ADMIN && <li><NavLink to='/adminClassrooms'>Аудиторії</NavLink>
         </li>}

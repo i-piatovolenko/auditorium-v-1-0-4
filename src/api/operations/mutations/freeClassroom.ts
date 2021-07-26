@@ -5,16 +5,22 @@ export const FREE_CLASSROOM = gql`
         freeClassroom(input: $input) {
             classroom {
                 id
-                name
                 occupied {
                     user {
                         id
                         firstName
-                        lastName
                         patronymic
+                        lastName
                         type
+                        nameTemp
+                        email
+                        phoneNumber
+                        department {
+                            name
+                          }
                     }
                     until
+                    state
                 }
             }
                 userErrors {

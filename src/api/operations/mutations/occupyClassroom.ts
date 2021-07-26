@@ -5,27 +5,22 @@ export const OCCUPY_CLASSROOM = gql`
         occupyClassroom(input: $input) {
             classroom {
                 id
-                name
-                special
-                chair {
-                    name
-                }
                 occupied {
                     user {
-                        id
-                        firstName
-                        patronymic
-                        lastName
-                        type
-                        department {
-                            name
+                      id
+                      firstName
+                      patronymic
+                      lastName
+                      type
+                      nameTemp
+                      email
+                      phoneNumber
+                      department {
+                          name
                         }
                     }
-                }
-                instruments {
-                    type
-                    name
-                    rate
+                    until
+                    state
                 }
             }
             userErrors {

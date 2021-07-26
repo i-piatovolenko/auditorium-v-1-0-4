@@ -4,10 +4,12 @@ export const DISABLE_CLASSROOM = gql`
     mutation disable($input: DisableClassroomInput!) {
         disableClassroom(input: $input) {
             classroom {
-                disabled {
-                    comment
-                    until
-                }
+            id
+            name
+            disabled {
+                comment
+                until
+            }
             }
             userErrors {
                 message

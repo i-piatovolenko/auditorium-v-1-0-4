@@ -7,10 +7,10 @@ import {fullName} from "../../helpers/helpers";
 import Button from "../../components/button/Button";
 import {client} from "../../api/client";
 import {GET_USERS_FOR_QUEUE} from "../../api/operations/queries/usersQueue";
-import {REMOVE_USERS_FROM_QUEUE} from "../../api/operations/mutations/removeUsersFromQueue";
+import {REMOVE_USER_FROM_QUEUE} from "../../api/operations/mutations/removeUserFromQueue";
 import {useNotification} from "../../components/notification/NotificationProvider";
 import useClassrooms from "../../hooks/useClassrooms";
-import {ADD_USERS_TO_QUEUE} from "../../api/operations/mutations/addUsersToQueue";
+import {ADD_USER_TO_QUEUE} from "../../api/operations/mutations/addUserToQueue";
 
 const Queue = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -28,10 +28,6 @@ const Queue = () => {
     });
   }, []);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  };
-
   const handleChose = (e: any) => {
     const chosenUser = (users as unknown as Array<User>)?.find(user => user.id === e.value);
 
@@ -46,7 +42,7 @@ const Queue = () => {
     setDisabled(true);
     try {
     await client.mutate({
-      mutation: REMOVE_USERS_FROM_QUEUE,
+      mutation: REMOVE_USER_FROM_QUEUE,
       variables: {
         where: {
           userId: {
@@ -90,7 +86,7 @@ const Queue = () => {
     }));
 
     try {
-    await client.mutate({mutation: ADD_USERS_TO_QUEUE, variables: {
+    await client.mutate({mutation: ADD_USER_TO_QUEUE, variables: {
         input: data
       }});
       dispatchNotification({
@@ -125,7 +121,6 @@ const Queue = () => {
         <form
           id="userQueueForm"
           className={styles.userSearch}
-          onSubmit={handleSubmit}
         >
           <p>Виберіть користувача, щоб додати або видалити з черги:</p>
           <Select

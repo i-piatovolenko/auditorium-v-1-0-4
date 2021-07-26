@@ -7,30 +7,20 @@ import {gql, useQuery} from "@apollo/client";
 
 const useClassrooms = (props?: any): Array<ClassroomType> => {
   const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
-  const { data } = useQuery(gql`
-    query gridUpdate {
-      gridUpdate @client
-    }
-  `);
+  const {data, loading, error} = useQuery(GET_CLASSROOMS, {
+    variables: { date: ISODateString(props?.date ? props.date : new Date()) }
+  })
 
   useEffect(() => {
-    client
-      .query({
-        query: GET_CLASSROOMS,
-        variables: { date: ISODateString(props?.date ? props.date : new Date()) },
-        fetchPolicy: 'network-only',
-      })
-      .then((data) => {
-        setClassrooms(
-          data.data.classrooms
-            .slice()
-            .sort(
-              (a: ClassroomType, b: ClassroomType) =>
-                parseInt(a.name) - parseInt(b.name)
-            )
-        );
-      });
-  }, [data.gridUpdate]);
+    !loading && !error && setClassrooms(
+      data.classrooms
+        .slice()
+        .sort(
+          (a: ClassroomType, b: ClassroomType) =>
+            parseInt(a.name) - parseInt(b.name)
+        )
+    );
+}, [data, loading, error]);
 
   return classrooms;
 };

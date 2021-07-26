@@ -8,7 +8,7 @@ export const GET_CLASSROOMS = gql`
       name
       floor
       special
-      hidden
+      isHidden
       chair {
           name
       }
@@ -24,6 +24,9 @@ export const GET_CLASSROOMS = gql`
           nameTemp
           email
           phoneNumber
+          department {
+              name
+          }
         }
         until
         state

@@ -100,3 +100,18 @@
   background-color: #2b5dff;
   color: #fff;
 }
+
+.disableButton {
+  position: absolute;
+  left: 16px;
+}
+
+.disableClassroomInput input{
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #656565;
+}
+
+.disableClassroomInput span{
+  width: 30%
+}

@@ -4,7 +4,8 @@ import {ACCESS_RIGHTS} from "../models/models";
 const serverURL = localStorage.getItem('serverURL');
 
 export const client = new ApolloClient({
-  uri: serverURL ? serverURL as string : 'http://3.141.103.67:4000/',
+  uri: serverURL ? serverURL as string : 'http://3.142.219.180:4000/',
+  connectToDevTools: true,
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

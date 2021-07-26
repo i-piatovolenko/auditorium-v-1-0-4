@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import Header from "../../components/header/Header";
-import {ACCESS_RIGHTS, ClassroomsFilterTypes} from "../../models/models";
+import {ACCESS_RIGHTS, ClassroomsFilterTypes, ClassroomType} from "../../models/models";
 import Classroom from "../../components/classroom/Classroom";
 import styles from "./classrooms.module.css";
 import Caviar from "../../components/caviar/Caviar";
@@ -12,6 +12,9 @@ import {filterClassrooms} from "../../helpers/filterClassrooms";
 import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../components/loader/Loader";
 import {useLocal} from "../../hooks/useLocal";
+import {useQuery} from "@apollo/client";
+import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
+import {ISODateString} from "../../helpers/helpers";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -21,16 +24,11 @@ const filters = [
 
 const Classrooms = () => {
   const classrooms = useClassrooms();
-  const [filteredClassrooms, setFilteredClassrooms] = useState(classrooms);
   const [filter, setFilter] = useState(filters[0].value);
   const [isNoWing, setIsNoWing] = useState(false);
   const [isOperaStudioOnly, setIsOperaStudioOnly] = useState(false);
   const dispatchNotification = useNotification();
-  const { data: {accessRights}} = useLocal('accessRights');
-
-  useEffect(() => {
-    setFilteredClassrooms(filterClassrooms(classrooms, filter, isOperaStudioOnly, isNoWing));
-  }, [classrooms, filter, isNoWing, isOperaStudioOnly]);
+  const {data: {accessRights}} = useLocal('accessRights');
 
   const handleFilterChange = (event: any) => {
     setFilter(event.value);
@@ -55,19 +53,23 @@ const Classrooms = () => {
         />
         {accessRights === ACCESS_RIGHTS.ADMIN && <Edit path='/adminClassrooms'/>}
       </Header>
-      {!classrooms.length
-        ? <Loader/>
-        : <><Caviar dispatchNotification={dispatchNotification} classrooms={filteredClassrooms}/>
+      {!classrooms.length ? <Loader/> : (
+        <>
+          <Caviar dispatchNotification={dispatchNotification}
+                  classrooms={filterClassrooms(classrooms, filter, isOperaStudioOnly, isNoWing)}
+          />
           <ul className={styles.classroomsList}>
-            {filteredClassrooms.map((classroom) => (
-              <Classroom
-                dispatchNotification={dispatchNotification}
-                key={classroom.id}
-                classroom={classroom}
-              />
-            ))}
+            {filterClassrooms(classrooms, filter, isOperaStudioOnly, isNoWing)
+              .map((classroom: ClassroomType) => (
+                <Classroom
+                  dispatchNotification={dispatchNotification}
+                  key={classroom.id}
+                  classroom={classroom}
+                />
+              ))}
           </ul>
-      </>}
+        </>
+      )}
     </div>
   );
 };
