@@ -1,9 +1,8 @@
 import {useEffect, useState} from "react";
-import {client} from "../api/client";
 import {GET_CLASSROOMS} from "../api/operations/queries/classrooms";
 import {ISODateString} from "../helpers/helpers";
 import {ClassroomType} from "../models/models";
-import {gql, useQuery} from "@apollo/client";
+import {useQuery} from "@apollo/client";
 
 const useClassrooms = (props?: any): Array<ClassroomType> => {
   const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);

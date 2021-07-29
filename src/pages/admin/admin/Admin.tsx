@@ -8,7 +8,6 @@ import {useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
 import {ACCESS_RIGHTS, User} from "../../../models/models";
 import CountUp from "react-countup";
-import {conjugate} from "../../../helpers/conjugate";
 import {useLocal} from "../../../hooks/useLocal";
 
 const Admin = () => {
@@ -31,7 +30,7 @@ const Admin = () => {
     if (serverURL) {
       setValue(serverURL);
     } else {
-      setValue('http://3.142.219.180:4000/');
+      setValue('http://54.75.17.229:4000/');
       localStorage.setItem('serverURL', value);
     }
   }, [serverURL]);
