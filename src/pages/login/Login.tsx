@@ -3,9 +3,7 @@ import styles from "./login.module.css";
 import Logo from "../../components/logo/Logo";
 import CustomInput from "../../components/customInput/CustomInput";
 import Button from "../../components/button/Button";
-import Registration from "../../components/registration/Registration";
-import { usePopupWindow } from "../../components/popupWindow/PopupWindowProvider";
-import { useNotification } from "../../components/notification/NotificationProvider";
+import {useNotification} from "../../components/notification/NotificationProvider";
 import {useMutation} from "@apollo/client";
 import {LOGIN} from "../../api/operations/mutations/login";
 import {ErrorCodes, ErrorCodesUa} from "../../models/models";
@@ -15,7 +13,6 @@ import {setAccessRights} from "../../helpers/helpers";
 
 const Login = () => {
   const dispatchNotification = useNotification();
-  const dispatchPopupWindow = usePopupWindow();
   const [login] = useMutation(LOGIN);
   const [disabled, setDisabled] = useState(true);
   const [loginValue, setLoginValue] = useState('');
@@ -23,20 +20,12 @@ const Login = () => {
   const history = useHistory();
 
   useEffect(() => {
-    if(loginValue.length && passwordValue.length) {
+    if (loginValue.length && passwordValue.length) {
       setDisabled(false);
     } else {
       setDisabled(true);
     }
   }, [loginValue, passwordValue]);
-
-  const handleSignup = () => {
-    dispatchPopupWindow({
-      header: <h1>Реєстрація</h1>,
-      body: <Registration />,
-      footer: <Button form="signupForm" type='submit'>Реєстрація</Button>
-    });
-  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -70,7 +59,7 @@ const Login = () => {
           });
           isLoggedVar(true);
           setAccessRights(user);
-          history.push('/');
+          history.push('/classrooms');
         }
       } catch (e) {
         dispatchNotification({
@@ -118,14 +107,11 @@ const Login = () => {
               value={passwordValue}
               onChange={handleChange}
             />
-            <div className={styles.loginButtons}>
-              <Button onClick={handleSignup} color="red">
-                Реєстрація
-              </Button>
-              <Button type={"submit"} disabled={disabled} form='loginForm' color="blue">
-                Увійти
-              </Button>
-            </div>
+            <Button type={"submit"} disabled={disabled} form='loginForm' color="blue"
+                    style={{marginTop: 32, height: 42}}
+            >
+              Увійти
+            </Button>
           </form>
         </div>
         <footer className={styles.loginFooter}>

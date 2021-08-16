@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./content.module.css";
-import Home from "../../../pages/home/Home";
-import { Route, Switch } from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 import Registry from "../../../pages/registry/Registry";
 import Schedule from "../../../pages/schedule/Schedule";
 import Users from "../../../pages/users/Users";
@@ -27,29 +26,31 @@ const Content: React.FC<PropTypes> = ({isLogged}) => {
   return (
     <div className={styles.content}>
       {!isLogged
-      ? <Switch>
-          <Route path="/" component={Login} />
-        </Switch>
-      : <Switch>
-        <Route exact path="/" component={Home} />
-        <Route path="/classrooms/:classroomName?" component={Classrooms} />
-        <Route path="/registry/:userId?" component={Registry} />
-        <Route path="/schedule" component={Schedule} />
-        <Route path="/users:userId?" component={Users} />
-        <Route path="/profile" component={Profile} />
-        <Route path="/admin" component={Admin} />
-        <Route path="/adminClassrooms" component={AdminClassrooms} />
-        <Route path="/adminUsers" component={AdminUsers} />
-        <Route path="/adminInstruments" component={AdminInstruments} />
-        <Route path="/adminDepartments" component={AdminDepartments} />
-        <Route path="/adminFaculties" component={AdminFaculties} />
-        <Route path="/adminDegrees" component={AdminDegrees} />
-        <Route path="/dashboard" component={Dashboard} />
-        <Route path="/queue" component={Queue} />
-      </Switch>
+        ? <Switch>
+            <Route path="/" component={Login}/>
+          </Switch>
+
+        : <Switch>
+            <Route exact path="/" component={Classrooms}/>
+            <Route path="/classrooms/:classroomName?" component={Classrooms}/>
+            <Route path="/registry/:userId?" component={Registry}/>
+            <Route path="/schedule" component={Schedule}/>
+            <Route path="/users:userId?" component={Users}/>
+            <Route path="/profile" component={Profile}/>
+            <Route path="/admin" component={Admin}/>
+            <Route path="/adminClassrooms" component={AdminClassrooms}/>
+            <Route path="/adminUsers" component={AdminUsers}/>
+            <Route path="/adminInstruments" component={AdminInstruments}/>
+            <Route path="/adminDepartments" component={AdminDepartments}/>
+            <Route path="/adminFaculties" component={AdminFaculties}/>
+            <Route path="/adminDegrees" component={AdminDegrees}/>
+            <Route path="/dashboard" component={Dashboard}/>
+            <Route path="/queue" component={Queue}/>
+          </Switch>
       }
     </div>
   );
-};
+}
+;
 
 export default Content;

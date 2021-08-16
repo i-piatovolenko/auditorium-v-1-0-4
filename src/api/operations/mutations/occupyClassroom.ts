@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import {gql} from "@apollo/client";
 
 export const OCCUPY_CLASSROOM = gql`
     mutation occupyClassroom($input: OccupyClassroomInput!) {
@@ -21,6 +21,14 @@ export const OCCUPY_CLASSROOM = gql`
                     }
                     until
                     state
+                }
+            }
+            prevClassroom {
+               id
+                occupied {
+                    user {
+                        id
+                    }
                 }
             }
             userErrors {

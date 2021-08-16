@@ -1,8 +1,8 @@
-import React, {FormEvent, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./queue.module.css";
 import Header from "../../components/header/Header";
 import Select from "react-select";
-import {QueueState, QueueType, User} from "../../models/models";
+import {DisabledState, EnqueuedBy, QueueType, User} from "../../models/models";
 import {fullName} from "../../helpers/helpers";
 import Button from "../../components/button/Button";
 import {client} from "../../api/client";
@@ -41,16 +41,14 @@ const Queue = () => {
   const removeFromLine = async () => {
     setDisabled(true);
     try {
-    await client.mutate({
-      mutation: REMOVE_USER_FROM_QUEUE,
-      variables: {
-        where: {
-          userId: {
-            equals: chosenUser.value
+      await client.mutate({
+        mutation: REMOVE_USER_FROM_QUEUE,
+        variables: {
+          input: {
+            userId: chosenUser.value
           }
         }
-      }
-    });
+      });
       dispatchNotification({
         header: "Успішно!",
         message: `Користувача видалено з черги.`,
@@ -77,18 +75,23 @@ const Queue = () => {
   const getInLine = async () => {
     setDisabled(true);
     const data = classrooms
+      .filter(classroom => !classroom.isHidden && classroom.disabled.state === DisabledState.NOT_DISABLED)
       .filter(classroom => withInstrument ? classroom.instruments.length : true)
       .map(({id}) => ({
-      userId: chosenUser.value,
-      classroomId: id,
-      state: QueueState.ACTIVE,
-      type: QueueType.MINIMAL
-    }));
+        classroomId: id,
+        type: QueueType.MINIMAL,
+      }));
 
     try {
-    await client.mutate({mutation: ADD_USER_TO_QUEUE, variables: {
-        input: data
-      }});
+      await client.mutate({
+        mutation: ADD_USER_TO_QUEUE, variables: {
+          input: {
+            userId: chosenUser.value,
+            data,
+            enqueuedBy: EnqueuedBy.DISPATCHER
+          }
+        }
+      });
       dispatchNotification({
         header: "Успішно!",
         message: `Користувача записано в чергу.`,
@@ -139,12 +142,12 @@ const Queue = () => {
           />
           {chosenUser.queueLength === 0 && (
             <label htmlFor="instrumentCheckbox" className={styles.checkboxInstrument}>
-            <input type='checkbox' name='instrument' id='instrumentCheckbox' checked={withInstrument}
-                   onChange={(e) => setWithInstrument(e.target.checked)}
-                   disabled={disabled}
-            />
-            З фортепіано
-          </label>)
+              <input type='checkbox' name='instrument' id='instrumentCheckbox' checked={withInstrument}
+                     onChange={(e) => setWithInstrument(e.target.checked)}
+                     disabled={disabled}
+              />
+              З фортепіано
+            </label>)
           }
           {chosenUser.queueLength !== -1 && (
             <Button onClick={chosenUser.queueLength > 0 ? removeFromLine : getInLine}

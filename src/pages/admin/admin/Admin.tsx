@@ -1,21 +1,20 @@
 import React, {useEffect, useState} from "react";
 import styles from "./admin.module.css";
-import mainStyles from '../../../styles/main.module.css';
 import Header from "../../../components/header/Header";
-import {NavLink} from "react-router-dom";
-import Button from "../../../components/button/Button";
+import {NavLink, useHistory} from "react-router-dom";
 import {useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
 import {ACCESS_RIGHTS, User} from "../../../models/models";
 import CountUp from "react-countup";
 import {useLocal} from "../../../hooks/useLocal";
+import Button from "../../../components/button/Button";
+import {isLoggedVar} from "../../../api/client";
 
 const Admin = () => {
-  const serverURL = localStorage.getItem('serverURL');
-  const [value, setValue] = useState('');
   const {data, loading, error} = useQuery(GET_USERS);
   const [unverifiedCounter, setUnverifiedCounter] = useState(0);
   const {data: {accessRights}} = useLocal('accessRights');
+  const history = useHistory();
 
   useEffect(() => {
     setUnverifiedCounter(0);
@@ -26,21 +25,9 @@ const Admin = () => {
     }
   }, [data]);
 
-  useEffect(() => {
-    if (serverURL) {
-      setValue(serverURL);
-    } else {
-      setValue('http://54.75.17.229:4000/');
-      localStorage.setItem('serverURL', value);
-    }
-  }, [serverURL]);
-
-  const handleChange = (e: any) => {
-    setValue(e.target.value);
-  };
-
-  const handleSubmit = () => {
-    localStorage.setItem('serverURL', value);
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    isLoggedVar(false);
   };
 
   return (
@@ -58,17 +45,11 @@ const Admin = () => {
             <li><NavLink to='/adminDepartments'>Кафедри</NavLink></li>
             <li><NavLink to='/adminFaculties'>Факультети</NavLink></li>
             <li><NavLink to='/adminDegrees'>Навчальні ступені</NavLink></li>
-            <li><NavLink to='/adminSchedule'>Розклад</NavLink></li>
+            {/*<li><NavLink to='/adminSchedule'>Розклад</NavLink></li>*/}
         </>}
       </ul>
       <div className={styles.settings}>
-        {accessRights === ACCESS_RIGHTS.ADMIN && <>
-        <label className={styles.serverURL}>
-            Server URL:
-            <input type="text" className={mainStyles.input} value={value as string} onChange={handleChange}/>
-        </label>
-        <Button onClick={handleSubmit}>Змінити</Button>
-        </>}
+        <Button onClick={handleLogout}>Вийти з профілю</Button>
       </div>
     </div>
   );

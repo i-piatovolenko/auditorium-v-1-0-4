@@ -1,25 +1,23 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./classroom.module.css";
 import {
-  ACCESS_RIGHTS,
   ClassroomType,
+  DisabledState,
   OccupiedInfo,
   OccupiedState,
   OccupiedStateUa,
+  User,
   UserTypes,
   UserTypesUa,
 } from "../../models/models";
-import {fullName, isOccupiedOnSchedule, typeStyle} from "../../helpers/helpers";
+import {fullName, isClassroomNotFree, typeStyle} from "../../helpers/helpers";
 import Instruments from "../instruments/Instruments";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Tag from "../tag/Tag";
 import Footer from "../footer/Footer";
 import specialPiano from "../../assets/images/specialPiano.svg";
-import {useLocal} from "../../hooks/useLocal";
-import {client} from "../../api/client";
-import {gql} from "@apollo/client/core";
-import {GET_DISABLED_CLASSROOMS} from "../../api/operations/queries/disabledClassrooms";
+import moment from "moment";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -31,14 +29,12 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
     isHidden, disabled
   } = classroom;
-  const userFullName = occupied?.user.nameTemp === null ? fullName(occupied?.user, true) :
-    occupied?.user.nameTemp;
+  const userFullName = fullName(occupied.user as User, true);
   const dispatchPopupWindow = usePopupWindow();
-  const {data: {accessRights}} = useLocal('accessRights');
-  const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
+  const [isOverdue, setIsOverDue] = useState(false);
+  // const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
+  let timeout: ReturnType<typeof setTimeout>;
 
-  const occupationInfo = occupied ? OccupiedStateUa[occupied?.state as OccupiedState]
-    : occupiedOnSchedule ? "Зайнято за розкдадом" : "Вільно";
   const header = (
     <>
       <h1>{`Аудиторія ${name}`}</h1>
@@ -46,6 +42,23 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       {isOperaStudio && <Tag body="Оперна студія"/>}
     </>
   );
+
+  useEffect(() => {
+    return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (classroom.occupied.state === OccupiedState.RESERVED) {
+      const untilString: string = classroom.occupied.until as unknown as string;
+      const untilStringWithoutZ = untilString.slice(0, untilString.length - 1);
+      const diffInMs = moment(untilStringWithoutZ).diff(moment());
+      if (diffInMs >= 0) {
+        timeout = setTimeout(() => setIsOverDue(true), diffInMs);
+      } else {
+        setIsOverDue(true);
+      }
+    }
+  }, [classroom.occupied.state]);
 
   const defineStyle = () => {
     const occupiedStyle = {
@@ -61,15 +74,16 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
     };
 
-    if (disabled) return disableStyle;
-    if (occupied) return occupiedStyle;
+    if (disabled?.state === DisabledState.DISABLED) return disableStyle;
+    if (isClassroomNotFree(occupied)) return occupiedStyle;
     return vacantStyle;
   };
 
   const defineStatus = () => {
-    if (disabled) return disabled.comment;
-    if (occupied) return OccupiedStateUa[occupied?.state as OccupiedState];
-    return occupiedOnSchedule ? "Зайнято за розкдадом" : "Вільно";
+    if (isOverdue) return 'Резервація прострочена!';
+    if (disabled?.state === DisabledState.DISABLED) return disabled?.comment;
+    if (isClassroomNotFree(occupied)) return OccupiedStateUa[occupied?.state as OccupiedState];
+    return "Вільно";
   }
 
   const handleClick = () => {
@@ -79,14 +93,16 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       body: <ClassroomInfo
         classroom={classroom}
         dispatchNotification={dispatchNotification}
+        dispatchPopupWindow={dispatchPopupWindow}
       />,
-      footer: accessRights >= ACCESS_RIGHTS.DISPATCHER && <Footer
-          classroomName={name}
-          classroomId={id}
-          disabled={disabled}
-          occupied={occupied}
-          dispatchNotification={dispatchNotification}
-          dispatchPopupWindow={dispatchPopupWindow}
+      footer: <Footer
+        classroomName={name}
+        classroomId={id}
+        disabled={disabled}
+        occupied={occupied}
+        dispatchNotification={dispatchNotification}
+        dispatchPopupWindow={dispatchPopupWindow}
+        isOverdue={isOverdue}
       />,
     });
   };
@@ -96,24 +112,25 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       <li
         key={id}
         className={styles.classroomsListItem}
-        style={{...defineStyle(), opacity: isHidden ? .5 : 1}}
+        style={{...defineStyle(), opacity: isHidden ? .5 : 1, border: isOverdue ? '4px solid red' : 'none'}}
         onClick={handleClick}
       >
         <div className={styles.header}>
           {special === 'PIANO' && <img className={styles.special} src={specialPiano} alt="Special Piano"/>}
           <h1 className={chair ? styles.isDepartment : ''}>{name}</h1>
-          <div className={styles.occupantInfo}>
-            <p className={styles.occupantName} title={userFullName}>{userFullName}</p>
-            <p
-              style={typeStyle(occupied as OccupiedInfo)}
-              className={styles.occupantType}
-            >
-              {UserTypesUa[occupied?.user.type as UserTypes]}
-            </p>
-          </div>
+          {isClassroomNotFree(occupied) && (
+            <div className={styles.occupantInfo}>
+              <p className={styles.occupantName} title={userFullName}>{userFullName}</p>
+              <p style={typeStyle(occupied as OccupiedInfo)} className={styles.occupantType}>
+                {UserTypesUa[occupied.user?.type as UserTypes]}
+              </p>
+            </div>
+          )}
         </div>
         <div className={styles.occupationInfo}>
-          <p className={occupied?.state === OccupiedState.RESERVED ? styles.reserved : ''}>
+          <p className={isOverdue ? styles.overdue :
+            occupied?.state === OccupiedState.RESERVED ? styles.reserved : ''}
+          >
             {defineStatus()}
           </p>
         </div>

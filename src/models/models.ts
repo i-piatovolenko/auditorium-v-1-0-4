@@ -108,18 +108,20 @@ export type EmployeeInfo = {
 };
 
 export type OccupiedInfo = {
-  user: User;
-  until: Date;
-  state: OccupiedState | null;
+  user: User | null;
+  until: Date | null;
+  state: OccupiedState;
 };
 
 export enum OccupiedState {
+  FREE = 'FREE',
   OCCUPIED = 'OCCUPIED',
   PENDING = 'PENDING',
   RESERVED = 'RESERVED'
 }
 
 export enum OccupiedStateUa {
+  FREE = 'Вільно',
   OCCUPIED = 'Зайнято',
   PENDING = 'Очікує підтвердження',
   RESERVED = 'Зарезервовано'
@@ -142,7 +144,13 @@ export type InstrumentType = {
   classroom: ClassroomType;
 };
 
+export enum DisabledState {
+  DISABLED = 'DISABLED',
+  NOT_DISABLED = 'NOT_DISABLED'
+}
+
 export type DisabledInfo = {
+  state: DisabledState;
   comment: string;
   until: Date;
 };
@@ -168,7 +176,7 @@ export type ClassroomType = {
   isWing: boolean;
   isOperaStudio: boolean;
   description: string | null;
-  occupied: OccupiedInfo | null;
+  occupied: OccupiedInfo;
   instruments: Array<InstrumentType>;
   disabled: DisabledInfo | null;
   schedule: Array<ScheduleUnitType>;
@@ -243,3 +251,8 @@ export type QueueRecord = {
 }
 
 export type LangT = 'ua' | 'en';
+
+export enum EnqueuedBy {
+  SELF = 'SELF',
+  DISPATCHER = 'DISPATCHER'
+}

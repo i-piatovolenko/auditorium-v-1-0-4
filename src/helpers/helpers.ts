@@ -1,17 +1,5 @@
-import {
-  HOUR,
-  MINUTE,
-  TIME_SNIPPETS,
-  WORKING_DAY_END,
-  WORKING_DAY_START,
-} from "./constants";
-import {
-  ACCESS_RIGHTS,
-  OccupiedInfo,
-  ScheduleUnitType,
-  User,
-  UserTypes,
-} from "../models/models";
+import {HOUR, MINUTE, TIME_SNIPPETS, WORKING_DAY_END, WORKING_DAY_START,} from "./constants";
+import {ACCESS_RIGHTS, OccupiedInfo, OccupiedState, ScheduleUnitType, User, UserTypes,} from "../models/models";
 import moment from "moment";
 import {ReactElement} from "react";
 import {accessRightsVar} from "../api/client";
@@ -74,8 +62,9 @@ export const formatMinutesToMM = (value: number) => {
   else return value;
 };
 
-export const fullName = (user: User | undefined, withInitials = false) => {
-  if (user !== undefined) {
+export const fullName = (user: User, withInitials = false) => {
+  if (user) {
+    if(user.nameTemp) return user.nameTemp
     if (withInitials) {
       return `${user.lastName} ${user.firstName.charAt(0)}. ${
         user.patronymic ? user.patronymic.charAt(0) + "." : ""
@@ -97,7 +86,7 @@ export const typeStyle = (occupied: OccupiedInfo) => {
     color: "#000",
   };
   if (occupied !== null) {
-    switch (occupied.user.type) {
+    switch (occupied.user?.type) {
       case UserTypes.STUDENT:
         return student;
       case UserTypes.POST_GRADUATE:
@@ -229,4 +218,9 @@ export const setAccessRights = (user: User) => {
   }
 
   accessRightsVar(accessRights);
+};
+
+
+export const isClassroomNotFree = (occupied: OccupiedInfo) => {
+  return occupied.state !== OccupiedState.FREE;
 };

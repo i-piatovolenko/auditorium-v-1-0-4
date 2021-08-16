@@ -59,3 +59,20 @@ export const GET_USER_BY_ID = gql`
     }
   }
 `;
+
+export const GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID = gql`
+  query getUserOccupiedClassroomsByUserId($where: UserWhereUniqueInput!) {
+    user(where: $where) {
+      id
+      occupiedClassrooms {
+        id
+        state
+        classroom {
+          id
+          name
+          
+        }
+      }
+     }
+  }
+`;

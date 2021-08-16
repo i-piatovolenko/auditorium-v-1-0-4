@@ -24,7 +24,7 @@ const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
     } else {
       setColumns(`20px 3fr 200px`);
     }
-  }, [data]);
+  }, [data, gridTemplateColumns]);
 
   useEffect(() => {
     setSortedData(data?.slice().sort((a, b) => {

@@ -1,24 +1,27 @@
 import React, {FormEvent, useEffect, useRef, useState,} from "react";
 import styles from "./occupantRegistration.module.css";
 import {useMutation, useQuery} from "@apollo/client";
-import {GET_USERS} from "../../../api/operations/queries/users";
+import {GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID, GET_USERS} from "../../../api/operations/queries/users";
 import {fullName} from "../../../helpers/helpers";
 import Title from "../../title/Title";
 import Select from 'react-select';
-import {User, UserTypesUa, UserTypes} from "../../../models/models";
+import {User, UserTypesUa, UserTypes, OccupiedState} from "../../../models/models";
 import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
-import {isButtonDisabledVar} from "../../../api/client";
+import {client, isButtonDisabledVar} from "../../../api/client";
+import ConfirmFooter from "../../footer/ConfirmFooter";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
+  dispatchPopupWindow: (value: any) => void;
   classroomId: number;
   classroomName: string;
   dispatch: (value: any) => void;
 }
 
-const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classroomId,
-   classroomName, dispatch
-}) => {
+const OccupantRegistration: React.FC<PropTypes> = ({
+                                                     dispatchNotification, classroomId,
+                                                     classroomName, dispatch, dispatchPopupWindow
+                                                   }) => {
   const [value, setValue] = useState<string>();
   const [existingUserValue, setExistingUserValue] = useState(null);
   const [chosenUserId, setChosenUserId] = useState(-1);
@@ -40,13 +43,13 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
   const existingUserInput = useRef(null);
 
   //@ts-ignore
-  useEffect(() => existingUserInput.current.focus(),[]);
+  useEffect(() => existingUserInput.current.focus(), []);
 
   useEffect(() => {
     if (!loading && !error) {
       setUsers(data.users.map((user: User) => ({label: user.id + ": " + fullName(user), value: user.id})));
     }
-  }, [data]);
+  }, [data, error, loading]);
 
   const handleReset = () => {
     setExistingUserValue(null);
@@ -77,13 +80,55 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
     setChosenUserType(e);
   };
 
-  const handleOccupy = (e: FormEvent<HTMLFormElement>) => {
+  const confirmOccupyAnotherClassroom = (oldClassroomName: string) => {
+    dispatchPopupWindow({
+      header: <h1>Увага!</h1>,
+      body: <span>Користувач знаходиться в аудиторії {oldClassroomName}. Після підтвердження користувача буде виписано з аудиторіЇ {oldClassroomName} і записано до аудиторії {classroomName}.</span>,
+      footer: <ConfirmFooter onOk={handleOccupy}/>,
+      isConfirm: true
+    });
+  }
+
+  const checkChosenUserIsOccupiedPreviously = async () => {
+    try {
+    const chosenUserOccupiedInfo = await client.query({
+      query: GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID,
+      variables: {
+        where: {
+          id: chosenUserId,
+        }
+      },
+      fetchPolicy: 'network-only'
+    });
+    const occupiedClassrooms = chosenUserOccupiedInfo.data.user.occupiedClassrooms;
+    if (occupiedClassrooms?.length) {
+      const occupiedOrReservedClassrooms = occupiedClassrooms.filter((classroom: any) => {
+        return classroom.state === OccupiedState.RESERVED || classroom.state === OccupiedState.OCCUPIED
+      });
+      if (occupiedOrReservedClassrooms.length) {
+        confirmOccupyAnotherClassroom(occupiedOrReservedClassrooms[0].classroom.name);
+      } else {
+       await handleOccupy();
+      }
+    } else {
+      await handleOccupy();
+    }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const onOccupyClick = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    await checkChosenUserIsOccupiedPreviously();
+  };
+
+  const handleOccupy = async () => {
     const existingUser = {
       userId: chosenUserId,
     };
     const newUser = {
-      userId: -1,
+      userId: chosenUserId,
       tempUser: {
         name: chosenUserName,
         type: chosenUserType.value
@@ -91,9 +136,9 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
     };
     const occupant = chosenUserId === -1 ? newUser : existingUser;
 
-    if(chosenUserName !== "") {
+    if (chosenUserName !== "") {
       isButtonDisabledVar(true);
-      occupyClassroom({
+      await occupyClassroom({
         variables: {
           input: {
             classroomName: classroomName.toString(),
@@ -101,17 +146,16 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
             ...occupant
           }
         }
-      }).then(() => {
-        dispatch({
-          type: "POP_POPUP_WINDOW",
-        });
-        dispatchNotification({
-          header: "Успішно!",
-          message: `Аудиторія ${classroomName} зайнята.`,
-          type: "ok",
-        });
-        isButtonDisabledVar(false);
+      })
+      dispatch({
+        type: "POP_POPUP_WINDOW",
       });
+      dispatchNotification({
+        header: "Успішно!",
+        message: `Аудиторія ${classroomName} зайнята.`,
+        type: "ok",
+      });
+      isButtonDisabledVar(false);
     } else {
       dispatchNotification({
         header: "Помилка",
@@ -127,43 +171,43 @@ const OccupantRegistration: React.FC<PropTypes> = ({dispatchNotification, classr
       <form
         id="userSearchForm"
         className={styles.userSearch}
-        onSubmit={handleOccupy}
+        onSubmit={onOccupyClick}
       >
-          <Select
-            placeholder="Існуючі користувачі"
-            options={users}
-            value={existingUserValue}
-            styles={{menuPortal: base => ({...base, zIndex: 9999})}}
-            menuPortalTarget={document.body}
-            onChange={handleExistingUser}
-            onFocus={handleReset}
-            ref={existingUserInput}
-          />
+        <Select
+          placeholder="Існуючі користувачі"
+          options={users}
+          value={existingUserValue}
+          styles={{menuPortal: base => ({...base, zIndex: 9999})}}
+          menuPortalTarget={document.body}
+          onChange={handleExistingUser}
+          onFocus={handleReset}
+          ref={existingUserInput}
+        />
         <div>
-            <input
-              type="text"
-              value={value}
-              onChange={handleNewUser}
-              name="tempUsersInput"
-              id="tempUsersInput"
-              placeholder="Новий користувач"
-              className={styles.createUserInput}
-              autoComplete="off"
-            />
+          <input
+            type="text"
+            value={value}
+            onChange={handleNewUser}
+            name="tempUsersInput"
+            id="tempUsersInput"
+            placeholder="Новий користувач"
+            className={styles.createUserInput}
+            autoComplete="off"
+          />
           {value && <Select
-            options={newUserTypes}
-            value={chosenUserType}
-            placeholder={UserTypesUa.STUDENT}
-            onChange={handleTypeSelect}
-            menuPortalTarget={document.body}
-            styles={{menuPortal: base => ({...base, zIndex: 9999})}}
+              options={newUserTypes}
+              value={chosenUserType}
+              placeholder={UserTypesUa.STUDENT}
+              onChange={handleTypeSelect}
+              menuPortalTarget={document.body}
+              styles={{menuPortal: base => ({...base, zIndex: 9999})}}
           />}
         </div>
       </form>
       <Title title="Вибраний користувач"/>
       <p>П.І.Б.: {chosenUserName}</p>
       {/*@ts-ignore*/}
-      <p>Статус: { chosenUserType && chosenUserName?.length !== 0 && UserTypesUa[chosenUserType.value]}</p>
+      <p>Статус: {chosenUserType && chosenUserName?.length !== 0 && UserTypesUa[chosenUserType.value]}</p>
     </div>
   );
 };

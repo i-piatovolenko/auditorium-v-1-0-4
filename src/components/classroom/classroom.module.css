@@ -101,6 +101,11 @@
   color: #fff;
 }
 
+.overdue {
+  background-color: #f91354;
+  color: #fff;
+}
+
 .disableButton {
   position: absolute;
   left: 16px;
@@ -114,4 +119,19 @@
 
 .disableClassroomInput span{
   width: 30%
+}
+
+.sanctions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sanctions label {
+  white-space: nowrap;
+  padding-right: 8px;
+  color: #f91354;
+}
+
+.sanctions input {
+  border: 2px solid #f91354 !important;
 }

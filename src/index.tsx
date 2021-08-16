@@ -11,9 +11,7 @@ import {BrowserRouter, HashRouter} from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
-    <HashRouter
-      basename='/auditorium-v-1-0-4'
-    >
+    <HashRouter>
       <ApolloProvider client={client}>
         <PopupWindowProvider>
           <NotificationProvider>

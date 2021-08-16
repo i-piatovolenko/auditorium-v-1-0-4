@@ -1,12 +1,11 @@
 import { gql } from "@apollo/client";
 
 export const GET_CLASSROOM = gql`
-  query getClassroom($id: Int!) {
-    classroom(id: id) {
+  query getClassroom($where: ClassroomWhereUniqueInput!) {
+    classroom(where: $where) {
       id
-      disabled {
-        comment
-        until
+      queue {
+        id
       }
     }
   }
