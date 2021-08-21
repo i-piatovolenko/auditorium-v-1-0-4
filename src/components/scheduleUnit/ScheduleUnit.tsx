@@ -2,11 +2,12 @@ import React from "react";
 import styles from "./scheduleUnit.module.css";
 import { useQuery } from "@apollo/client";
 import { GET_SCHEDULE_UNIT } from "../../api/operations/queries/schedule";
-import {fullName, getScheduleUnitSize, ISODateString} from "../../helpers/helpers";
+import {fullName, getScheduleUnitSize} from "../../helpers/helpers";
 import {ActivityTypes, ScheduleUnitType} from "../../models/models";
 import Button from "../button/Button";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import UserProfile from "../userProfile/UserProfile";
+import moment from "moment";
 
 interface PropTypes {
   classroomName: string;
@@ -17,7 +18,7 @@ const ScheduleUnit: React.FC<PropTypes> = ({ classroomName }) => {
   const { data, loading, error } = useQuery(GET_SCHEDULE_UNIT, {
     variables: {
       classroomName: classroomName,
-      date: ISODateString(new Date()),
+      date: moment().toISOString(),
     },
   });
 

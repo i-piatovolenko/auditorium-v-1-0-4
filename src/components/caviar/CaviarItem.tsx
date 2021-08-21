@@ -23,8 +23,7 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) =>  
   useEffect(() => {
     if (classroom.occupied.state === OccupiedState.RESERVED) {
       const untilString: string = classroom.occupied.until as unknown as string;
-      const untilStringWithoutZ = untilString.slice(0, untilString.length - 1);
-      const diffInMs = moment(untilStringWithoutZ).diff(moment());
+      const diffInMs = moment(untilString).diff(moment());
       if (diffInMs >= 0) {
         timeout = setTimeout(() => setIsOverDue(true), diffInMs);
       } else {

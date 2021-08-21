@@ -7,13 +7,13 @@ import {useForm} from "react-hook-form";
 import {CREATE_CLASSROOM} from "../../../../api/operations/mutations/createClassroom";
 import {GET_CLASSROOMS} from "../../../../api/operations/queries/classrooms";
 import {client, gridUpdate} from "../../../../api/client";
-import {ISODateString} from "../../../../helpers/helpers";
 import TextArea from "antd/es/input/TextArea";
 import {selectLightStyles} from "../../../../styles/selectStyles";
 import useInstruments from "../../../../hooks/useInstruments";
 import mainStyles from "../../../../styles/main.module.css";
 import useDepartments from "../../../../hooks/useDepartments";
 import addIcon from '../../../../assets/images/addLined.svg';
+import moment from "moment";
 
 interface PropTypes {
   dispatch: (value: any) => void;
@@ -84,7 +84,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
     });
     await client.query({
       query: GET_CLASSROOMS,
-      variables: {date: ISODateString(new Date())},
+      variables: {date: moment().toISOString()},
       fetchPolicy: 'network-only',
     });
     gridUpdate(!gridUpdate());

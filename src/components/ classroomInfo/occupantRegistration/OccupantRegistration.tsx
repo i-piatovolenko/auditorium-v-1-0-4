@@ -143,7 +143,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         variables: {
           input: {
             classroomName: classroomName.toString(),
-            until: moment().add(3, 'hour').format('YYYY-MM-DDTHH:mm:ss') + 'Z',
+            until: moment().add(3, 'hours').toISOString(),
             ...occupant
           }
         }

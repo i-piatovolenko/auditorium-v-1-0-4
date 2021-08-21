@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
 import {GET_CLASSROOMS} from "../api/operations/queries/classrooms";
-import {ISODateString} from "../helpers/helpers";
 import {ClassroomType} from "../models/models";
 import {useQuery} from "@apollo/client";
+import moment from "moment";
 
 const useClassrooms = (props?: any): [Array<ClassroomType>, any] => {
   const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
   const {data, loading, error, subscribeToMore} = useQuery(GET_CLASSROOMS, {
-    variables: { date: ISODateString(props?.date ? props.date : new Date()) }
+    variables: { date: moment(props?.date || new Date()).toISOString() }
   });
 
   useEffect(() => {

@@ -4,11 +4,11 @@ import Header from "../../components/header/Header";
 import ScheduleUnit from "../../components/scheduleUnit/ScheduleUnit";
 import {useQuery} from "@apollo/client";
 import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
-import {ISODateString} from "../../helpers/helpers";
 import {ACCESS_RIGHTS, ClassroomType} from "../../models/models";
 import mainStyles from "../../styles/main.module.css";
 import {useLocal} from "../../hooks/useLocal";
 import Edit from "../../components/icons/edit/Edit";
+import moment from "moment";
 
 const timePeriods = [
   '9:00', '10:00', '11:00', '12:00', '13:00', '14:00',
@@ -18,7 +18,7 @@ const timePeriods = [
 const Schedule = () => {
   const [date, setDate] = useState(new Date());
   const {data, loading, error} = useQuery(GET_CLASSROOMS, {
-    variables: {date: ISODateString(new Date(date))}
+    variables: {date: moment(date).toISOString()}
   });
   const { data: {accessRights}} = useLocal('accessRights');
 

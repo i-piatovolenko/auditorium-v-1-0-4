@@ -40,9 +40,19 @@ function Dashboard() {
         query: GET_PENDING_CLASSROOMS,
         variables: {
           where: {
-            state: {
-              equals: OccupiedState.PENDING
-            }
+            OR: [
+              {
+                state: {
+                  equals: OccupiedState.PENDING
+                }
+              },
+              {
+                state: {
+                  equals: OccupiedState.RESERVED
+                }
+              }
+            ]
+
           }
         },
         fetchPolicy: 'network-only'

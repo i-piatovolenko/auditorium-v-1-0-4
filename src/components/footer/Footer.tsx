@@ -11,6 +11,7 @@ import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom
 import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
 import {fullName, isClassroomNotFree} from "../../helpers/helpers";
 import ConfirmFooter from "./ConfirmFooter";
+import moment from "moment";
 
 interface PropTypes {
   classroomName: string;
@@ -93,7 +94,7 @@ const Footer: React.FC<PropTypes> = ({
               input: {
                 classroomName: String(classroomName),
                 comment,
-                until: until + ':00Z'
+                until: moment(until).toISOString()
               }
             },
           });
