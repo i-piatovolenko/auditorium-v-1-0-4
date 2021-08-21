@@ -43,6 +43,7 @@ const Login = () => {
           }
         });
         if (result?.data.login.userErrors?.length) {
+          localStorage.removeItem('token')
           dispatchNotification({
             header: 'Помилка!',
             message: ErrorCodesUa[result?.data.login.userErrors[0].code as ErrorCodes],
@@ -50,8 +51,10 @@ const Login = () => {
           });
         } else {
           const user = result?.data.login.user;
+          const token = result?.data.login.token;
 
           localStorage.setItem('user', JSON.stringify(user));
+          localStorage.setItem('token', token);
           dispatchNotification({
             header: 'Вітаємо!',
             message: 'Авторизація успішна!',

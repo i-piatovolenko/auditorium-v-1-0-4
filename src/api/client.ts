@@ -1,8 +1,60 @@
-import { ApolloClient, InMemoryCache, makeVar } from "@apollo/client";
+import {ApolloClient, createHttpLink, InMemoryCache, makeVar, split} from "@apollo/client";
 import {ACCESS_RIGHTS} from "../models/models";
+import {WebSocketLink} from "@apollo/client/link/ws";
+import {setContext} from "@apollo/client/link/context";
+import {getMainDefinition} from "@apollo/client/utilities";
+
+const wsLink: any = new WebSocketLink({
+  uri: 'ws://54.75.17.229:4000/',
+  options: {
+    reconnect: true,
+    connectionParams: () => {
+      const token = localStorage.getItem('token')
+      return {
+        authorization: token ? `Bearer ${token}` : "",
+      }
+    }
+  }
+});
+
+const subscriptionMiddleware = {
+  applyMiddleware: (options: any, next: any) => {
+    const token = localStorage.getItem('token')
+    options.authorization = token ? `Bearer ${token}` : ""
+    next()
+  },
+}
+
+wsLink.subscriptionClient.use([subscriptionMiddleware]);
+
+const httpLink = createHttpLink({
+  uri: 'http://54.75.17.229:4000/'
+});
+
+const authLink = setContext((_, {headers}) => {
+  const token = localStorage.getItem('token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    }
+  }
+});
+
+const splitLink = split(
+  ({query}) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  httpLink,
+);
 
 export const client = new ApolloClient({
-  uri: 'http://54.75.17.229:4000/',
+  link: authLink.concat(splitLink),
   connectToDevTools: true,
   cache: new InMemoryCache({
     typePolicies: {

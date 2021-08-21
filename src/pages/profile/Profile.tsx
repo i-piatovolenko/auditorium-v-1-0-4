@@ -20,6 +20,7 @@ const Profile = () => {
     if (confirm('Ви бажаете вийти?')) {
       isLoggedVar(false);
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
       history.push('/');
     }
   };

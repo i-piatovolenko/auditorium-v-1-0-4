@@ -50,7 +50,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
       <p className={styles.description}>
         {chair ? chair.name + ". " + description : description}
       </p>
-      <p>Черга за цією аудиторію: {queueSize ? `${queueSize} чол.` : 'відсутня'}</p>
+      <p>Черга за цією аудиторію: {queueSize ? `${queueSize} люд.` : 'відсутня'}</p>
       {/*<Title title="Розклад на сьогодні" />*/}
       {/*<ScheduleUnit classroomName={name} />*/}
       {instruments.length > 0 && (

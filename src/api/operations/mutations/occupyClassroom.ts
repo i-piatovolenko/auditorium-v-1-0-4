@@ -7,16 +7,13 @@ export const OCCUPY_CLASSROOM = gql`
                 id
                 occupied {
                     user {
-                      id
-                      firstName
-                      patronymic
-                      lastName
-                      type
-                      nameTemp
-                      email
-                      phoneNumber
-                      department {
-                          name
+                        id
+                        firstName
+                        patronymic
+                        lastName
+                        type
+                        department {
+                            name
                         }
                     }
                     until
@@ -28,7 +25,16 @@ export const OCCUPY_CLASSROOM = gql`
                 occupied {
                     user {
                         id
+                        firstName
+                        patronymic
+                        lastName
+                        type
+                        department {
+                            name
+                        }
                     }
+                    until
+                    state
                 }
             }
             userErrors {
