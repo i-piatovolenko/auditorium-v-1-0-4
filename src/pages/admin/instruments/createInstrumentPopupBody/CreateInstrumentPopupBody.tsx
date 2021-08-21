@@ -10,7 +10,7 @@ import {FormData} from '../models';
 import {SelectData} from '../models';
 import Select from "react-select";
 import {selectLightStyles} from "../../../../styles/selectStyles";
-import {InstrumentType} from "../../../../models/models";
+import {ClassroomType, InstrumentType} from "../../../../models/models";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
@@ -26,7 +26,7 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
   dispatch, addInstrument, instrument, onUpdate,
   handleErrorDetails}) => {
   const {register, handleSubmit, watch, formState: {errors}} = useForm<FormData>();
-  const classrooms = useClassrooms();
+  const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
   const [classroomsData, setClassroomsData] = useState<SelectData[]>([{
     value: instrument?.classroom ? String(instrument?.classroom?.id) : '',
     label: instrument?.classroom ? String(instrument?.classroom?.name) : ''

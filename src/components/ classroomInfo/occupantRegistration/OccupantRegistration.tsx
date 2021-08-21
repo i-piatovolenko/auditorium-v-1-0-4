@@ -9,6 +9,7 @@ import {User, UserTypesUa, UserTypes, OccupiedState} from "../../../models/model
 import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
 import {client, isButtonDisabledVar} from "../../../api/client";
 import ConfirmFooter from "../../footer/ConfirmFooter";
+import moment from "moment";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
@@ -142,7 +143,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         variables: {
           input: {
             classroomName: classroomName.toString(),
-            until: new Date(),
+            until: moment().add(3, 'hour').format('YYYY-MM-DDTHH:mm:ss') + 'Z',
             ...occupant
           }
         }

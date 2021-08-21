@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import styles from "./queue.module.css";
 import Header from "../../components/header/Header";
 import Select from "react-select";
-import {DisabledState, EnqueuedBy, QueueType, User} from "../../models/models";
+import {ClassroomType, DisabledState, EnqueuedBy, QueueType, User} from "../../models/models";
 import {fullName} from "../../helpers/helpers";
 import Button from "../../components/button/Button";
 import {client} from "../../api/client";
@@ -15,7 +15,7 @@ import {ADD_USER_TO_QUEUE} from "../../api/operations/mutations/addUserToQueue";
 const Queue = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [disabled, setDisabled] = useState(false);
-  const classrooms = useClassrooms();
+  const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
   const [withInstrument, setWithInstrument] = useState(false);
   const [chosenUser, setChosenUser] = useState({label: '', value: -1, queueLength: -1});
   const dispatchNotification = useNotification();

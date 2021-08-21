@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Header from "../../components/header/Header";
 import {ACCESS_RIGHTS, ClassroomsFilterTypes, ClassroomType} from "../../models/models";
 import Classroom from "../../components/classroom/Classroom";
@@ -12,6 +12,7 @@ import {filterClassrooms} from "../../helpers/filterClassrooms";
 import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../components/loader/Loader";
 import {useLocal} from "../../hooks/useLocal";
+import {FOLLOW_CLASSROOMS} from "../../api/operations/subscriptions/classrooms";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -20,12 +21,19 @@ const filters = [
 ];
 
 const Classrooms = () => {
-  const classrooms = useClassrooms();
+  const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
   const [filter, setFilter] = useState(filters[0].value);
   const [isNoWing, setIsNoWing] = useState(false);
   const [isOperaStudioOnly, setIsOperaStudioOnly] = useState(false);
   const dispatchNotification = useNotification();
   const {data: {accessRights}} = useLocal('accessRights');
+
+  useEffect(() => {
+    const unsubscribeClassrooms = subscribeToMore({
+      document: FOLLOW_CLASSROOMS,
+    });
+    return () => unsubscribeClassrooms
+  });
 
   const handleFilterChange = (event: any) => {
     setFilter(event.value);

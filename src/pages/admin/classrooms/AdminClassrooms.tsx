@@ -18,7 +18,7 @@ import BrowseClassroomPopupBody from "./browseClassroomPopupBody/BrowseClassroom
 const listHeader = ['ID', 'Назва', 'Кафедра', 'Спец.', 'Оп. студія', 'Флігель'];
 
 const AdminClassrooms = () => {
-  const classrooms: ClassroomType[] = useClassrooms();
+  const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
   const [listData, setListData] = useState<any>([]);
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();

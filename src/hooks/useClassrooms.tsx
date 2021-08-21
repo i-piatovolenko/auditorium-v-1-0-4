@@ -4,11 +4,11 @@ import {ISODateString} from "../helpers/helpers";
 import {ClassroomType} from "../models/models";
 import {useQuery} from "@apollo/client";
 
-const useClassrooms = (props?: any): Array<ClassroomType> => {
+const useClassrooms = (props?: any): [Array<ClassroomType>, any] => {
   const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
-  const {data, loading, error} = useQuery(GET_CLASSROOMS, {
+  const {data, loading, error, subscribeToMore} = useQuery(GET_CLASSROOMS, {
     variables: { date: ISODateString(props?.date ? props.date : new Date()) }
-  })
+  });
 
   useEffect(() => {
     !loading && !error && setClassrooms(
@@ -21,7 +21,7 @@ const useClassrooms = (props?: any): Array<ClassroomType> => {
     );
 }, [data, loading, error]);
 
-  return classrooms;
+  return [classrooms, subscribeToMore];
 };
 
 export default useClassrooms;
