@@ -32,7 +32,7 @@ const Classrooms = () => {
     const unsubscribeClassrooms = subscribeToMore({
       document: FOLLOW_CLASSROOMS,
     });
-    return () => unsubscribeClassrooms
+    return () => unsubscribeClassrooms();
   });
 
   const handleFilterChange = (event: any) => {

@@ -118,6 +118,27 @@
     align-items: center;
 }
 
+.hiddenLogout {
+    position: absolute;
+    width: 200px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 5px 10px rgba(0, 0, 0, 0.24);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding: 16px;
+    left: calc(100vw / 2 - 50px);
+    top: calc(100vh / 2 - 100px);
+    opacity: 0;
+}
+
+.hiddenLogout:hover {
+    opacity: 1;
+}
+
 @keyframes swing-in-top-fwd {
     0% {
         transform: rotateX(-100deg);

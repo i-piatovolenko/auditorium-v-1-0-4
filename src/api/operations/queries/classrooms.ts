@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const GET_CLASSROOMS = gql`
-  query getClassrooms($date: Date!) {
+  query getClassrooms {
     classrooms {
       id
       description
@@ -30,10 +30,6 @@ export const GET_CLASSROOMS = gql`
         }
         until
         state
-      }
-      schedule(date: $date) {
-        from
-        to
       }
       instruments {
         name

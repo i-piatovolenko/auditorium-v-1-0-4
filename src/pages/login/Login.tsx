@@ -6,7 +6,7 @@ import Button from "../../components/button/Button";
 import {useNotification} from "../../components/notification/NotificationProvider";
 import {useMutation} from "@apollo/client";
 import {LOGIN} from "../../api/operations/mutations/login";
-import {ErrorCodes, ErrorCodesUa} from "../../models/models";
+import {ErrorCodes, ErrorCodesUa, UserTypes} from "../../models/models";
 import {isLoggedVar} from "../../api/client";
 import {useHistory} from "react-router-dom";
 import {setAccessRights} from "../../helpers/helpers";
@@ -62,7 +62,12 @@ const Login = () => {
           });
           isLoggedVar(true);
           setAccessRights(user);
-          history.push('/classrooms');
+          if (user.type === UserTypes.ADMIN || user.type === UserTypes.DISPATCHER) {
+            history.push('/classrooms');
+          }
+          else {
+            history.push('/dashboard')
+          }
         }
       } catch (e) {
         dispatchNotification({

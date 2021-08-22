@@ -16,41 +16,48 @@ import AdminDegrees from "../../../pages/admin/degrees/AdminDegrees";
 import Login from "../../../pages/login/Login";
 import Dashboard from "../../../pages/dashboard/Dashboard";
 import Queue from "../../../pages/queue/Queue";
+import {User, UserTypes} from "../../../models/models";
 
 interface PropTypes {
   isLogged: boolean;
 }
 
 const Content: React.FC<PropTypes> = ({isLogged}) => {
+    const user: User = JSON.parse(localStorage.getItem('user'));
 
-  return (
-    <div className={styles.content}>
-      {!isLogged
-        ? <Switch>
+    return (
+      <div className={styles.content}>
+        {!isLogged
+          ? <Switch>
             <Route path="/" component={Login}/>
           </Switch>
 
-        : <Switch>
-            <Route exact path="/" component={Classrooms}/>
-            <Route path="/classrooms/:classroomName?" component={Classrooms}/>
-            <Route path="/registry/:userId?" component={Registry}/>
-            <Route path="/schedule" component={Schedule}/>
-            <Route path="/users:userId?" component={Users}/>
-            <Route path="/profile" component={Profile}/>
-            <Route path="/admin" component={Admin}/>
-            <Route path="/adminClassrooms" component={AdminClassrooms}/>
-            <Route path="/adminUsers" component={AdminUsers}/>
-            <Route path="/adminInstruments" component={AdminInstruments}/>
-            <Route path="/adminDepartments" component={AdminDepartments}/>
-            <Route path="/adminFaculties" component={AdminFaculties}/>
-            <Route path="/adminDegrees" component={AdminDegrees}/>
-            <Route path="/dashboard" component={Dashboard}/>
-            <Route path="/queue" component={Queue}/>
-          </Switch>
-      }
-    </div>
-  );
-}
+          : user && (user.type === UserTypes.ADMIN || user.type === UserTypes.DISPATCHER) ? (
+            <Switch>
+              <Route exact path="/" component={Classrooms}/>
+              <Route path="/classrooms/:classroomName?" component={Classrooms}/>
+              <Route path="/registry/:userId?" component={Registry}/>
+              <Route path="/schedule" component={Schedule}/>
+              <Route path="/users:userId?" component={Users}/>
+              <Route path="/profile" component={Profile}/>
+              <Route path="/admin" component={Admin}/>
+              <Route path="/adminClassrooms" component={AdminClassrooms}/>
+              <Route path="/adminUsers" component={AdminUsers}/>
+              <Route path="/adminInstruments" component={AdminInstruments}/>
+              <Route path="/adminDepartments" component={AdminDepartments}/>
+              <Route path="/adminFaculties" component={AdminFaculties}/>
+              <Route path="/adminDegrees" component={AdminDegrees}/>
+              <Route path="/dashboard" component={Dashboard}/>
+              <Route path="/queue" component={Queue}/>
+            </Switch>
+          ) : (
+            <Switch>
+              <Route path="/dashboard" component={Dashboard}/>
+            </Switch>
+          )}
+      </div>
+    );
+  }
 ;
 
 export default Content;

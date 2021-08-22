@@ -2,13 +2,14 @@ import React, {useEffect, useRef, useState} from 'react';
 import styles from './dashboard.module.css';
 import Header from "../../components/header/Header";
 import moment from "moment";
-import {ClassroomType, LangT, OccupiedState, User} from "../../models/models";
+import {ClassroomType, EnqueuedBy, LangT, OccupiedState, User} from "../../models/models";
 import {fullName} from "../../helpers/helpers";
 import {GET_GENERAL_QUEUE} from "../../api/operations/queries/generalQueue";
 import {GET_PENDING_CLASSROOMS} from "../../api/operations/queries/pendingClassrooms";
 import strings from '../../localize/localize';
-import {client} from "../../api/client";
+import {client, isLoggedVar} from "../../api/client";
 import {GET_FREE_CLASSROOMS} from "../../api/operations/queries/freeClassrooms";
+import Button from "../../components/button/Button";
 
 function Dashboard() {
   const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
@@ -42,13 +43,26 @@ function Dashboard() {
           where: {
             OR: [
               {
-                state: {
-                  equals: OccupiedState.PENDING
+                occupied: {
+                  state: {
+                    equals: OccupiedState.PENDING
+                  }
                 }
               },
               {
-                state: {
-                  equals: OccupiedState.RESERVED
+                occupied: {
+                  state: {
+                    equals: OccupiedState.RESERVED
+                  },
+                  user: {
+                    queueInfo: {
+                      currentSession: {
+                        enqueuedBy: {
+                          equals: EnqueuedBy.DISPATCHER
+                        }
+                      }
+                    }
+                  }
                 }
               }
             ]
@@ -64,8 +78,10 @@ function Dashboard() {
         query: GET_FREE_CLASSROOMS,
         variables: {
           where: {
-            state: {
-              equals: null
+            occupied: {
+              state: {
+                equals: OccupiedState.FREE
+              }
             }
           }
         },
@@ -83,8 +99,17 @@ function Dashboard() {
     };
   }, []);
 
+  const handleLogoutClick = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    isLoggedVar(false);
+  };
+
   return (
     <div className={styles.wrapper}>
+      <div className={styles.hiddenLogout}>
+        <Button onClick={handleLogoutClick} color='red'>Вийти з аккаунту</Button>
+      </div>
       <Header>
         <div className={styles.header}>
           <h1>{strings[lang].generalQueue}</h1>
@@ -98,29 +123,29 @@ function Dashboard() {
             {data && data.generalQueue
               .slice(0, 10)
               .map((user: User, index: number) => (
-              <li key={user.id}>
-                <span>{index+1} </span>
-                <span className={styles.fullName}>
+                <li key={user.id}>
+                  <span>{index + 1} </span>
+                  <span className={styles.fullName}>
                   {user.nameTemp || fullName(user, true)}
                 </span>
-              </li>
-            ))}
+                </li>
+              ))}
           </ul>
         </div>
         <div className={styles.rightPart}>
           <ul className={styles.waitingApprove}>
-          {classrooms && classrooms
-            .map(({id, name, occupied}) => (
-              <li key={id}>
+            {classrooms && classrooms
+              .map(({id, name, occupied}) => (
+                <li key={id}>
                 <span className={styles.classroomName}>
                   Ауд. {name}
                 </span>
-                <span>
+                  <span>
                   {occupied!.user.nameTemp || fullName(occupied!.user, true)}
                 </span>
-              </li>
+                </li>
               ))
-          }
+            }
           </ul>
           <div className={styles.info}>
             <p>
@@ -135,7 +160,7 @@ function Dashboard() {
                       {strings[lang].freeClassrooms}
                       {freeClassrooms.map(name => <span>{name}</span>)}
                     </>
-                    )
+                  )
                   : strings[lang].noFreeClassrooms
               }
             </p>

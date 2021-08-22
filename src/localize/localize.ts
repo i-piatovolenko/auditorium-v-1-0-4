@@ -13,7 +13,7 @@ const strings = {
     vilnukhAud: 'Free classrooms: ',
     noFreeClassrooms: 'No free classrooms',
     generalQueue: 'General Queue',
-    pendingConfirmation: 'Pending confirmation'
+    pendingConfirmation: 'Confirmation Pending'
   }
 }
 
