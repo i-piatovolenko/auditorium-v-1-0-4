@@ -5,7 +5,7 @@ import {setContext} from "@apollo/client/link/context";
 import {getMainDefinition} from "@apollo/client/utilities";
 
 const wsLink: any = new WebSocketLink({
-  uri: 'ws://54.75.17.229:4000/',
+  uri: 'ws://api.auditoriu.me/',
   options: {
     reconnect: true,
     connectionParams: () => {
@@ -28,7 +28,7 @@ const subscriptionMiddleware = {
 wsLink.subscriptionClient.use([subscriptionMiddleware]);
 
 const httpLink = createHttpLink({
-  uri: 'http://54.75.17.229:4000/'
+  uri: 'http://api.auditoriu.me/'
 });
 
 const authLink = setContext((_, {headers}) => {

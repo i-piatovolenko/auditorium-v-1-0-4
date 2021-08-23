@@ -11,6 +11,14 @@ export const GET_USERS = gql`
       department {
         name
       }
+      occupiedClassrooms {
+        id
+          state
+          classroom {
+            id
+            name
+          }
+      }
       email
       phoneNumber
       extraPhoneNumbers

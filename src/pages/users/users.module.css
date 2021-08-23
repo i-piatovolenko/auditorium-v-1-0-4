@@ -8,3 +8,12 @@
 .centerText {
     text-align: center;
 }
+
+.unverified {
+    color: #f91354;
+    background: #f9135411;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 0 8px;
+    border: 1px solid #f91354;
+}

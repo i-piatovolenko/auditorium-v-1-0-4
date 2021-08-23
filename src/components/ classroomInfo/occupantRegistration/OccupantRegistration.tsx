@@ -5,7 +5,14 @@ import {GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID, GET_USERS} from "../../../api/o
 import {fullName} from "../../../helpers/helpers";
 import Title from "../../title/Title";
 import Select from 'react-select';
-import {User, UserTypesUa, UserTypes, OccupiedState} from "../../../models/models";
+import {
+  EmployeeAccountStatus,
+  OccupiedState,
+  StudentAccountStatus,
+  User,
+  UserTypes,
+  UserTypesUa
+} from "../../../models/models";
 import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroom";
 import {client, isButtonDisabledVar} from "../../../api/client";
 import ConfirmFooter from "../../footer/ConfirmFooter";
@@ -48,7 +55,12 @@ const OccupantRegistration: React.FC<PropTypes> = ({
 
   useEffect(() => {
     if (!loading && !error) {
-      setUsers(data.users.map((user: User) => ({label: user.id + ": " + fullName(user), value: user.id})));
+      setUsers(data.users.filter(({studentInfo, employeeInfo, nameTemp}: User) => {
+        return (studentInfo && studentInfo.accountStatus === StudentAccountStatus.ACTIVE) ||
+          (employeeInfo && employeeInfo.accountStatus === EmployeeAccountStatus.ACTIVE) &&
+          !nameTemp
+      })
+        .map((user: User) => ({label: user.id + ": " + fullName(user), value: user.id})));
     }
   }, [data, error, loading]);
 
@@ -91,29 +103,30 @@ const OccupantRegistration: React.FC<PropTypes> = ({
   }
 
   const checkChosenUserIsOccupiedPreviously = async () => {
+    if (chosenUserId === -1) return await handleOccupy();
     try {
-    const chosenUserOccupiedInfo = await client.query({
-      query: GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID,
-      variables: {
-        where: {
-          id: chosenUserId,
-        }
-      },
-      fetchPolicy: 'network-only'
-    });
-    const occupiedClassrooms = chosenUserOccupiedInfo.data.user.occupiedClassrooms;
-    if (occupiedClassrooms?.length) {
-      const occupiedOrReservedClassrooms = occupiedClassrooms.filter((classroom: any) => {
-        return classroom.state === OccupiedState.RESERVED || classroom.state === OccupiedState.OCCUPIED
+      const chosenUserOccupiedInfo = await client.query({
+        query: GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID,
+        variables: {
+          where: {
+            id: chosenUserId,
+          }
+        },
+        fetchPolicy: 'network-only'
       });
-      if (occupiedOrReservedClassrooms.length) {
-        confirmOccupyAnotherClassroom(occupiedOrReservedClassrooms[0].classroom.name);
+      const occupiedClassrooms = chosenUserOccupiedInfo.data.user.occupiedClassrooms;
+      if (occupiedClassrooms?.length) {
+        const occupiedOrReservedClassrooms = occupiedClassrooms.filter((classroom: any) => {
+          return classroom.state === OccupiedState.RESERVED || classroom.state === OccupiedState.OCCUPIED
+        });
+        if (occupiedOrReservedClassrooms.length) {
+          confirmOccupyAnotherClassroom(occupiedOrReservedClassrooms[0].classroom.name);
+        } else {
+          await handleOccupy();
+        }
       } else {
-       await handleOccupy();
+        await handleOccupy();
       }
-    } else {
-      await handleOccupy();
-    }
     } catch (e) {
       console.log(e);
     }
@@ -139,7 +152,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
 
     if (chosenUserName !== "") {
       isButtonDisabledVar(true);
-      await occupyClassroom({
+      const result = await occupyClassroom({
         variables: {
           input: {
             classroomName: classroomName.toString(),
@@ -148,13 +161,23 @@ const OccupantRegistration: React.FC<PropTypes> = ({
           }
         }
       })
+      if (result.data.occupyClassroom.userErrors.length) {
+        result.data.occupyClassroom.userErrors.forEach(({message}: any) => {
+          dispatchNotification({
+            header: "Помилка",
+            message,
+            type: "alert",
+          });
+        })
+      } else {
+        dispatchNotification({
+          header: "Успішно!",
+          message: `Аудиторія ${classroomName} зайнята.`,
+          type: "ok",
+        });
+      }
       dispatch({
         type: "POP_POPUP_WINDOW",
-      });
-      dispatchNotification({
-        header: "Успішно!",
-        message: `Аудиторія ${classroomName} зайнята.`,
-        type: "ok",
       });
       isButtonDisabledVar(false);
     } else {

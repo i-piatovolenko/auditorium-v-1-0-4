@@ -1,6 +1,13 @@
 import React from 'react';
 import styles from "./browseUserPopupBody.module.css";
-import {EmploymentTypes, EmploymentTypesUa, User, UserTypes, UserTypesUa} from "../../../../models/models";
+import {
+  EmploymentTypes,
+  EmploymentTypesUa,
+  StudentAccountStatus,
+  User,
+  UserTypes,
+  UserTypesUa
+} from "../../../../models/models";
 import {fullName} from "../../../../helpers/helpers";
 
 interface PropTypes {
@@ -10,7 +17,7 @@ interface PropTypes {
 const BrowseUserPopupBody: React.FC<PropTypes> = ({user}) => {
   return (
     <div>
-      {!user.verified && <div className={styles.verification}>
+      {user.studentInfo?.accountStatus === StudentAccountStatus.UNVERIFIED && <div className={styles.verification}>
         <h2>Користувача не верифіковано!</h2>
         <p>Перед верифікацією користувача звірте правильність даних з офіційном документом.</p>
       </div>}

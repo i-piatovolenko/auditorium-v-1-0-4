@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Header from '../../../components/header/Header';
 import styles from './adminUsers.module.css';
-import {ACCESS_RIGHTS, User, UserTypes, UserTypesUa} from "../../../models/models";
+import {ACCESS_RIGHTS, StudentAccountStatus, User, UserTypes, UserTypesUa} from "../../../models/models";
 import {usePopupWindow} from "../../../components/popupWindow/PopupWindowProvider";
 import {useNotification} from "../../../components/notification/NotificationProvider";
 import {useMutation, useQuery} from "@apollo/client";
@@ -18,7 +18,6 @@ import Delete from "../../../components/icons/delete/Delete";
 import DataList from "../../../components/dataList/DataList";
 import BrowseUserPopupBody from "./browseUserPopupBody/BrowseUserPopupBody";
 import Button from "../../../components/button/Button";
-import EditUserPopupBody from "../admin/editUserPopupBody/EditUserPopupBody";
 import {VERIFY_USER} from "../../../api/operations/mutations/verifyUser";
 import {useLocal} from "../../../hooks/useLocal";
 
@@ -57,19 +56,18 @@ const AdminUsers = () => {
   const dispatchNotification = useNotification();
   const [searchValue, setSearchValue] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const history = useHistory();
   const [listData, setListData] = useState<any[]>([]);
   const [verifyUser] = useMutation(VERIFY_USER);
   const {data: {accessRights}} = useLocal('accessRights');
-  const user = (item: User) => <>
-    <span className={styles.alignText}>{item.id}</span>
-    <span>{fullName(item)}</span>
-    <span>{item.verified
-      ? ''
-      : <Button color='red' onClick={() => handleCreate(item)}>Верифікувати</Button>}
+  const user = (user: User) => <>
+    <span className={styles.alignText}>{user.id}</span>
+    <span>{fullName(user)}</span>
+    <span>{user.studentInfo?.accountStatus === StudentAccountStatus.UNVERIFIED && (
+      <Button color='red' onClick={() => verify(user.id)}>Верифікувати</Button>
+    )}
     </span>
-    <span className={styles.alignText}>{UserTypesUa[item.type as UserTypes]}</span>
-    {accessRights === ACCESS_RIGHTS.ADMIN && <Edit dark onClick={() => handleCreate(item)}/>}
+    <span className={styles.alignText}>{UserTypesUa[user.type as UserTypes]}</span>
+    {accessRights === ACCESS_RIGHTS.ADMIN && <Edit dark onClick={() => handleCreate(user)}/>}
     {accessRights === ACCESS_RIGHTS.ADMIN && <Delete onClick={() => handleDelete()}/>}
   </>;
 
@@ -126,7 +124,14 @@ const AdminUsers = () => {
   const verify = async (userId: number) => {
     try {
       const result = await verifyUser({variables: {input: {userId}}});
-      showNotification(dispatchNotification, ['Успішно!', 'Користувача верифіковано', 'ok']);
+      if (result.data.verifyUser.userErrors.length) {
+        result.data.verifyUser.userErrors.forEach(({message}: any) => {
+          showNotification(dispatchNotification, ['Помилка!', message, 'alert']);
+        })
+      } else {
+        showNotification(dispatchNotification, ['Успішно!', 'Користувача верифіковано', 'ok']);
+      }
+
     } catch (e) {
       showNotification(dispatchNotification, ['Помилка!', e.message.slice(0, 100), 'alert']);
     }

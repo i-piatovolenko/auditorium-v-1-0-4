@@ -26,8 +26,12 @@ const UserProfile: React.FC<PropTypes> = ({userId}) => {
         <p>{data.user.id}</p>
         <Title title="Статус"/>
         <p>{UserTypesUa[data.user.type as UserTypes]}</p>
-        <Title title="Кафедра"/>
-        <p>{data.user.department}</p>
+        {data.user.department && (
+          <>
+            <Title title="Кафедра"/>
+            <p>{data.user.department.name}</p>
+          </>
+        )}
         <Title title="E-mail"/>
         <p>
           <Button>

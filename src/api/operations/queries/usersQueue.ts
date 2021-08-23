@@ -10,6 +10,21 @@ export const GET_USERS_FOR_QUEUE = gql`
       queue {
         id
       }
+      type
+      queueInfo {
+        sanctionedUntil
+      }
+      studentInfo {
+        accountStatus
+      }
+      occupiedClassrooms {
+        id
+          state
+          classroom {
+            id
+            name
+          }
+      }
     }
   }
 `;

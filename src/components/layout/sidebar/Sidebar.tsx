@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import styles from "./sidebar.module.css";
 import Logo from "../../logo/Logo";
-import { NavLink, Route, Switch } from "react-router-dom";
+import {NavLink, Route, Switch} from "react-router-dom";
 import menuIcon from "../../../assets/images/menu.svg";
 import classroomsIcon from "../../../assets/images/classrooms.svg";
 import registryIcon from "../../../assets/images/registry.svg";
@@ -10,7 +10,7 @@ import controlIcon from "../../../assets/images/settings.svg";
 import queueIcon from "../../../assets/images/queue.png";
 import {useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
-import {User} from "../../../models/models";
+import {StudentAccountStatus, User} from "../../../models/models";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(true);
@@ -20,8 +20,9 @@ const Sidebar = () => {
   useEffect(() => {
     setUnverifiedCounter(0);
     if (data) {
-      data.users.forEach((user: User) => {
-        !user.verified && setUnverifiedCounter(prevState => prevState+1);
+      data.users.forEach(({studentInfo}: User) => {
+        studentInfo?.accountStatus === StudentAccountStatus.UNVERIFIED
+        && setUnverifiedCounter(prevState => prevState + 1);
       });
     }
   }, [data]);
@@ -63,7 +64,7 @@ const Sidebar = () => {
             Аудиторії
           </Route>
           <Route exact path="/queue">
-              Черга
+            Черга
           </Route>
           <Route exact path="/registry">
             Журнал
@@ -90,21 +91,21 @@ const Sidebar = () => {
             onClick={onClick}
             to="/classrooms"
           >
-            <img className={styles.icon} src={classroomsIcon} alt="classrooms" />
+            <img className={styles.icon} src={classroomsIcon} alt="classrooms"/>
             Аудиторії
           </NavLink>
         </li>
         <li>
-            <NavLink
-                activeClassName={styles.linkActive}
-                className={styles.link}
-                onClick={onClick}
-                to="/queue"
-            >
-              {/*TODO change PNG icon to SVG*/}
-                <img className={styles.icon} src={queueIcon} alt="queue" />
-                Черга
-            </NavLink>
+          <NavLink
+            activeClassName={styles.linkActive}
+            className={styles.link}
+            onClick={onClick}
+            to="/queue"
+          >
+            {/*TODO change PNG icon to SVG*/}
+            <img className={styles.icon} src={queueIcon} alt="queue"/>
+            Черга
+          </NavLink>
         </li>
         <li>
           <NavLink
@@ -113,7 +114,7 @@ const Sidebar = () => {
             onClick={onClick}
             to="/registry"
           >
-            <img className={styles.icon} src={registryIcon} alt="registry" />
+            <img className={styles.icon} src={registryIcon} alt="registry"/>
             Журнал
           </NavLink>
         </li>
@@ -129,13 +130,14 @@ const Sidebar = () => {
         {/*  </NavLink>*/}
         {/*</li>*/}
         <li>
+          {unverifiedCounter !== 0 && <span className={styles.alert}>!</span>}
           <NavLink
             activeClassName={styles.linkActive}
             className={styles.link}
             onClick={onClick}
             to="/users"
           >
-            <img className={styles.icon} src={usersIcon} alt="users" />
+            <img className={styles.icon} src={usersIcon} alt="users"/>
             Користувачі
           </NavLink>
         </li>
@@ -151,14 +153,13 @@ const Sidebar = () => {
         {/*  </NavLink>*/}
         {/*</li>*/}
         <li>
-          {unverifiedCounter !== 0 && <span className={styles.alert}>!</span>}
           <NavLink
             activeClassName={styles.linkActive}
             className={styles.link}
             onClick={onClick}
             to="/admin"
           >
-            <img className={[styles.icon, styles.settings].join(' ')} src={controlIcon} alt="control" />
+            <img className={[styles.icon, styles.settings].join(' ')} src={controlIcon} alt="control"/>
             Налаштування
           </NavLink>
         </li>

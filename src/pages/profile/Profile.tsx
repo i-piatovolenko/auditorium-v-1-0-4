@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import styles from "./profile.module.css";
 import Header from "../../components/header/Header";
 import useUsers from "../../hooks/useUsers";
-import {User, UserTypes, UserTypesUa} from "../../models/models";
+import {StudentAccountStatus, User, UserTypes, UserTypesUa} from "../../models/models";
 import {fullName} from "../../helpers/helpers";
 import Button from "../../components/button/Button";
 import {isLoggedVar} from "../../api/client";
@@ -40,7 +40,7 @@ const Profile = () => {
         {me && <div className={styles.profileData}>
             <div><span>П.І.Б.:</span><span>{fullName(me)}</span></div>
             <div><span>ID:</span><span>{me.id}</span></div>
-          {!me.verified && <div><span>Верифіковано:</span><span>Ні</span></div>}
+          {me.studentInfo.accountStatus === StudentAccountStatus.UNVERIFIED && <div><span>Верифіковано:</span><span>Ні</span></div>}
             <div><span>Тип:</span><span>{UserTypesUa[me.type as UserTypes]}</span></div>
           {me.department && <div><span>Кафедра:</span><span>{me.department.name}</span></div>}
             <div><span>Тел.:</span><span>{me.phoneNumber}</span></div>

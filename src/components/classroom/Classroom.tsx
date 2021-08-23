@@ -51,26 +51,37 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     if (classroom.occupied.state === OccupiedState.RESERVED) {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
-      if (diffInMs >= 0) {
+
+      if (diffInMs >= 0 && classroom.occupied.state === OccupiedState.RESERVED && !timeout) {
         timeout = setTimeout(() => setIsOverDue(true), diffInMs);
-      } else {
+      } else if (diffInMs <= 0 && classroom.occupied.state === OccupiedState.RESERVED) {
         setIsOverDue(true);
+      } else {
+        setIsOverDue(false);
       }
+    } else {
+      setIsOverDue(false);
     }
+    if (occupied.state !== OccupiedState.RESERVED && timeout) clearTimeout(timeout);
+    defineStyle();
+    defineStatus();
+    defineStatusStiles();
   }, [classroom.occupied.state]);
 
   const defineStyle = () => {
     const occupiedStyle = {
       background: "#fff",
-      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
+      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)",
+      border: isOverdue ? '4px solid red' : 'none'
     };
     const vacantStyle = {
       background: "#4bfd63",
-      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
+      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)",
     };
     const disableStyle = {
       background: "#b1b1b1",
-      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)"
+      transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)",
+      border: isOverdue ? '4px solid red' : 'none'
     };
 
     if (disabled?.state === DisabledState.DISABLED) return disableStyle;
@@ -78,9 +89,17 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     return vacantStyle;
   };
 
+  const defineStatusStiles = () => {
+    if (isOverdue) return styles.overdue;
+    if (!isOverdue && occupied.state === OccupiedState.RESERVED) return  styles.reserved;
+    else return ''
+  };
+
   const defineStatus = () => {
     if (isOverdue) return 'Резервація прострочена!';
-    if (disabled?.state === DisabledState.DISABLED) return disabled?.comment;
+    if (disabled?.state === DisabledState.DISABLED) {
+      return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');
+    }
     if (isClassroomNotFree(occupied)) return OccupiedStateUa[occupied?.state as OccupiedState];
     return "Вільно";
   }
@@ -111,7 +130,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       <li
         key={id}
         className={styles.classroomsListItem}
-        style={{...defineStyle(), opacity: isHidden ? .5 : 1, border: isOverdue ? '4px solid red' : 'none'}}
+        style={{...defineStyle(), opacity: isHidden ? .5 : 1}}
         onClick={handleClick}
       >
         <div className={styles.header}>
@@ -127,8 +146,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
           )}
         </div>
         <div className={styles.occupationInfo}>
-          <p className={isOverdue ? styles.overdue :
-            occupied?.state === OccupiedState.RESERVED ? styles.reserved : ''}
+          <p className={defineStatusStiles()}
           >
             {defineStatus()}
           </p>

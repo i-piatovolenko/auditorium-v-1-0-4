@@ -91,15 +91,16 @@ export type User = {
   startYear: number;
   studentInfo: StudentInfo;
   employeeInfo: EmployeeInfo;
-  verified: boolean;
   expireDate: Date | null;
   queue: QueueRecord[];
+  queueInfo: UserQueueInfo;
+  occupiedClassrooms: OccupiedInfo[];
 };
 
 export type StudentInfo = {
   degree: Degree;
   startYear: number;
-  accountStatus: string;
+  accountStatus: StudentAccountStatus;
 };
 
 export type EmployeeInfo = {
@@ -108,9 +109,12 @@ export type EmployeeInfo = {
 };
 
 export type OccupiedInfo = {
+  id: number;
   user: User | null;
-  until: Date | null;
+  until: string;
   state: OccupiedState;
+  classroom: ClassroomType;
+  classroomId: number;
 };
 
 export enum OccupiedState {
@@ -255,4 +259,38 @@ export type LangT = 'ua' | 'en';
 export enum EnqueuedBy {
   SELF = 'SELF',
   DISPATCHER = 'DISPATCHER'
+}
+
+export type UserQueueInfo = {
+  id: number;
+  user: User;
+  sanctionedUntil: string;
+  currentSession: QueueSession
+}
+
+export type QueueSession = {
+  id: number;
+  queueInfo: UserQueueInfo;
+  state: UserQueueState;
+  enqueuedBy: EnqueuedBy;
+  skips: number;
+  remainingOccupationTime: string;
+}
+
+export enum UserQueueState {
+  IN_QUEUE_MINIMAL = 'IN_QUEUE_MINIMAL',
+  IN_QUEUE_DESIRED_AND_OCCUPYING = 'IN_QUEUE_DESIRED_AND_OCCUPYING',
+  QUEUE_RESERVED_NOT_OCCUPYING = 'QUEUE_RESERVED_NOT_OCCUPYING',
+  OCCUPYING = 'OCCUPYING',
+}
+
+export enum StudentAccountStatus {
+  UNVERIFIED = 'UNVERIFIED',
+  ACTIVE = 'ACTIVE',
+  ACADEMIC_LEAVE = 'ACADEMIC_LEAVE'
+}
+
+export enum EmployeeAccountStatus {
+  ACTIVE = 'ACTIVE',
+  FROZEN = 'FROZEN'
 }

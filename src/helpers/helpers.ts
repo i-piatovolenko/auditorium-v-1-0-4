@@ -1,5 +1,13 @@
 import {HOUR, MINUTE, TIME_SNIPPETS, WORKING_DAY_END, WORKING_DAY_START,} from "./constants";
-import {ACCESS_RIGHTS, OccupiedInfo, OccupiedState, ScheduleUnitType, User, UserTypes,} from "../models/models";
+import {
+  ACCESS_RIGHTS,
+  OccupiedInfo,
+  OccupiedState,
+  ScheduleUnitType,
+  StudentAccountStatus,
+  User,
+  UserTypes,
+} from "../models/models";
 import moment from "moment";
 import {ReactElement} from "react";
 import {accessRightsVar} from "../api/client";
@@ -64,7 +72,7 @@ export const formatMinutesToMM = (value: number) => {
 
 export const fullName = (user: User, withInitials = false) => {
   if (user) {
-    if(user.nameTemp) return user.nameTemp
+    if (user.nameTemp) return user.nameTemp
     if (withInitials) {
       return `${user.lastName} ${user.firstName.charAt(0)}. ${
         user.patronymic ? user.patronymic.charAt(0) + "." : ""
@@ -79,8 +87,8 @@ export const fullName = (user: User, withInitials = false) => {
 };
 
 export const typeStyle = (occupied: OccupiedInfo) => {
-  const student = { backgroundColor: "rgba(46,40,124)", color: "#fff" };
-  const employee = { backgroundColor: "#ffc000", color: "#fff" };
+  const student = {backgroundColor: "rgba(46,40,124)", color: "#fff"};
+  const employee = {backgroundColor: "#ffc000", color: "#fff"};
   const vacant = {
     backgroundColor: "transparent",
     color: "#000",
@@ -148,6 +156,7 @@ export const ISODateString = (d: Date) => {
   function pad(n: any) {
     return n < 10 ? "0" + n : n;
   }
+
   return (
     d.getUTCFullYear() +
     "-" +
@@ -223,4 +232,9 @@ export const setAccessRights = (user: User) => {
 
 export const isClassroomNotFree = (occupied: OccupiedInfo) => {
   return occupied.state !== OccupiedState.FREE;
+};
+
+export const checkVerified = (user: User) => {
+  if (!user.studentInfo) return true;
+  return user.studentInfo.accountStatus !== StudentAccountStatus.UNVERIFIED;
 };

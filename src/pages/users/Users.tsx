@@ -2,10 +2,9 @@ import React, {useEffect, useState} from "react";
 import styles from "./users.module.css";
 import mainStyles from "./../../styles/main.module.css";
 import Header from "../../components/header/Header";
-import {ACCESS_RIGHTS, User, UserTypeColors, UserTypes, UserTypesUa} from "../../models/models";
-import {fullName} from "../../helpers/helpers";
+import {ACCESS_RIGHTS, StudentAccountStatus, User, UserTypeColors, UserTypes, UserTypesUa} from "../../models/models";
+import {checkVerified, fullName, showNotification} from "../../helpers/helpers";
 import {usePopupWindow} from "../../components/popupWindow/PopupWindowProvider";
-import UserProfile from "../../components/userProfile/UserProfile";
 import {CategoryType} from "../../styles/selectStyles";
 import Edit from "../../components/icons/edit/Edit";
 import HeaderSelect from "../../components/headerSelect/HeaderSelect";
@@ -13,6 +12,14 @@ import DataList from "../../components/dataList/DataList";
 import useUsers from "../../hooks/useUsers";
 import {useLocal} from "../../hooks/useLocal";
 import {isAvailableAccess} from "./helpers/helpers";
+import BrowseUserPopupBody from "../admin/users/browseUserPopupBody/BrowseUserPopupBody";
+import Button from "../../components/button/Button";
+import {useMutation} from "@apollo/client";
+import {VERIFY_USER} from "../../api/operations/mutations/verifyUser";
+import {useNotification} from "../../components/notification/NotificationProvider";
+import CountUp from "react-countup";
+import {client} from "../../api/client";
+import {GET_USER_BY_ID} from "../../api/operations/queries/users";
 
 const categories: CategoryType[] = [
   {
@@ -52,10 +59,12 @@ const listHeader = ['ID', 'П.І.Б.', 'Статус'];
 const Users = () => {
   const users = useUsers();
   const dispatchPopupWindow = usePopupWindow();
+  const dispatchNotification = useNotification();
   const [searchValue, setSearchValue] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
   const [isSearching, setIsSearching] = useState(false);
-  const { data: {accessRights}} = useLocal('accessRights');
+  const {data: {accessRights}} = useLocal('accessRights');
+  const [verifyUser] = useMutation(VERIFY_USER);
 
   useEffect(() => {
     const onlyExisting = users.filter(user => !user.nameTemp && isAvailableAccess(accessRights, user));
@@ -65,15 +74,32 @@ const Users = () => {
   const handleClick = (user: User) => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
-      body: <UserProfile userId={user.id as number}/>,
+      body: <BrowseUserPopupBody user={user}/>,
+      footer: !checkVerified(user) && <Button onClick={() => verify(user.id)}>Верифікувати</Button>
     });
   };
 
+  const verify = async (userId: number) => {
+    try {
+      const result = await verifyUser({variables: {input: {userId}}});
+      if (result.data.verifyUser.userErrors.length) {
+        result.data.verifyUser.userErrors.forEach(({message}: any) => {
+          showNotification(dispatchNotification, ['Помилка!', message, 'alert']);
+        })
+      } else {
+        showNotification(dispatchNotification, ['Успішно!', 'Користувача верифіковано', 'ok']);
+      }
+    } catch (e) {
+      showNotification(dispatchNotification, ['Помилка!', e.message.slice(0, 100), 'alert']);
+    }
+  };
+
   const handleSearch = (e: any) => {
-    setSearchValue(e.target.value);
+    setSearchValue(e.target.value.toLowerCase());
     if (e.target.value) {
       const filter = users.filter(user => !user.nameTemp && isAvailableAccess(accessRights, user))
-        .filter((user: User) => (fullName(user) + user.id).includes(e.target.value));
+        .filter((user: User) => (fullName(user) + user.id).toLowerCase()
+          .includes(e.target.value.toLowerCase()));
 
       setFilteredUsers(filter);
       setIsSearching(true);
@@ -94,12 +120,15 @@ const Users = () => {
   };
 
   const listData = filteredUsers?.map((user: User) => <>
-      <span className={styles.centerText}>{user.id}</span>
-      <span onClick={() => handleClick(user)}>{fullName(user)}</span>
-      <span className={styles.userType} style={{backgroundColor: UserTypeColors[user.type as UserTypes]}}>
+    <span className={styles.centerText}>{user.id}</span>
+    <span onClick={() => handleClick(user)}>
+        {fullName(user)}
+      {!checkVerified(user) && <span className={styles.unverified}>Не верифіковано</span>}
+    </span>
+    <span className={styles.userType} style={{backgroundColor: UserTypeColors[user.type as UserTypes]}}>
         {UserTypesUa[user.type as UserTypes]}
       </span>
-    </>);
+  </>);
 
   return (
     <>

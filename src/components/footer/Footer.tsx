@@ -12,6 +12,7 @@ import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
 import {fullName, isClassroomNotFree} from "../../helpers/helpers";
 import ConfirmFooter from "./ConfirmFooter";
 import moment from "moment";
+import {GIVE_OUT_CLASSROOM_KEY} from "../../api/operations/mutations/giveOutClassroomKey";
 
 interface PropTypes {
   classroomName: string;
@@ -45,6 +46,13 @@ const Footer: React.FC<PropTypes> = ({
         }
       }
     });
+    const [giveOutKey] = useMutation(GIVE_OUT_CLASSROOM_KEY, {
+      variables: {
+        input: {
+          classroomName
+        }
+      }
+    })
     const {data: {isButtonDisabled: disabled}} = useQuery(gql`
     query isButtonDisabled {
       isButtonDisabled @client
@@ -56,10 +64,19 @@ const Footer: React.FC<PropTypes> = ({
     }
   `);
 
-    const handleFreeClassroom = () => {
+    const handleFreeClassroom = async () => {
       isButtonDisabledVar(true);
       try {
-        freeClassroom().then(() => {
+        const result = await freeClassroom();
+        if (result.data.freeClassroom.userErrors.length) {
+          result.data.freeClassroom.userErrors.forEach(({message}: any) => {
+            dispatchNotification({
+              header: "Помилка",
+              message,
+              type: "alert",
+            });
+          })
+        } else {
           dispatchNotification({
             header: "Успішно!",
             message: `Аудиторія ${classroomName} звільнена.`,
@@ -70,7 +87,7 @@ const Footer: React.FC<PropTypes> = ({
           props.dispatch({
             type: "POP_POPUP_WINDOW",
           });
-        });
+        }
       } catch (e: any) {
         dispatchNotification({
           header: "Помилка!",
@@ -88,7 +105,7 @@ const Footer: React.FC<PropTypes> = ({
     const submitDisable = async (comment: string, until: string) => {
       if (comment && until) {
         try {
-          await client.mutate({
+          const result = await client.mutate({
             mutation: DISABLE_CLASSROOM,
             variables: {
               input: {
@@ -98,11 +115,21 @@ const Footer: React.FC<PropTypes> = ({
               }
             },
           });
-          dispatchNotification({
-            header: "Успішно!",
-            message: `Аудиторія ${classroomName} заблокована.`,
-            type: "ok",
-          });
+          if (result.data.disableClassroom.userErrors.length) {
+            result.data.disableClassroom.userErrors.forEach(({message}: any) => {
+              dispatchNotification({
+                header: "Помилка",
+                message,
+                type: "alert",
+              });
+            })
+          } else {
+            dispatchNotification({
+              header: "Успішно!",
+              message: `Аудиторія ${classroomName} заблокована.`,
+              type: "ok",
+            });
+          }
           //@ts-ignore
           props.dispatch({
             type: "POP_POPUP_WINDOW",
@@ -143,12 +170,22 @@ const Footer: React.FC<PropTypes> = ({
 
     const handleEnableClassroom = async () => {
       try {
-        await enableClassroom();
-        dispatchNotification({
-          header: "Успішно!",
-          message: `Аудиторія ${classroomName} разблокована.`,
-          type: "ok",
-        });
+        const result = await enableClassroom();
+        if (result.data.enableClassroom.userErrors.length) {
+          result.data.enableClassroom.userErrors.forEach(({message}: any) => {
+            dispatchNotification({
+              header: "Помилка",
+              message,
+              type: "alert",
+            });
+          })
+        } else {
+          dispatchNotification({
+            header: "Успішно!",
+            message: `Аудиторія ${classroomName} разблокована.`,
+            type: "ok",
+          });
+        }
         //@ts-ignore
         props.dispatch({
           type: "POP_POPUP_WINDOW",
@@ -183,12 +220,22 @@ const Footer: React.FC<PropTypes> = ({
     const handleGiveOutKey = async () => {
       isButtonDisabledVar(true);
       try {
-        //TODO give out key mutation (RESERVED to OCCUPIED state changing)
-        dispatchNotification({
-          header: "Операція успішна!",
-          message: "Ключ видано",
-          type: "ok",
-        });
+        const result = await giveOutKey();
+        if (result.data.giveOutClassroomKey.userErrors.length) {
+          result.data.giveOutClassroomKey.userErrors.forEach(({message}: any) => {
+            dispatchNotification({
+              header: "Помилка",
+              message,
+              type: "alert",
+            });
+          })
+        } else {
+          dispatchNotification({
+            header: "Операція успішна!",
+            message: "Ключ видано",
+            type: "ok",
+          });
+        }
         //@ts-ignore
         props.dispatch({
           type: "POP_POPUP_WINDOW",
@@ -229,13 +276,14 @@ const Footer: React.FC<PropTypes> = ({
               Передати {confirmSanctions ? '(з санкціями)' : ''}
             </Button>
             {disabled && <img className={styles.spinner} src={spinner} alt="wait"/>}
-            <Button onClick={confirmFreeClassroom} disabled={disabled}>
+            <Button onClick={confirmFreeClassroom} disabled={disabled} color='red'>
               Звільнити {confirmSanctions ? '(з санкціями)' : ''}
             </Button>
             {occupied.state === OccupiedState.RESERVED && (
               <>
                 {disabled && <img className={styles.spinner} src={spinner} alt="wait"/>}
-                <Button onClick={confirmGiveOutKey} disabled={disabled}>
+                <Button onClick={confirmGiveOutKey} disabled={disabled}
+                        style={{padding: '0 40px', height: '2.5rem'}}>
                   Видати ключ
                 </Button>
               </>

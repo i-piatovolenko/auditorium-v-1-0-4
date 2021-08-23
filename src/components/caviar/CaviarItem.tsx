@@ -24,12 +24,18 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) =>  
     if (classroom.occupied.state === OccupiedState.RESERVED) {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
-      if (diffInMs >= 0) {
+
+      if (diffInMs >= 0 && classroom.occupied.state === OccupiedState.RESERVED && !timeout) {
         timeout = setTimeout(() => setIsOverDue(true), diffInMs);
-      } else {
+      } else if (diffInMs <= 0 && classroom.occupied.state === OccupiedState.RESERVED) {
         setIsOverDue(true);
+      } else {
+        setIsOverDue(false);
       }
+    } else {
+      setIsOverDue(false);
     }
+    if (classroom.occupied.state !== OccupiedState.RESERVED && timeout) clearTimeout(timeout);
   }, [classroom.occupied.state]);
 
   const calcStyle = (classroom: ClassroomType) => {

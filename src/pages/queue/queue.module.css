@@ -20,3 +20,9 @@
     margin: 16px 0;
     display: block;
 }
+
+.sanctions {
+    color: #f91354;
+    font-weight: 600;
+    font-size: 14px;
+}

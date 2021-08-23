@@ -2,7 +2,15 @@ import React, {useEffect, useState} from "react";
 import styles from "./queue.module.css";
 import Header from "../../components/header/Header";
 import Select from "react-select";
-import {ClassroomType, DisabledState, EnqueuedBy, QueueType, User} from "../../models/models";
+import {
+  ClassroomType,
+  DisabledState,
+  EnqueuedBy,
+  QueueType,
+  StudentAccountStatus,
+  User,
+  UserTypes
+} from "../../models/models";
 import {fullName} from "../../helpers/helpers";
 import Button from "../../components/button/Button";
 import {client} from "../../api/client";
@@ -11,6 +19,7 @@ import {REMOVE_USER_FROM_QUEUE} from "../../api/operations/mutations/removeUserF
 import {useNotification} from "../../components/notification/NotificationProvider";
 import useClassrooms from "../../hooks/useClassrooms";
 import {ADD_USER_TO_QUEUE} from "../../api/operations/mutations/addUserToQueue";
+import moment from "moment";
 
 const Queue = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -83,7 +92,7 @@ const Queue = () => {
       }));
 
     try {
-      await client.mutate({
+      const result = await client.mutate({
         mutation: ADD_USER_TO_QUEUE, variables: {
           input: {
             userId: chosenUser.value,
@@ -92,11 +101,21 @@ const Queue = () => {
           }
         }
       });
-      dispatchNotification({
-        header: "Успішно!",
-        message: `Користувача записано в чергу.`,
-        type: "ok",
-      });
+      if (result.data.addUserToQueue.userErrors.length) {
+        result.data.addUserToQueue.userErrors.forEach(({message}: any) => {
+          dispatchNotification({
+            header: "Помилка",
+            message,
+            type: "alert",
+          });
+        })
+      } else {
+        dispatchNotification({
+          header: "Успішно!",
+          message: `Користувача записано в чергу.`,
+          type: "ok",
+        });
+      }
       client.query({
         query: GET_USERS_FOR_QUEUE,
         fetchPolicy: 'network-only'
@@ -115,6 +134,21 @@ const Queue = () => {
     }
   };
 
+  const sanctions = chosenUser.value !== -1 && users
+    .find(({id}) => chosenUser.value === id).queueInfo.sanctionedUntil;
+
+  const renderSanction = () => {
+    if (sanctions) return (
+      <>
+        <p className={styles.sanctions}>
+          {`Неможливо поставити в чергу. Користувач знаходиться під санкціями до ${
+            moment(sanctions).format('DD-MM-YYYY HH:mm')}`}
+        </p>
+      </>
+    );
+    return null;
+  };
+
   return (
     <div>
       <Header>
@@ -125,10 +159,14 @@ const Queue = () => {
           id="userQueueForm"
           className={styles.userSearch}
         >
-          <p>Виберіть користувача, щоб додати або видалити з черги:</p>
+          <p>Виберіть студента, щоб додати або видалити з черги:</p>
           <Select
             placeholder="Користувачі"
-            options={users.map((user: User) => ({
+            options={users.filter(user => {
+              return !user.occupiedClassrooms.length
+                && (user.type === UserTypes.POST_GRADUATE || user.type === UserTypes.STUDENT) &&
+                user.studentInfo.accountStatus === StudentAccountStatus.ACTIVE
+            }).map((user: User) => ({
                 label: user.id + ": " + fullName(user),
                 value: user.id as number,
                 queueLength: user?.queue.length as number
@@ -151,12 +189,13 @@ const Queue = () => {
           }
           {chosenUser.queueLength !== -1 && (
             <Button onClick={chosenUser.queueLength > 0 ? removeFromLine : getInLine}
-                    disabled={disabled}
+                    disabled={disabled || (chosenUser.queueLength === 0 && !!sanctions)}
             >
               {chosenUser.queueLength > 0 ? 'Видалити з черги' : 'Поставити в чергу'}
             </Button>
           )}
         </form>
+        {renderSanction()}
       </div>
     </div>
   );
