@@ -1,17 +1,22 @@
-import React, {useState} from 'react';
-import {User, UserTypes, UserTypesUa} from "../../../../models/models";
+import React, {useEffect, useState} from 'react';
+import {
+  Department,
+  EmployeeAccountStatus,
+  EmploymentTypes,
+  EmploymentTypesUa,
+  User,
+  UserTypes,
+  UserTypesUa
+} from "../../../../models/models";
 import styles from './../../classrooms/createClassroomPopupBody/createClassroomPopupBody.module.css';
 import {client} from "../../../../api/client";
 import {SIGNUP_EMPLOYEE} from "../../../../api/operations/mutations/signupEmployee";
 import moment from "moment";
-import {CREATE_USER} from "../../../../api/operations/mutations/createUser";
-import {useForm} from "react-hook-form";
-import useDepartments from "../../../../hooks/useDepartments";
-import useInstruments from "../../../../hooks/useInstruments";
 import Select from "react-select";
 import {selectLightStyles} from "../../../../styles/selectStyles";
-import mainStyles from "../../../../styles/main.module.css";
 import Button from "../../../../components/button/Button";
+import {useQuery} from "@apollo/client";
+import {GET_DEPARTMENTS} from "../../../../api/operations/queries/departments";
 
 interface PropTypes {
   user: User;
@@ -23,35 +28,64 @@ const userTypesData = [
   {value: UserTypes.CONCERTMASTER, label: UserTypesUa.CONCERTMASTER},
   {value: UserTypes.TEACHER, label: UserTypesUa.TEACHER},
   {value: UserTypes.PIANO_TUNER, label: UserTypesUa.PIANO_TUNER},
-  {value: UserTypes.POST_GRADUATE, label: UserTypesUa.POST_GRADUATE},
-  {value: UserTypes.STUDENT, label: UserTypesUa.STUDENT},
   {value: UserTypes.OTHER, label: UserTypesUa.OTHER},
   {value: UserTypes.ADMIN, label: UserTypesUa.ADMIN},
 ];
 
-const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
-  const departmentsData = useDepartments(true);
-  const instrumentsData = useInstruments(true);
-  const {register, handleSubmit, setValue, watch, formState: {errors}} = useForm();
-  const [selectedUserType, setSelectedUserType] = useState(userTypesData[0]);
+const employmentTypesData = [
+  {value: EmploymentTypes.FULL_TIME, label: EmploymentTypesUa.FULL_TIME},
+  {value: EmploymentTypes.PART_TIME, label: EmploymentTypesUa.PART_TIME},
+  {value: EmploymentTypes.HOURLY, label: EmploymentTypesUa.HOURLY},
+];
 
-  const handleSignUpEmployee = async () => {
+const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
+  const {data, loading, error} = useQuery(GET_DEPARTMENTS);
+  const [departmentsData, setDepartmentsData] = useState([{value: -1, label: ''}]);
+  const [selectedDepartment, setSelectedDepartment] = useState(departmentsData[0]);
+  const [selectedUserType, setSelectedUserType] = useState(userTypesData[0]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [patronymic, setPatronymic] = useState('');
+  const [expireDate, setExpireDate] = useState(moment().toISOString());
+  const [selectedEmploymentType, setSelectedEmploymentType] = useState(employmentTypesData[0]);
+
+  useEffect(() => {
+    if (!loading && !error) {
+      const mappedDepartments = data.departments.map((department: Department) => {
+        return ({value: department.id, label: department.name});
+      });
+      setDepartmentsData(mappedDepartments);
+      setSelectedDepartment(mappedDepartments[0]);
+    }
+  }, [data]);
+
+  const handleSignUpEmployee = async (e: any) => {
+    e.preventDefault();
     try {
       const result = await client.mutate({
         mutation: SIGNUP_EMPLOYEE,
         variables: {
           input: {
-            firstName: 'first',
-            patronymic: 'patr',
-            lastName: 'last',
-            type: 'STUDENT',
-            expireDate: moment().add(12, 'months').toISOString(),
-            department: {
+            firstName,
+            patronymic,
+            lastName,
+            type: selectedUserType.value,
+            // expireDate,
+            department: (
+              selectedUserType.value === UserTypes.TEACHER
+              || selectedUserType.value === UserTypes.CONCERTMASTER
+              || selectedUserType.value === UserTypes.ILLUSTRATOR
+            ) ? {
               connect: {
-                id: 1
+                id: selectedDepartment.value
               }
-            },
-            employeeInfo: undefined
+            } : undefined,
+            employeeInfo: {
+              create: {
+                employmentType: selectedEmploymentType.value,
+                accountStatus: EmployeeAccountStatus.ACTIVE
+              }
+            }
           }
         }
       });
@@ -60,54 +94,26 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
     }
   };
 
-  const handleCreateUser = async (data: any) => {
-    const {firstName, lastName, patronymic, email, password, phoneNumber, extraPhoneNumbers} = data;
-    try {
-      const result = await client.mutate({
-        mutation: CREATE_USER,
-        variables: {
-          data: {
-            firstName,
-            lastName,
-            patronymic,
-            type: selectedUserType.value,
-            email,
-            phoneNumber,
-            extraPhoneNumbers,
-            password
-          }
-        }
-      });
-    } catch (e) {
-
-    }
-  };
-
   return (
     <div>
       <div className={styles.wrapper}>
-        <form className={styles.container} onSubmit={handleSignUpEmployee}
-              id='signUpEmployee'>
-          {errors.name && <span className={mainStyles.required}>Обов'язкове поле</span>}
+        <form className={styles.container}>
           <label>Прізвище
             <input
               placeholder="Прізвище"
-              onChange={(e) => setValue('lastName', e.target.value)}
-              {...register("lastName", {required: true})}
+              onChange={(e) => setLastName(e.target.value)}
             />
           </label>
           <label>Ім'я
             <input
               placeholder="Ім'я"
-              onChange={(e) => setValue('firstName', e.target.value)}
-              {...register("firstName", {required: true})}
+              onChange={(e) => setFirstName(e.target.value)}
             />
           </label>
           <label>По-батькові
             <input
               placeholder="По-батькові"
-              onChange={(e) => setValue('patronymic', e.target.value)}
-              {...register("patronymic", {required: true})}
+              onChange={(e) => setPatronymic(e.target.value)}
             />
           </label>
           <label>Тип аккаунту
@@ -122,36 +128,38 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
               placeholder='Виберіть тип'
             />
           </label>
-          <label>E-mail
-            <input
-              placeholder="E-mail"
-              onChange={(e) => setValue('email', e.target.value)}
-              {...register("email", {required: true})}
+          <label>Тип занятості
+            <Select
+              value={selectedEmploymentType}
+              onChange={e => setSelectedEmploymentType(e)}
+              options={employmentTypesData}
+              //@ts-ignore
+              styles={selectLightStyles}
+              menuPortalTarget={document.body}
+              isSearchable
+              placeholder='Виберіть тип зайнятість'
             />
           </label>
-          <label>Password
-            <input
-              disabled={true}
-              placeholder="password"
-              defaultValue="password12345"
-              {...register("password", {required: true})}
-            />
-          </label>
-          <label>Телефон
-            <input
-              placeholder="Телефон"
-              onChange={(e) => setValue('phoneNumber', e.target.value)}
-              {...register("phoneNumber", {required: true})}
-            />
-          </label>
-          <label>Телефон-2
-            <input
-              placeholder="Телефон-2"
-              onChange={(e) => setValue('extraPhoneNumbers', e.target.value)}
-              {...register("extraPhoneNumbers", {required: true})}
-            />
-          </label>
-          <Button type='submit' form='signUpEmployee'>Створити співробітника</Button>
+          {(selectedUserType.value === UserTypes.TEACHER
+            || selectedUserType.value === UserTypes.CONCERTMASTER
+            || selectedUserType.value === UserTypes.ILLUSTRATOR
+          ) && (
+            <label>Кафедра
+              <Select
+                value={selectedDepartment}
+                onChange={e => setSelectedDepartment(e)}
+                options={departmentsData}
+                //@ts-ignore
+                styles={selectLightStyles}
+                menuPortalTarget={document.body}
+                isSearchable
+                placeholder='Виберіть кафедру'
+              />
+            </label>
+          )}
+          <Button onClick={handleSignUpEmployee} style={{marginTop: 16, height: 40}}>
+            Створити новий аккаунт
+          </Button>
         </form>
       </div>
     </div>

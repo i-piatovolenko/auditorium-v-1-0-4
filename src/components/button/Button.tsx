@@ -2,7 +2,7 @@ import React, {CSSProperties} from "react";
 import styles from "./button.module.css";
 
 interface PropTypes {
-  onClick?: () => void;
+  onClick?: (e: any) => any;
   kind?: "default" | "primary";
   type?: "button" | "submit" | "reset"
   color?: "white" | "blue" | "red" | "orange";

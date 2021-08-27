@@ -21,6 +21,8 @@ import Button from "../../../components/button/Button";
 import {VERIFY_USER} from "../../../api/operations/mutations/verifyUser";
 import {useLocal} from "../../../hooks/useLocal";
 import EditUserPopupBody from "./editUserPopupBody/EditUserPopupBody";
+import {client} from "../../../api/client";
+import {DELETE_USER} from "../../../api/operations/mutations/deleteUser";
 
 const categories: CategoryType[] = [
   {
@@ -68,8 +70,7 @@ const AdminUsers = () => {
     )}
     </span>
     <span className={styles.alignText}>{UserTypesUa[user.type as UserTypes]}</span>
-    {accessRights === ACCESS_RIGHTS.ADMIN && <Edit dark onClick={() => handleCreate(user)}/>}
-    {accessRights === ACCESS_RIGHTS.ADMIN && <Delete onClick={() => handleDelete()}/>}
+    {accessRights === ACCESS_RIGHTS.ADMIN && <Delete onClick={() => handleDelete(user.id)}/>}
   </>;
 
   useEffect(() => {
@@ -87,16 +88,54 @@ const AdminUsers = () => {
     });
   };
 
-  const handleDelete = () => {
+  const handleErrorDetails = (e: any) => {
+    dispatchPopupWindow({
+      header: <h1>{e.name}</h1>,
+      body: <>
+        <p>{e.message}</p>
+        <p>{e.extraInfo}</p>
+        <pre>{e.stack}</pre>
+      </>,
+      footer: ''
+    });
+  };
 
+  const handleDelete = async (userId: number) => {
+    const confirmDelete = window.confirm('Ви дійсно бажаєте видалити всі дані про користувача?')
+    if (confirmDelete) {
+      try {
+        const result = await client.mutate({
+          mutation: DELETE_USER,
+          variables: {
+            where: {
+              id: userId
+            }
+          }
+        });
+        dispatchNotification({
+          header: "Успішно!",
+          message: `Користувача видалено.`,
+          type: "ok",
+        });
+      } catch (e) {
+        console.log(e);
+        dispatchNotification({
+          header: "Помилка!",
+          message: <><span>Щось пішло не так.</span><br/>
+            <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline'}}
+                  onClick={() => handleErrorDetails && handleErrorDetails(e)}>Деталі</span></>,
+          type: "alert",
+        });
+      }
+    }
   };
 
   const handleCreate = (user: User) => {
     dispatchPopupWindow({
-      header: <h1>Створити нового користувача</h1>,
+      header: <h1>Створити новий аккаунт співробітника</h1>,
       //@ts-ignore
       body: <EditUserPopupBody user={user} dispatchNotification={dispatchNotification}/>,
-      footer: <Button type='submit' form='createUser'>Створити</Button>
+      footer: null
     });
   };
 

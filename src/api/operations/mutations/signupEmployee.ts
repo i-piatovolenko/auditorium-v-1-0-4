@@ -3,6 +3,7 @@ import {gql} from "@apollo/client";
 export const SIGNUP_EMPLOYEE = gql`
     mutation signupEmployee($input: SignupEmployeeInput!) {
         signupEmployee(input: $input) {
+        user {
             id
       firstName
       patronymic
@@ -35,6 +36,11 @@ export const SIGNUP_EMPLOYEE = gql`
       employeeInfo {
         employmentType
         accountStatus
+      }
+      } 
+      userErrors {
+        message
+        code
       }
         }
     }
