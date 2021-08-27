@@ -5,6 +5,7 @@ import {GET_USER_BY_ID} from "../../api/operations/queries/users";
 import Title from "../title/Title";
 import {UserTypes, UserTypesUa} from "../../models/models";
 import Button from "../button/Button";
+import moment from "moment";
 
 interface PropTypes {
   userId: number;

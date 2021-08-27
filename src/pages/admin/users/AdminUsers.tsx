@@ -134,7 +134,8 @@ const AdminUsers = () => {
     dispatchPopupWindow({
       header: <h1>Створити новий аккаунт співробітника</h1>,
       //@ts-ignore
-      body: <EditUserPopupBody user={user} dispatchNotification={dispatchNotification}/>,
+      body: <EditUserPopupBody user={user} dispatchNotification={dispatchNotification}
+                               dispatchPopupWindow={dispatchPopupWindow}/>,
       footer: null
     });
   };

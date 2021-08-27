@@ -24,6 +24,7 @@ export const GET_USERS = gql`
       phoneNumber
       extraPhoneNumbers
       nameTemp
+      expireDate
       studentInfo {
         degree {
           id
@@ -56,6 +57,7 @@ export const GET_USER_BY_ID = gql`
       phoneNumber
       extraPhoneNumbers
       nameTemp
+      expireDate
       studentInfo {
         degree {
           id

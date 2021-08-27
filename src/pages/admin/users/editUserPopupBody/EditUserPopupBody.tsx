@@ -17,6 +17,7 @@ import {selectLightStyles} from "../../../../styles/selectStyles";
 import Button from "../../../../components/button/Button";
 import {useQuery} from "@apollo/client";
 import {GET_DEPARTMENTS} from "../../../../api/operations/queries/departments";
+import {GET_USERS} from "../../../../api/operations/queries/users";
 
 interface PropTypes {
   user: User;
@@ -38,7 +39,10 @@ const employmentTypesData = [
   {value: EmploymentTypes.HOURLY, label: EmploymentTypesUa.HOURLY},
 ];
 
-const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
+const EditUserPopupBody: React.FC<PropTypes> = ({
+                                                  user, dispatch, dispatchNotification,
+                                                  dispatchPopupWindow
+                                                }: any) => {
   const {data, loading, error} = useQuery(GET_DEPARTMENTS);
   const [departmentsData, setDepartmentsData] = useState([{value: -1, label: ''}]);
   const [selectedDepartment, setSelectedDepartment] = useState(departmentsData[0]);
@@ -46,7 +50,8 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [patronymic, setPatronymic] = useState('');
-  const [expireDate, setExpireDate] = useState(moment().toISOString());
+  const [withDateLimit, setWithDateLimit] = useState(true);
+  const [expireDate, setExpireDate] = useState('');
   const [selectedEmploymentType, setSelectedEmploymentType] = useState(employmentTypesData[0]);
 
   useEffect(() => {
@@ -59,6 +64,20 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
     }
   }, [data]);
 
+  const handleErrorDetails = (e: any) => {
+    dispatchPopupWindow({
+      header: <h1>{e.name}</h1>,
+      body: (
+        <>
+          <p>{e.message}</p>
+          <p>{e.extraInfo}</p>
+          <pre>{e.stack}</pre>
+        </>
+      ),
+      footer: ''
+    });
+  };
+
   const handleSignUpEmployee = async (e: any) => {
     e.preventDefault();
     try {
@@ -70,7 +89,6 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
             patronymic,
             lastName,
             type: selectedUserType.value,
-            // expireDate,
             department: (
               selectedUserType.value === UserTypes.TEACHER
               || selectedUserType.value === UserTypes.CONCERTMASTER
@@ -85,12 +103,42 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
                 employmentType: selectedEmploymentType.value,
                 accountStatus: EmployeeAccountStatus.ACTIVE
               }
-            }
+            },
+            expireDate: !withDateLimit ? moment(expireDate).toISOString() : undefined
           }
         }
       });
+      if (result.data.signupEmployee.userErrors?.length) {
+        result.data.signupEmployee.userErrors.forEach(({message}: any) => {
+          dispatchNotification({
+            header: "Помилка",
+            message,
+            type: "alert",
+          });
+        })
+      } else {
+        await client.query({
+          query: GET_USERS,
+          fetchPolicy: 'network-only'
+        })
+        dispatchNotification({
+          header: "Успішно!",
+          message: `Новий аккаунт співробітника створено.`,
+          type: "ok",
+        });
+        dispatch({
+          type: "POP_POPUP_WINDOW",
+        });
+      }
     } catch (e) {
       console.log(e);
+      dispatchNotification({
+        header: "Помилка!",
+        message: <><span>Щось пішло не так.</span><br/>
+          <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline'}}
+                onClick={() => handleErrorDetails && handleErrorDetails(e)}>Деталі</span></>,
+        type: "alert",
+      });
     }
   };
 
@@ -140,6 +188,18 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
               placeholder='Виберіть тип зайнятість'
             />
           </label>
+          <label>Безстроковий термін дії
+            <input type="checkbox" checked={withDateLimit}
+                   onChange={() => setWithDateLimit(prevState => !prevState)}
+            />
+          </label>
+          {!withDateLimit && (
+            <label>Термін дії
+              <input type="date" value={expireDate}
+                     onChange={e => setExpireDate(e.target.value)}
+              />
+            </label>
+          )}
           {(selectedUserType.value === UserTypes.TEACHER
             || selectedUserType.value === UserTypes.CONCERTMASTER
             || selectedUserType.value === UserTypes.ILLUSTRATOR
@@ -157,7 +217,8 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) => {
               />
             </label>
           )}
-          <Button onClick={handleSignUpEmployee} style={{marginTop: 16, height: 40}}>
+          <Button onClick={handleSignUpEmployee} style={{marginTop: 16, height: 40}}
+                  disabled={!firstName || !lastName || !patronymic}>
             Створити новий аккаунт
           </Button>
         </form>

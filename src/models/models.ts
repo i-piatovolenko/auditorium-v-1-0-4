@@ -143,7 +143,7 @@ export type InstrumentType = {
   type: string;
   name: string;
   rate: number;
-  persNumber: number;
+  persNumber: string;
   comments: Comment | null;
   classroom: ClassroomType;
 };

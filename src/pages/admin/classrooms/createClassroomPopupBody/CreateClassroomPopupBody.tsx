@@ -146,7 +146,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
                 disconnect: removedInstruments
               },
               // queueInfo: {
-              //   create: {
+              //   update: {
               //     queuePolicy: {
               //       create: {
               //         policy: allowedForSelectedDepartments ? QueuePolicyTypes.SELECTED_DEPARTMENTS

@@ -136,14 +136,14 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
         <label>
           Інв. номер
           <input className={mainStyles.input}
-                 type='number' placeholder='Наприклад: "3242234"'
+                 type='text' placeholder='Наприклад: "3242234"'
                  defaultValue={isEditMode ? instrument?.persNumber: undefined}
                  {...register("persNumber", {required: true})}/>
         </label>
         <label>
           Рейтинг
           <input className={mainStyles.input}
-                 defaultValue={isEditMode && instrument ? instrument.rate : 1}
+                 defaultValue={isEditMode && instrument ? instrument.rate : 1} step='.1'
                  type='number' min='1' max='10' placeholder='Рейтинг' {...register("rate")}/>
         </label>
         <label>

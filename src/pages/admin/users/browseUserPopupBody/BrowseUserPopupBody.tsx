@@ -9,6 +9,8 @@ import {
   UserTypesUa
 } from "../../../../models/models";
 import {fullName} from "../../../../helpers/helpers";
+import Title from "../../../../components/title/Title";
+import moment from "moment";
 
 interface PropTypes {
   user: User;
@@ -18,13 +20,23 @@ const BrowseUserPopupBody: React.FC<PropTypes> = ({user}) => {
   return (
     <div>
       {user.studentInfo?.accountStatus === StudentAccountStatus.UNVERIFIED && <div className={styles.verification}>
-        <h2>Користувача не верифіковано!</h2>
-        <p>Перед верифікацією користувача звірте правильність даних з офіційном документом.</p>
+          <h2>Користувача не верифіковано!</h2>
+          <p>Перед верифікацією користувача звірте правильність даних з офіційном документом.</p>
       </div>}
       <div className={styles.list}>
         <div><span>ID: </span><span>{user.id}</span></div>
         <div><span>П.І.Б.: </span><span>{fullName(user)}</span></div>
         <div><span>Статус: </span><span>{UserTypesUa[user.type as UserTypes]}</span></div>
+        {user.expireDate && (
+          <div>
+            <span>
+              Термін дії аккаунту:
+            </span>
+            <span>
+              {moment(user.expireDate).format('DD.MM.YYYY')}
+            </span>
+          </div>
+        )}
         {user.studentInfo && <div><span>Ступінь: </span><span>{user.studentInfo.degree.name}</span></div>}
         {user.employeeInfo && <div><span>Зайнятість: </span>
             <span>{EmploymentTypesUa[user.employeeInfo.employmentType as EmploymentTypes]}</span></div>}
@@ -32,7 +44,7 @@ const BrowseUserPopupBody: React.FC<PropTypes> = ({user}) => {
         <div><span>E-mail: </span><span>{user.email}</span></div>
         <div><span>Тел.: </span><span>{user.phoneNumber}</span></div>
         {user?.extraPhoneNumbers && <div><span>Інші тел.: </span>
-          <ul>{JSON.parse(user.extraPhoneNumbers).map((item: string) => <li>{item}</li>)}</ul>
+            <ul>{JSON.parse(user.extraPhoneNumbers).map((item: string) => <li>{item}</li>)}</ul>
         </div>}
       </div>
     </div>
