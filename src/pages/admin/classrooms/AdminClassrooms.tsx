@@ -6,7 +6,7 @@ import useClassrooms from "../../../hooks/useClassrooms";
 import {usePopupWindow} from "../../../components/popupWindow/PopupWindowProvider";
 import CreateClassroomPopupBody from "./createClassroomPopupBody/CreateClassroomPopupBody";
 import {useNotification} from "../../../components/notification/NotificationProvider";
-import {useMutation} from "@apollo/client";
+import {useMutation, useQuery} from "@apollo/client";
 import {DELETE_CLASSROOM} from "../../../api/operations/mutations/deleteClassroom";
 import Add from "../../../components/icons/add/Add";
 import Edit from "../../../components/icons/edit/Edit";
@@ -14,11 +14,13 @@ import Delete from "../../../components/icons/delete/Delete";
 import DataList from "../../../components/dataList/DataList";
 import Button from "../../../components/button/Button";
 import BrowseClassroomPopupBody from "./browseClassroomPopupBody/BrowseClassroomPopupBody";
+import {GET_CLASSROOMS} from "../../../api/operations/queries/classrooms";
 
 const listHeader = ['ID', 'Назва', 'Кафедра', 'Спец.', 'Оп. студія', 'Флігель'];
 
 const AdminClassrooms = () => {
-  const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
+  const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
+  const {data, loading, error} = useQuery(GET_CLASSROOMS);
   const [listData, setListData] = useState<any>([]);
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
@@ -33,6 +35,11 @@ const AdminClassrooms = () => {
     <Edit dark onClick={() => handleCreate(item)}/>
     <Delete onClick={() => handleDelete(item.id)}/>
   </>;
+
+
+  useEffect(() => {
+    !loading && !error && setClassrooms(data.classrooms);
+  }, [data, loading, error]);
 
   useEffect(() => {
     const data = classrooms.map(item => dataItem(item));
@@ -57,18 +64,41 @@ const AdminClassrooms = () => {
 
     if (confirm) {
       try {
-        await deleteClassroom({variables: {where: {id}}});
-        dispatchNotification({
-          header: "Успішно!",
-          message: `Аудиторію видалено.`,
-          type: "ok",
+        const result = await deleteClassroom({
+          variables: {where: {id}},
+          update(cache) {
+            cache.modify({
+              fields: {
+                classrooms(existingClassroomsRefs, {readField}) {
+                  return existingClassroomsRefs.filter(
+                    (classroomRef: any) => id !== readField('id', classroomRef),
+                  );
+                },
+              },
+            })
+          }
         });
+        if (result.data.deleteOneClassroom.userErrors?.length) {
+          result.data.deleteOneClassroom.userErrors.forEach(({message}: any) => {
+            dispatchNotification({
+              header: "Помилка",
+              message,
+              type: "alert",
+            });
+          })
+        } else {
+          dispatchNotification({
+            header: "Успішно!",
+            message: `Аудиторія видалена.`,
+            type: "ok",
+          });
+        }
       } catch (e) {
         console.log(e)
         dispatchNotification({
           header: "Помилка!",
-          message:  <><span>Щось пішло не так.</span><br/>
-            <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline' }}
+          message: <><span>Щось пішло не так.</span><br/>
+            <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline'}}
                   onClick={() => handleErrorDetails && handleErrorDetails(e)}>Деталі</span></>,
           type: "alert",
         });

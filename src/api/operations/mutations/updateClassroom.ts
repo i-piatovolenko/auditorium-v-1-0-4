@@ -1,8 +1,8 @@
 import {gql} from "@apollo/client";
 
-export const CREATE_CLASSROOM = gql`
-    mutation createOneClassroom($data: ClassroomCreateInput!) {
-        createOneClassroom(data: $data) {
+export const UPDATE_CLASSROOM = gql`
+    mutation updateOneClassroom($data: ClassroomUpdateInput!, $where: ClassroomWhereUniqueInput!) {
+        updateOneClassroom(data: $data, where: $where) {
           id
           description
           name

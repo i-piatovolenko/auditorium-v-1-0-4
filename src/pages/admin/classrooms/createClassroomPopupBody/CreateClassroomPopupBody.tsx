@@ -1,19 +1,25 @@
-import React, {useEffect, useState, Fragment} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import styles from './createClassroomPopupBody.module.css';
 import Select, {components} from "react-select";
 import {useMutation} from "@apollo/client";
-import {ClassroomType, Department, InstrumentType} from "../../../../models/models";
+import {
+  ClassroomType,
+  Department,
+  ExclusivelyQueueAllowedDepartmentsInfo,
+  InstrumentType,
+  QueuePolicyTypes, SpecialClassroomTypes
+} from "../../../../models/models";
 import {useForm} from "react-hook-form";
 import {CREATE_CLASSROOM} from "../../../../api/operations/mutations/createClassroom";
 import {GET_CLASSROOMS} from "../../../../api/operations/queries/classrooms";
-import {client, gridUpdate} from "../../../../api/client";
-import TextArea from "antd/es/input/TextArea";
+import {client} from "../../../../api/client";
 import {selectLightStyles} from "../../../../styles/selectStyles";
 import useInstruments from "../../../../hooks/useInstruments";
 import mainStyles from "../../../../styles/main.module.css";
 import useDepartments from "../../../../hooks/useDepartments";
 import addIcon from '../../../../assets/images/addLined.svg';
 import moment from "moment";
+import {UPDATE_CLASSROOM} from "../../../../api/operations/mutations/updateClassroom";
 
 interface PropTypes {
   dispatch: (value: any) => void;
@@ -21,12 +27,17 @@ interface PropTypes {
   item?: ClassroomType;
 }
 
-const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
+const CreateClassroomPopupBody: React.FC<PropTypes> = ({
+                                                         item,
+                                                         dispatchNotification, ...props
+                                                       }) => {
   const departmentsData = useDepartments(true);
   const instrumentsData = useInstruments(true);
   const [createClassroom] = useMutation(CREATE_CLASSROOM);
   const [departments, setDepartments] = useState<any>([]);
   const [selectedDepartment, setSelectedDepartment] = useState<any>();
+  const [selectedAllowedDepartments, setSelectedAllowedDepartments] = useState([]);
+  const [allowedForSelectedDepartments, setAllowedForSelectedDepartments] = useState(false);
   const [instruments, setInstruments] = useState<any>([]);
   const [selectedInstruments, setSelectedInstruments] = useState<any>([]);
   const [freeInstrumentsOnly, setFreeInstrumentsOnly] = useState(true);
@@ -53,9 +64,13 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
     if (item && item.instruments) {
       const itemInstruments = item.instruments
         .map(({id, name, type, persNumber}) => ({
-          value: id, label: name + ', ' + type + (persNumber ? ' - ' + persNumber :  '')
+          value: id, label: name + ', ' + type + (persNumber ? ' - ' + persNumber : '')
         }));
       setSelectedInstruments(itemInstruments);
+    }
+    if (item && item.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS) {
+      setAllowedForSelectedDepartments(true);
+      setMappedSelectedAllowedDepartments(item.queueInfo.queuePolicy.queueAllowedDepartments)
     }
   }, [])
 
@@ -65,37 +80,182 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
     })));
   };
 
+  const setMappedSelectedAllowedDepartments = (data: ExclusivelyQueueAllowedDepartmentsInfo[]) => {
+    setSelectedAllowedDepartments(data.map(({department}) => ({
+      value: department.id, label: department.name
+    })));
+  };
+
   const onSubmit = async (data: any) => {
-    await createClassroom({
-      variables: {
-        data: {
-          name: data.name,
-          special: data.special ? 'PIANO' : undefined,
-          floor: Number(data.floor),
-          isWing: data.isWing,
-          isOperaStudio: data.isOperaStudio,
-          description: data.description,
-          chair: selectedDepartment ? {connect: {id: selectedDepartment.value}} : undefined,
-          instruments: selectedInstruments.length > 0
-            ? {connect: selectedInstruments.map((item: any) => ({id: item.value}))} : undefined,
-          orderIndex: 0,
+    if (item) {
+      const newInstruments = item.instruments ? selectedInstruments.filter(({value}: any) => {
+        return !(item.instruments.some(instrument => instrument.id === value))
+      }).map(({value}: any) => ({id: value})) : selectedInstruments
+        .map(({value}: any) => ({id: value}));
+
+      const removedInstruments = item.instruments ? item.instruments.filter(instrument => {
+        return !(selectedInstruments.some(({value}: any) => value === instrument.id))
+      }).map(({id}: any) => ({id})) : [];
+
+      const newQueueAllowedDepartments = item.queueInfo.queuePolicy.queueAllowedDepartments ?
+        selectedAllowedDepartments.filter(({value}: any) => {
+          return !(item.queueInfo.queuePolicy.queueAllowedDepartments
+            .some(allowedDep => allowedDep.department.id === value))
+        }).map(({value}: any) => ({id: value})) : selectedAllowedDepartments.map(({value}: any) => ({id: value}));
+
+      const removedQueueAllowedDepartments = item.queueInfo.queuePolicy.queueAllowedDepartments ?
+        item.queueInfo.queuePolicy.queueAllowedDepartments.filter(({department}) => {
+          return !(selectedAllowedDepartments.some(({value}: any) => value === department.id))
+        }).map(({id}: any) => ({id})) : [];
+
+      try {
+        const result = await client.mutate({
+          mutation: UPDATE_CLASSROOM,
+          variables: {
+            data: {
+              name: data.name ? {
+                set: data.name
+              } : undefined,
+              special: data.special ? {
+                set: SpecialClassroomTypes.PIANO
+              } : undefined,
+              floor: data.floor ? {
+                set: Number(data.floor)
+              } : undefined,
+              isWing: {
+                set: data.isWing
+              },
+              isOperaStudio: {
+                set: data.isOperaStudio
+              },
+              description: data.description ? {
+                set: data.description
+              } : undefined,
+              isHidden: {
+                set: data.isHidden
+              },
+              chair: item.chair && !selectedDepartment ? {
+                disconnect: true
+              } : selectedDepartment.value !== item.chair?.id ? {
+                connect: {
+                  id: selectedDepartment.value
+                }
+              } : undefined,
+              instruments: {
+                connect: newInstruments,
+                disconnect: removedInstruments
+              },
+              // queueInfo: {
+              //   create: {
+              //     queuePolicy: {
+              //       create: {
+              //         policy: allowedForSelectedDepartments ? QueuePolicyTypes.SELECTED_DEPARTMENTS
+              //           : QueuePolicyTypes.ALL_DEPARTMENTS,
+              //         queueAllowedDepartments: allowedForSelectedDepartments ? {
+              //           createMany: {
+              //             data: newQueueAllowedDepartments
+              //           }
+              //         } : undefined
+              //       }
+              //     }
+              //   }
+              // }
+            },
+            where: {
+              id: item.id
+            }
+          }
+        })
+        if (result.data.updateOneClassroom.userErrors?.length) {
+          result.data.updateOneClassroom.userErrors.forEach(({message}: any) => {
+            dispatchNotification({
+              header: "Помилка",
+              message,
+              type: "alert",
+            });
+          })
+        } else {
+          dispatchNotification({
+            header: "Успішно!",
+            message: `Аудиторія ${item.name} змінена.`,
+            type: "ok",
+          });
+          props.dispatch({
+            type: "POP_POPUP_WINDOW",
+          });
         }
+      } catch (e) {
+        dispatchNotification({
+          header: "Помилка",
+          message: JSON.stringify(e),
+          type: "alert",
+        });
       }
-    });
-    await client.query({
-      query: GET_CLASSROOMS,
-      variables: {date: moment().toISOString()},
-      fetchPolicy: 'network-only',
-    });
-    gridUpdate(!gridUpdate());
-    props.dispatch({
-      type: "POP_POPUP_WINDOW",
-    });
-    props.dispatchNotification({
-      header: "Успішно!",
-      message: `Аудиторія ${data.name}  створена.`,
-      type: "ok",
-    });
+    } else {
+      try {
+        const result = await createClassroom({
+          variables: {
+            data: {
+              name: data.name,
+              special: data.special ? SpecialClassroomTypes.PIANO : undefined,
+              floor: Number(data.floor),
+              isWing: data.isWing,
+              isOperaStudio: data.isOperaStudio,
+              description: data.description,
+              chair: selectedDepartment ? {connect: {id: selectedDepartment.value}} : undefined,
+              instruments: selectedInstruments.length > 0
+                ? {connect: selectedInstruments.map((item: any) => ({id: item.value}))} : undefined,
+              orderIndex: 0,
+              isHidden: data.isHidden,
+              queueInfo: {
+                create: {
+                  queuePolicy: {
+                    create: {
+                      policy: allowedForSelectedDepartments ? QueuePolicyTypes.SELECTED_DEPARTMENTS
+                        : QueuePolicyTypes.ALL_DEPARTMENTS,
+                      queueAllowedDepartments: allowedForSelectedDepartments ? {
+                        createMany: {
+                          data: selectedAllowedDepartments.map(({value}: any) => ({departmentId: value}))
+                        }
+                      } : undefined
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+        if (result.data.createOneClassroom.userErrors?.length) {
+          result.data.createOneClassroom.userErrors.forEach(({message}: any) => {
+            dispatchNotification({
+              header: "Помилка",
+              message,
+              type: "alert",
+            });
+          })
+        } else {
+          dispatchNotification({
+            header: "Успішно!",
+            message: `Аудиторія ${data.name} створена.`,
+            type: "ok",
+          });
+        }
+      } catch (e) {
+        dispatchNotification({
+          header: "Помилка",
+          message: JSON.stringify(e),
+          type: "alert",
+        });
+      }
+      await client.query({
+        query: GET_CLASSROOMS,
+        variables: {date: moment().toISOString()},
+        fetchPolicy: 'network-only',
+      });
+      props.dispatch({
+        type: "POP_POPUP_WINDOW",
+      });
+    }
   };
 
   const handleSelectDepartment = (e: any) => {
@@ -104,6 +264,10 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
 
   const handleSelectInstrument = (e: any) => {
     setSelectedInstruments([...e]);
+  };
+
+  const handleSelectAllowedDepartment = (e: any) => {
+    setSelectedAllowedDepartments([...e]);
   };
 
   const handleFreeInstruments = () => {
@@ -135,16 +299,17 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
         <input
           placeholder="Не більше 5 символів"
           maxLength={5}
+          onChange={(e) => setValue('name', e.target.value)}
           defaultValue={item ? item.name : undefined}
           {...register("name", {required: true})}
         />
       </label>
       <label>Опис
-        <TextArea
-          showCount
+        <input
           maxLength={100}
           onChange={(e) => setValue('description', e.target.value)}
           placeholder="Не більше 100 символів"
+          {...register("description")}
           defaultValue={item ? item.description as string : undefined}
         />
       </label>
@@ -179,6 +344,33 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({item, ...props}) => {
         <input {...register("floor")} type="number" min={1} max={4}
                defaultValue={item ? item.floor as number : 1}/>
       </label>
+      <label>Прихована
+        <input {...register("isHidden")} type="checkbox"
+               defaultChecked={item ? item.isHidden : false}/>
+      </label>
+      <label>Доступна тільки для вибраних кафедр
+        <input {...register("allowedForSelectedDepartments")}
+               type="checkbox" checked={allowedForSelectedDepartments}
+               onChange={() => setAllowedForSelectedDepartments(prevState => !prevState)}
+        />
+      </label>
+      {allowedForSelectedDepartments && (
+        <label>Кафедри, яким аудиторія буде доступна
+          <Select options={departments}
+            //@ts-ignore
+                  styles={selectLightStyles}
+                  menuPortalTarget={document.body}
+                  value={selectedAllowedDepartments}
+                  onChange={handleSelectAllowedDepartment}
+                  components={{DropdownIndicator, MenuList}}
+                  isSearchable
+                  isClearable={false}
+                  isMulti
+                  placeholder='Додати кафедру'
+                  noOptionsMessage={() => 'Кафедри відсутні'}
+          />
+        </label>
+      )}
       <label>Інструменти
         <Select options={instruments}
           //@ts-ignore

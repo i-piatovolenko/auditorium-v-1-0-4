@@ -1,5 +1,5 @@
 import React from 'react';
-import {ClassroomType} from "../../../../models/models";
+import {ClassroomType, QueuePolicyTypes} from "../../../../models/models";
 import styles from './browseClassroomPopupBody.module.css';
 
 interface PropTypes {
@@ -17,6 +17,17 @@ const BrowseClassroomPopupBody: React.FC<PropTypes> = ({classroom}) => {
       <div><span>Спеціалізована: </span><span>{classroom.special ? 'так' : 'ні'}</span></div>
       <div><span>Флігель: </span><span>{classroom.isWing ? 'так' : 'ні'}</span></div>
       <div><span>Оперна студія: </span><span>{classroom.isOperaStudio ? 'так' : 'ні'}</span></div>
+      <div><span>Прихована: </span><span>{classroom.isHidden ? 'так' : 'ні'}</span></div>
+      {classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS && (
+        <div>
+          <span>Заблокована для всіх, окрім: </span>
+          <span>
+         {classroom.queueInfo.queuePolicy.queueAllowedDepartments.map(({department}) => {
+           return department.name
+         }).join(', ')}
+        </span>
+        </div>
+      )}
       <div><span>Інструменти: </span>{classroom.instruments?.length > 0 ? <ul className={styles.instruments}>
         {classroom.instruments.map(item => <li key={item.id}>{item.name}</li>)}
       </ul> : '-'}</div>

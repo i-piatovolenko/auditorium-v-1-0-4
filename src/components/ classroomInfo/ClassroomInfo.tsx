@@ -38,7 +38,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
       },
       fetchPolicy: 'network-only'
     }).then(res => {
-      setQueueSize(res.data.classroom.queue.length);
+      setQueueSize(res.data.classroom.queue?.length);
     });
     } catch (e) {
       console.log(e);
@@ -53,7 +53,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
       <p>Черга за цією аудиторію: {queueSize ? `${queueSize} люд.` : 'відсутня'}</p>
       {/*<Title title="Розклад на сьогодні" />*/}
       {/*<ScheduleUnit classroomName={name} />*/}
-      {instruments.length > 0 && (
+      {instruments?.length > 0 && (
         <>
           <Title title="Інструменти" />
           <Instruments expanded instruments={instruments} />

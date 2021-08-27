@@ -6,7 +6,7 @@ import {usePopupWindow} from "../../../components/popupWindow/PopupWindowProvide
 import {useNotification} from "../../../components/notification/NotificationProvider";
 import {useMutation, useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
-import {fullName, showNotification} from "../../../helpers/helpers";
+import {checkVerified, fullName, showNotification} from "../../../helpers/helpers";
 import mainStyles from "../../../styles/main.module.css";
 import Select from "react-select";
 import {CategoryType, selectStyles} from "../../../styles/selectStyles";
@@ -20,7 +20,7 @@ import BrowseUserPopupBody from "./browseUserPopupBody/BrowseUserPopupBody";
 import Button from "../../../components/button/Button";
 import {VERIFY_USER} from "../../../api/operations/mutations/verifyUser";
 import {useLocal} from "../../../hooks/useLocal";
-import EditUserPopupBody from "../admin/editUserPopupBody/EditUserPopupBody";
+import EditUserPopupBody from "./editUserPopupBody/EditUserPopupBody";
 
 const categories: CategoryType[] = [
   {
@@ -95,8 +95,8 @@ const AdminUsers = () => {
     dispatchPopupWindow({
       header: <h1>Створити нового користувача</h1>,
       //@ts-ignore
-      body: <EditUserPopupBody user={user}/>,
-      footer: ''
+      body: <EditUserPopupBody user={user} dispatchNotification={dispatchNotification}/>,
+      footer: <Button type='submit' form='createUser'>Створити</Button>
     });
   };
 
@@ -144,7 +144,7 @@ const AdminUsers = () => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <BrowseUserPopupBody user={user}/>,
-      footer: !user.verified && <Button onClick={() => verify(user.id)}>Верифікувати</Button>
+      footer: !checkVerified(user) && <Button onClick={() => verify(user.id)}>Верифікувати</Button>
     });
   };
 

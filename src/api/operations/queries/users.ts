@@ -9,6 +9,7 @@ export const GET_USERS = gql`
       lastName
       type
       department {
+        id
         name
       }
       occupiedClassrooms {
@@ -25,6 +26,7 @@ export const GET_USERS = gql`
       nameTemp
       studentInfo {
         degree {
+          id
           name
         }
         startYear
@@ -47,6 +49,7 @@ export const GET_USER_BY_ID = gql`
       lastName
       type
       department {
+        id
         name
       }
       email
@@ -55,6 +58,7 @@ export const GET_USER_BY_ID = gql`
       nameTemp
       studentInfo {
         degree {
+          id
           name
         }
         startYear
@@ -78,7 +82,6 @@ export const GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID = gql`
         classroom {
           id
           name
-          
         }
       }
      }

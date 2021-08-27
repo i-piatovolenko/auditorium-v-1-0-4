@@ -10,6 +10,7 @@ export const GET_CLASSROOMS = gql`
       special
       isHidden
       chair {
+          id
           name
       }
       isWing
@@ -32,6 +33,7 @@ export const GET_CLASSROOMS = gql`
         state
       }
       instruments {
+        id
         name
         type
         rate
@@ -41,6 +43,17 @@ export const GET_CLASSROOMS = gql`
         until
         state
       }
+      queueInfo {
+        queuePolicy {
+          policy
+          queueAllowedDepartments {
+            department {
+              id
+              name
+            }
+          }
+          }
+        }
     }
   }
 `;

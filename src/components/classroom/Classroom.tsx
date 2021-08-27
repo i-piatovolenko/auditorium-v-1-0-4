@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import styles from "./classroom.module.css";
 import {
   ClassroomType,
@@ -33,7 +33,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   const dispatchPopupWindow = usePopupWindow();
   const [isOverdue, setIsOverDue] = useState(false);
   // const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
-  let timeout: ReturnType<typeof setTimeout>;
+  let timeout = useRef(null);
 
   const header = (
     <>
@@ -44,7 +44,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   );
 
   useEffect(() => {
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(timeout.current);
   }, []);
 
   useEffect(() => {
@@ -52,8 +52,8 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
 
-      if (diffInMs >= 0 && classroom.occupied.state === OccupiedState.RESERVED && !timeout) {
-        timeout = setTimeout(() => setIsOverDue(true), diffInMs);
+      if (diffInMs >= 0 && classroom.occupied.state === OccupiedState.RESERVED && !timeout.current) {
+        timeout.current = setTimeout(() => setIsOverDue(true), diffInMs);
       } else if (diffInMs <= 0 && classroom.occupied.state === OccupiedState.RESERVED) {
         setIsOverDue(true);
       } else {
@@ -62,7 +62,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     } else {
       setIsOverDue(false);
     }
-    if (occupied.state !== OccupiedState.RESERVED && timeout) clearTimeout(timeout);
+    if (occupied.state !== OccupiedState.RESERVED && timeout.current) clearTimeout(timeout.current);
     defineStyle();
     defineStatus();
     defineStatusStiles();
