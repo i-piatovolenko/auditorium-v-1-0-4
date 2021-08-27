@@ -10,7 +10,9 @@ const EditUserPopupBody: React.FC<PropTypes> = ({user}) =>  {
   return (
     <div>
       <div className={styles.userInfo}>
-        <div><span></span></div>
+        <div>
+          test
+        </div>
       </div>
     </div>
   );

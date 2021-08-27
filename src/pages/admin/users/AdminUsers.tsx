@@ -20,6 +20,7 @@ import BrowseUserPopupBody from "./browseUserPopupBody/BrowseUserPopupBody";
 import Button from "../../../components/button/Button";
 import {VERIFY_USER} from "../../../api/operations/mutations/verifyUser";
 import {useLocal} from "../../../hooks/useLocal";
+import EditUserPopupBody from "../admin/editUserPopupBody/EditUserPopupBody";
 
 const categories: CategoryType[] = [
   {
@@ -91,12 +92,12 @@ const AdminUsers = () => {
   };
 
   const handleCreate = (user: User) => {
-    // dispatchPopupWindow({
-    //   header: <h1>Створити нового користувача</h1>,
-    //   //@ts-ignore
-    //   body: <EditUserPopupBody user={user}/>,
-    //   footer: ''
-    // });
+    dispatchPopupWindow({
+      header: <h1>Створити нового користувача</h1>,
+      //@ts-ignore
+      body: <EditUserPopupBody user={user}/>,
+      footer: ''
+    });
   };
 
   const handleSearch = (e: any) => {
