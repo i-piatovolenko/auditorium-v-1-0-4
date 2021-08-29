@@ -10,8 +10,10 @@ interface PropTypes {
   isSearching?: boolean;
 }
 
-const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
-  handleItemClick, isSearching = false}) => {
+const DataList: React.FC<PropTypes> = ({
+                                         header, data, gridTemplateColumns,
+                                         handleItemClick, isSearching = false
+                                       }) => {
 
   const [columnIndex, setColumnIndex] = useState(0);
   const [sortedData, setSortedData] = useState(data);
@@ -30,7 +32,10 @@ const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
     setSortedData(data?.slice().sort((a, b) => {
       const aValue = a.props.children[columnIndex].props.children;
       const bValue = b.props.children[columnIndex].props.children;
-      if (typeof aValue === 'string') return aValue.localeCompare(bValue);
+      if (typeof aValue === 'string') {
+        return aValue
+          .localeCompare(bValue, undefined, {numeric: true, sensitivity: 'base'});
+      }
       return aValue - bValue;
     }));
   }, [columnIndex, data]);
@@ -49,8 +54,8 @@ const DataList: React.FC<PropTypes> = ({header, data, gridTemplateColumns,
         {isSearching && !data.length
           ? <li className={styles.emptyResult}>Нічого не знайдено</li>
           : sortedData?.map(item => <li
-          onClick={() => handleItemClick && handleItemClick(item.props.children[0].props.children)}
-          className={styles.row} style={{gridTemplateColumns: columns}}>{item}</li>)}
+            onClick={() => handleItemClick && handleItemClick(item.props.children[0].props.children)}
+            className={styles.row} style={{gridTemplateColumns: columns}}>{item}</li>)}
       </ul>
     </div>
   );

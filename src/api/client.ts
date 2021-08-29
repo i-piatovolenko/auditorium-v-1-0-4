@@ -1,8 +1,9 @@
-import {ApolloClient, createHttpLink, InMemoryCache, makeVar, split} from "@apollo/client";
+import {ApolloClient, createHttpLink, from, InMemoryCache, makeVar, split} from "@apollo/client";
 import {ACCESS_RIGHTS} from "../models/models";
 import {WebSocketLink} from "@apollo/client/link/ws";
 import {setContext} from "@apollo/client/link/context";
 import {getMainDefinition} from "@apollo/client/utilities";
+import {onError} from "@apollo/client/link/error";
 
 const wsLink: any = new WebSocketLink({
   uri: 'wss://api.auditoriu.me/',
@@ -53,8 +54,19 @@ const splitLink = split(
   httpLink,
 );
 
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors)
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      alert(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    );
+
+  if (networkError) networkErrorVar(networkError);
+});
+
 export const client = new ApolloClient({
-  link: authLink.concat(splitLink),
+  link: from([errorLink, authLink.concat(splitLink)]),
   connectToDevTools: true,
   cache: new InMemoryCache({
     typePolicies: {
@@ -90,6 +102,11 @@ export const client = new ApolloClient({
               return isPassedVar();
             },
           },
+          networkError: {
+            read() {
+              return networkErrorVar();
+            },
+          },
         },
       },
     },
@@ -101,3 +118,4 @@ export const gridUpdate = makeVar(false);
 export const accessRightsVar = makeVar(ACCESS_RIGHTS.USER);
 export const isButtonDisabledVar = makeVar(false);
 export const isPassedVar = makeVar(false);
+export const networkErrorVar = makeVar(null);

@@ -13,7 +13,7 @@ const useClassrooms = (): [Array<ClassroomType>, any] => {
         .slice()
         .sort(
           (a: ClassroomType, b: ClassroomType) =>
-            parseInt(a.name) - parseInt(b.name)
+            a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'})
         )
     );
 }, [data, loading, error]);

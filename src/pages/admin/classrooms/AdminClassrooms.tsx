@@ -16,7 +16,7 @@ import Button from "../../../components/button/Button";
 import BrowseClassroomPopupBody from "./browseClassroomPopupBody/BrowseClassroomPopupBody";
 import {GET_CLASSROOMS} from "../../../api/operations/queries/classrooms";
 
-const listHeader = ['ID', 'Назва', 'Кафедра', 'Спец.', 'Оп. студія', 'Флігель'];
+const listHeader = ['Назва', 'Кафедра', 'Спец.', 'Оп. студія', 'Флігель'];
 
 const AdminClassrooms = () => {
   const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
@@ -26,7 +26,6 @@ const AdminClassrooms = () => {
   const dispatchNotification = useNotification();
   const [deleteClassroom] = useMutation(DELETE_CLASSROOM);
   const dataItem = (item: ClassroomType) => <>
-    <span className={styles.centerText}>{item.id}</span>
     <span className={styles.centerText}>{item.name}</span>
     <span>{item.chair?.name}</span>
     <span className={styles.centerText}>{item.special ? 'Так' : 'Ні'}</span>
@@ -134,7 +133,7 @@ const AdminClassrooms = () => {
         <Add onClick={() => handleCreate()}/>
       </Header>
       <DataList header={listHeader} data={listData} handleItemClick={handleItemClick}
-                gridTemplateColumns={'40px 40px 1fr 100px 80px 80px 40px 40px'}/>
+                gridTemplateColumns={'40px 1fr 100px 80px 80px 40px 40px'}/>
     </div>
   );
 }

@@ -128,7 +128,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
               isOperaStudio: {
                 set: data.isOperaStudio
               },
-              description: data.description ? {
+              description: data.description !== null ? {
                 set: data.description
               } : undefined,
               isHidden: {
@@ -136,7 +136,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
               },
               chair: item.chair && !selectedDepartment ? {
                 disconnect: true
-              } : selectedDepartment.value !== item.chair?.id ? {
+              } : selectedDepartment?.value !== item.chair?.id ? {
                 connect: {
                   id: selectedDepartment.value
                 }
@@ -145,21 +145,20 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
                 connect: newInstruments,
                 disconnect: removedInstruments
               },
-              // queueInfo: {
-              //   update: {
-              //     queuePolicy: {
-              //       create: {
-              //         policy: allowedForSelectedDepartments ? QueuePolicyTypes.SELECTED_DEPARTMENTS
-              //           : QueuePolicyTypes.ALL_DEPARTMENTS,
-              //         queueAllowedDepartments: allowedForSelectedDepartments ? {
-              //           createMany: {
-              //             data: newQueueAllowedDepartments
-              //           }
-              //         } : undefined
-              //       }
-              //     }
-              //   }
-              // }
+              queueInfo: {
+                update: {
+                  queuePolicy: {
+                    update: {
+                      queueAllowedDepartments: {
+                        deleteMany: removedQueueAllowedDepartments,
+                        createMany: {
+                          data: newQueueAllowedDepartments
+                        }
+                      }
+                    }
+                  }
+                }
+              },
             },
             where: {
               id: item.id
@@ -185,6 +184,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
           });
         }
       } catch (e) {
+        console.log(e)
         dispatchNotification({
           header: "Помилка",
           message: JSON.stringify(e),

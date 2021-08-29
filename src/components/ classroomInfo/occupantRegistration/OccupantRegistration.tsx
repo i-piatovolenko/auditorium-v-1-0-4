@@ -214,7 +214,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
             onChange={handleNewUser}
             name="tempUsersInput"
             id="tempUsersInput"
-            placeholder="Новий користувач"
+            placeholder="Тимчасовий користувач"
             className={styles.createUserInput}
             autoComplete="off"
           />

@@ -6,6 +6,7 @@ import {
   OccupiedInfo,
   OccupiedState,
   OccupiedStateUa,
+  QueuePolicyTypes,
   User,
   UserTypes,
   UserTypesUa,
@@ -84,7 +85,9 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       border: isOverdue ? '4px solid red' : 'none'
     };
 
-    if (disabled?.state === DisabledState.DISABLED) return disableStyle;
+    if (disabled?.state === DisabledState.DISABLED
+      || (classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
+    && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length)) return disableStyle;
     if (isClassroomNotFree(occupied)) return occupiedStyle;
     return vacantStyle;
   };
@@ -96,6 +99,10 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   };
 
   const defineStatus = () => {
+    if (classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
+      && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length) {
+      return 'Недоступно для видачі студенту';
+    }
     if (isOverdue) return 'Резервація прострочена!';
     if (disabled?.state === DisabledState.DISABLED) {
       return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');

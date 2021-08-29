@@ -1,5 +1,5 @@
 import React, {CSSProperties, useEffect, useState} from 'react';
-import {ClassroomType, DisabledState, OccupiedState} from "../../models/models";
+import {ClassroomType, DisabledState, OccupiedState, QueuePolicyTypes} from "../../models/models";
 import Tag from "../tag/Tag";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Footer from "../footer/Footer";
@@ -11,7 +11,7 @@ type PropTypes = {
   dispatchNotification: (value: string) => void;
 }
 
-const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) =>  {
+const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   const dispatchPopupWindow = usePopupWindow();
   const [isOverdue, setIsOverDue] = useState(false);
   let timeout: ReturnType<typeof setTimeout>;
@@ -41,7 +41,9 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) =>  
   const calcStyle = (classroom: ClassroomType) => {
     const resStyles: CSSProperties = {};
     if (classroom.isHidden) resStyles.opacity = .5;
-    if (classroom.disabled.state === DisabledState.DISABLED) {
+    if (classroom.disabled.state === DisabledState.DISABLED
+      || (classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
+        && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length)) {
       resStyles.background = '#b1b1b1';
     } else {
       classroom.occupied.state === OccupiedState.FREE ?

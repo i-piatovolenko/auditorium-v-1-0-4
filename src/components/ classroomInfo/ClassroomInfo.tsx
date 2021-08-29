@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styles from "./classroomInfo.module.css";
-import {ClassroomType} from "../../models/models";
+import {ClassroomType, DisabledState, QueuePolicyTypes} from "../../models/models";
 import Instruments from "../instruments/Instruments";
 import Title from "../title/Title";
 import OccupantInfo from "./occupantInfo/OccupantInfo";
@@ -9,6 +9,7 @@ import {gql, useQuery} from "@apollo/client";
 import {isClassroomNotFree} from "../../helpers/helpers";
 import {client} from "../../api/client";
 import {GET_CLASSROOM} from "../../api/operations/queries/classroom";
+import moment from "moment";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -45,12 +46,37 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
     }
   }, []);
 
+  const defineStatus = () => {
+    const {isHidden, disabled, queueInfo: {queuePolicy}} = classroom;
+    if (isHidden) return 'Аудиторія прихована';
+    if (disabled.state === DisabledState.DISABLED) {
+      return `Аудиторія відключена від системи до ${
+        moment(disabled.until).format('DD.MM.YYYY HH:mm')}. Причина: ${
+        disabled.comment
+      }`;
+    }
+    if (queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
+      && queuePolicy.queueAllowedDepartments.length) {
+      return `Аудиторія доступна для студентів: ${
+        queuePolicy.queueAllowedDepartments.map(({department: {name}}) => name)
+      }`
+    }
+    if (queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
+      && !queuePolicy.queueAllowedDepartments.length) {
+      return 'Аудиторія відключена від системи'
+    }
+  }
+
   return (
     <div>
       <p className={styles.description}>
         {chair ? chair.name + ". " + description : description}
       </p>
       <p>Черга за цією аудиторію: {queueSize ? `${queueSize} люд.` : 'відсутня'}</p>
+      <>
+        <Title title="Статус аудиторії" />
+        {defineStatus()}
+      </>
       {/*<Title title="Розклад на сьогодні" />*/}
       {/*<ScheduleUnit classroomName={name} />*/}
       {instruments?.length > 0 && (

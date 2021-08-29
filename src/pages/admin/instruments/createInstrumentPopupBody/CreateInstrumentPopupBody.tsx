@@ -12,6 +12,11 @@ import Select from "react-select";
 import {selectLightStyles} from "../../../../styles/selectStyles";
 import {ClassroomType, InstrumentType} from "../../../../models/models";
 
+const instrumentTypes = [
+  {value: 'UpRightPiano', label: 'Фортепіано'},
+  {value: 'GrandPiano', label: 'Рояль'}
+];
+
 interface PropTypes {
   dispatchNotification: (value: any) => void;
   dispatch?: (value: any) => void;
@@ -22,9 +27,11 @@ interface PropTypes {
   isEditMode: boolean;
 }
 
-const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, isEditMode,
-  dispatch, addInstrument, instrument, onUpdate,
-  handleErrorDetails}) => {
+const CreateInstrumentPopupBody: React.FC<PropTypes> = ({
+                                                          dispatchNotification, isEditMode,
+                                                          dispatch, addInstrument, instrument, onUpdate,
+                                                          handleErrorDetails
+                                                        }) => {
   const {register, handleSubmit, watch, formState: {errors}} = useForm<FormData>();
   const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
   const [classroomsData, setClassroomsData] = useState<SelectData[]>([{
@@ -34,6 +41,7 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
   const [createInstrument] = useMutation(CREATE_INSTRUMENT);
   const [updateInstrument] = useMutation(UPDATE_INSTRUMENT);
   const [classroomValue, setClassroomValue] = useState(classroomsData[0]);
+  const [selectedInstrumentType, setSelectedInstrumentType] = useState(instrumentTypes[0]);
 
   useEffect(() => {
     const data = classrooms.map(item => ({value: item.id, label: item.name}));
@@ -65,7 +73,7 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
           variables: {
             data: {
               name: {set: name},
-              type: {set: type},
+              type: {set: selectedInstrumentType.value},
               persNumber: {set: persNumber},
               rate: {set: Number(rate)},
               classroom: classroomId ? {connect: {id: classroomId}} : undefined
@@ -85,7 +93,7 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
         const result = await createInstrument({
           variables: {
             data: {
-              name, type, persNumber, rate: Number(rate),
+              name, type: selectedInstrumentType.value, persNumber, rate: Number(rate),
               classroom: classroomId ? {connect: {id: classroomId}} : undefined
             }
           }
@@ -96,8 +104,10 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
           message: `Інструмент ${name}  створений.`,
           type: "ok",
         });
-        addInstrument({...result.data.createOneInstrument,
-          classroom: {name: classroomId ? classroomName : ''}});
+        addInstrument({
+          ...result.data.createOneInstrument,
+          classroom: {name: classroomId ? classroomName : ''}
+        });
       }
 
       dispatch && dispatch({
@@ -107,8 +117,8 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
       console.log(e)
       dispatchNotification({
         header: "Помилка!",
-        message:  <><span>Щось пішло не так.</span><br/>
-          <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline' }}
+        message: <><span>Щось пішло не так.</span><br/>
+          <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline'}}
                 onClick={() => handleErrorDetails && handleErrorDetails(e)}>Деталі</span></>,
         type: "alert",
       });
@@ -126,18 +136,23 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({dispatchNotification, i
                  {...register("name", {required: true})}/>
         </label>
         {errors.type && <span className={mainStyles.required}>Обов'язкове поле</span>}
-        <label>
-          Тип
-          <input className={mainStyles.input} type='text' placeholder='Наприклад: "Фортепіано"'
-                 defaultValue={isEditMode ? instrument?.type : undefined}
-                 {...register("type", {required: true})}/>
+        <label>Тип
+          <Select
+            value={selectedInstrumentType}
+            onChange={(e) => setSelectedInstrumentType(e)}
+            options={instrumentTypes}
+            //@ts-ignore
+            styles={selectLightStyles}
+            menuPortalTarget={document.body}
+            placeholder='Виберіть тип інструменту'
+          />
         </label>
         {errors.persNumber && <span className={mainStyles.required}>Обов'язкове поле</span>}
         <label>
           Інв. номер
           <input className={mainStyles.input}
                  type='text' placeholder='Наприклад: "3242234"'
-                 defaultValue={isEditMode ? instrument?.persNumber: undefined}
+                 defaultValue={isEditMode ? instrument?.persNumber : undefined}
                  {...register("persNumber", {required: true})}/>
         </label>
         <label>
