@@ -8,7 +8,8 @@ import {ACCESS_RIGHTS, StudentAccountStatus, User} from "../../../models/models"
 import CountUp from "react-countup";
 import {useLocal} from "../../../hooks/useLocal";
 import Button from "../../../components/button/Button";
-import {isLoggedVar} from "../../../api/client";
+import {client, isLoggedVar} from "../../../api/client";
+import {handleLogout} from "../../../helpers/logout";
 
 const Admin = () => {
     const {data, loading, error} = useQuery(GET_USERS);
@@ -25,12 +26,6 @@ const Admin = () => {
         });
       }
     }, [data]);
-
-    const handleLogout = () => {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      isLoggedVar(false);
-    };
 
     return (
       <div>

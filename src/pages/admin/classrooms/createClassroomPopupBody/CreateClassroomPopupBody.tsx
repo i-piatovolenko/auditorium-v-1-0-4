@@ -7,7 +7,8 @@ import {
   Department,
   ExclusivelyQueueAllowedDepartmentsInfo,
   InstrumentType,
-  QueuePolicyTypes, SpecialClassroomTypes
+  QueuePolicyTypes,
+  SpecialClassroomTypes
 } from "../../../../models/models";
 import {useForm} from "react-hook-form";
 import {CREATE_CLASSROOM} from "../../../../api/operations/mutations/createClassroom";
@@ -101,12 +102,13 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
         selectedAllowedDepartments.filter(({value}: any) => {
           return !(item.queueInfo.queuePolicy.queueAllowedDepartments
             .some(allowedDep => allowedDep.department.id === value))
-        }).map(({value}: any) => ({id: value})) : selectedAllowedDepartments.map(({value}: any) => ({id: value}));
+        }).map(({value}: any) => ({departmentId: value})) : selectedAllowedDepartments
+          .map(({value}: any) => ({departmentId: value}));
 
       const removedQueueAllowedDepartments = item.queueInfo.queuePolicy.queueAllowedDepartments ?
         item.queueInfo.queuePolicy.queueAllowedDepartments.filter(({department}) => {
           return !(selectedAllowedDepartments.some(({value}: any) => value === department.id))
-        }).map(({id}: any) => ({id})) : [];
+        }).map(({id}: any) => ({departmentId: id})) : [];
 
       try {
         const result = await client.mutate({
@@ -149,12 +151,19 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
                 update: {
                   queuePolicy: {
                     update: {
-                      queueAllowedDepartments: {
-                        deleteMany: removedQueueAllowedDepartments,
-                        createMany: {
-                          data: newQueueAllowedDepartments
+                      policy: {
+                        set: allowedForSelectedDepartments ? QueuePolicyTypes.SELECTED_DEPARTMENTS
+                          : QueuePolicyTypes.ALL_DEPARTMENTS
+                      },
+                      queueAllowedDepartments:
+                        allowedForSelectedDepartments ? {
+                          deleteMany: removedQueueAllowedDepartments,
+                          createMany: {
+                            data: newQueueAllowedDepartments
+                          }
+                        } : {
+                          deleteMany: removedQueueAllowedDepartments
                         }
-                      }
                     }
                   }
                 }

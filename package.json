@@ -70,7 +70,9 @@
     "@types/react-paginate": "^6.2.1",
     "@types/react-router-dom": "^5.1.7",
     "@types/react-select": "^4.0.13",
-    "@types/uuid": "^8.3.0"
+    "@types/uuid": "^8.3.0",
+    "core-js": "^3.16.4",
+    "raf": "^3.4.1"
   },
   "engines": {
     "node": "14.x"

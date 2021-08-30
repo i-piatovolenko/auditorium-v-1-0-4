@@ -54,14 +54,12 @@ const splitLink = split(
   httpLink,
 );
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
+const errorLink = onError(({graphQLErrors, networkError}) => {
   if (graphQLErrors)
-    graphQLErrors.forEach(({ message, locations, path }) =>
-      alert(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-      ),
+    graphQLErrors.forEach(({message, locations, path, extensions}) => {
+        console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
+      }
     );
-
   if (networkError) networkErrorVar(networkError);
 });
 

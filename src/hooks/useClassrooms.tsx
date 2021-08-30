@@ -8,6 +8,7 @@ const useClassrooms = (): [Array<ClassroomType>, any] => {
   const {data, loading, error, subscribeToMore} = useQuery(GET_CLASSROOMS);
 
   useEffect(() => {
+    // if(error && JSON.stringify(error).includes('BAD_TOKEN')) handleLogout();
     !loading && !error && setClassrooms(
       data.classrooms
         .slice()

@@ -23,9 +23,10 @@ import moment from "moment";
 interface PropTypes {
   classroom: ClassroomType;
   dispatchNotification: (value: any) => void;
+  index: number;
 }
 
-const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
+const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}) => {
   const {
     id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
     isHidden, disabled
@@ -139,6 +140,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
         className={styles.classroomsListItem}
         style={{...defineStyle(), opacity: isHidden ? .5 : 1}}
         onClick={handleClick}
+        tabIndex={index}
       >
         <div className={styles.header}>
           {special === 'PIANO' && <img className={styles.special} src={specialPiano} alt="Special Piano"/>}

@@ -29,7 +29,7 @@ input[type='checkbox'] {
 
 label {
     display: grid;
-    grid-template-columns: 30% auto;
+    grid-template-columns: 24% auto;
     align-items: center;
     margin-bottom: 8px;
 }

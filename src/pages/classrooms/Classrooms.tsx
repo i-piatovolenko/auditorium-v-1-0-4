@@ -18,6 +18,8 @@ import {client} from "../../api/client";
 import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
 import {GET_USERS} from "../../api/operations/queries/users";
 import Button from "../../components/button/Button";
+import {FOLLOW_USERS} from "../../api/operations/subscriptions/users";
+import {useSubscription} from "@apollo/client";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -27,6 +29,7 @@ const filters = [
 
 const Classrooms = () => {
   const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
+  const {data, loading, error} = useSubscription(FOLLOW_USERS);
   const [filter, setFilter] = useState(filters[0].value);
   const [isNoWing, setIsNoWing] = useState(false);
   const [isOperaStudioOnly, setIsOperaStudioOnly] = useState(false);
@@ -132,11 +135,12 @@ const Classrooms = () => {
           <ul className={styles.classroomsList}>
             {filterClassrooms(classrooms, filter, isOperaStudioOnly, isNoWing,
               isAvailableForStudentOnly)
-              .map((classroom: ClassroomType) => (
+              .map((classroom: ClassroomType, index) => (
                 <Classroom
                   dispatchNotification={dispatchNotification}
                   key={classroom.id}
                   classroom={classroom}
+                  index={index}
                 />
               ))}
           </ul>

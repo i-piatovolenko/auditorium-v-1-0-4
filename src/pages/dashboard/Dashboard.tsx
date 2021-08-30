@@ -103,6 +103,7 @@ function Dashboard() {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     isLoggedVar(false);
+    client.clearStore();
   };
 
   return (
