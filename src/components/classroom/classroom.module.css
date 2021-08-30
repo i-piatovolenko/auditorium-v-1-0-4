@@ -30,7 +30,20 @@
   top: 0;
 }
 
-.footer > button{
+.footer {
+  position: relative;
+  width: 100%;
+  display: grid;
+  justify-content: end;
+  grid-template-columns: 1fr auto;
+}
+
+.footer > button {
+  margin-left: 16px;
+  width: fit-content;
+}
+
+.footer div > button{
   margin-left: 8px;
 }
 
@@ -87,15 +100,6 @@
   margin: 8px 0;
 }
 
-.spinner {
-  width: 60px;
-  height: 60px;
-  position: relative;
-  top: 25px;
-  left: 14px;
-  margin-left: -20px;
-}
-
 .isDepartment {
   color: #ff8c00;
 }
@@ -128,6 +132,9 @@
 .sanctions {
   display: flex;
   justify-content: flex-end;
+  position: absolute;
+  right: 0;
+  bottom: 50px;
 }
 
 .sanctions label {

@@ -43,6 +43,9 @@ export const GET_CLASSROOMS = gql`
         until
         state
       }
+      queue {
+        id
+      }
       queueInfo {
         queuePolicy {
           policy

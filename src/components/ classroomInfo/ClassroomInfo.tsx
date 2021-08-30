@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import styles from "./classroomInfo.module.css";
-import {ClassroomType, DisabledState, QueuePolicyTypes} from "../../models/models";
+import {ClassroomType, DisabledState, OccupiedState, QueuePolicyTypes} from "../../models/models";
 import Instruments from "../instruments/Instruments";
 import Title from "../title/Title";
 import OccupantInfo from "./occupantInfo/OccupantInfo";
@@ -47,7 +47,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
   }, []);
 
   const defineStatus = () => {
-    const {isHidden, disabled, queueInfo: {queuePolicy}} = classroom;
+    const {isHidden, disabled, queueInfo: {queuePolicy}, occupied} = classroom;
     if (isHidden) return 'Аудиторія прихована';
     if (disabled.state === DisabledState.DISABLED) {
       return `Аудиторія відключена від системи до ${
@@ -65,6 +65,10 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
       && !queuePolicy.queueAllowedDepartments.length) {
       return 'Аудиторія відключена від системи'
     }
+    if (occupied.state === OccupiedState.FREE) return 'Аудиторія вільна'
+    if (occupied.state === OccupiedState.OCCUPIED) return 'Аудиторія зайнята'
+    if (occupied.state === OccupiedState.PENDING) return 'Аудиторія очікує підтвердження'
+    if (occupied.state === OccupiedState.RESERVED) return 'Аудиторія зарезервована'
   }
 
   return (

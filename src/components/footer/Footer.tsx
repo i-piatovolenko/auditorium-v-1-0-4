@@ -5,7 +5,6 @@ import {client, isButtonDisabledVar, isPassedVar} from "../../api/client";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
 import {DisabledInfo, DisabledState, OccupiedInfo, OccupiedState} from "../../models/models";
-import spinner from './../../assets/images/spinner.svg';
 import DisableClassroom from "../DisableClassroom";
 import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom";
 import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
@@ -162,7 +161,7 @@ const Footer: React.FC<PropTypes> = ({
         ),
         footer: (
           <>
-            <input form='disableClassroomForm' type='submit' value='Заблокувати'/>
+            <Button form='disableClassroomForm' type='submit' color='red'>Заблокувати</Button>
           </>
         )
       });
@@ -252,13 +251,9 @@ const Footer: React.FC<PropTypes> = ({
     }
 
     const DisabledButton = () => disabledClassroom?.state === DisabledState.DISABLED ? (
-      <span className={styles.disableButton}>
-              <Button color="red" onClick={handleEnableClassroom}>Разблокувати</Button>
-            </span>
+      <Button color="red" onClick={handleEnableClassroom}>Разблокувати</Button>
     ) : (
-      <span className={styles.disableButton}>
-              <Button color="red" onClick={handleDisableClassroom}>Заблокувати</Button>
-            </span>
+      <Button color="red" onClick={handleDisableClassroom}>Заблокувати</Button>
     );
 
     return (
@@ -272,27 +267,27 @@ const Footer: React.FC<PropTypes> = ({
         {isClassroomNotFree(occupied) && !isPassed ? (
           <>
             <DisabledButton/>
-            <Button onClick={handlePassClassroom}>
-              Передати {confirmSanctions ? '(з санкціями)' : ''}
-            </Button>
-            {disabled && <img className={styles.spinner} src={spinner} alt="wait"/>}
-            <Button onClick={confirmFreeClassroom} disabled={disabled} color='red'>
-              Звільнити {confirmSanctions ? '(з санкціями)' : ''}
-            </Button>
-            {occupied.state === OccupiedState.RESERVED && (
-              <>
-                {disabled && <img className={styles.spinner} src={spinner} alt="wait"/>}
-                <Button onClick={confirmGiveOutKey} disabled={disabled}
-                        style={{padding: '0 40px', height: '2.5rem'}}>
-                  Видати ключ
-                </Button>
-              </>
-            )}
+            <div>
+              <Button onClick={handlePassClassroom}>
+                Передати {confirmSanctions ? '(з санкціями)' : ''}
+              </Button>
+              <Button onClick={confirmFreeClassroom} disabled={disabled} color='red'>
+                Звільнити {confirmSanctions ? '(з санкціями)' : ''}
+              </Button>
+              {occupied.state === OccupiedState.RESERVED && (
+                <>
+                  <Button onClick={confirmGiveOutKey} disabled={disabled}
+                          style={{padding: '0 40px', height: '2.5rem'}}>
+                    Видати ключ
+                  </Button>
+
+                </>
+              )}
+            </div>
           </>
         ) : (
           <>
             <DisabledButton/>
-            {disabled && <img className={styles.spinner} src={spinner} alt="wait"/>}
             <Button type="submit" form="userSearchForm" disabled={disabled}>
               Записати {confirmSanctions ? '(з санкціями для попереднього користувача)' : ''}
             </Button>

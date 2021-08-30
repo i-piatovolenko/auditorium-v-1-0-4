@@ -31,6 +31,9 @@ export const GET_CLASSROOM = gql`
         until
         state
       }
+      queue {
+        id
+      }
       instruments {
         name
         type

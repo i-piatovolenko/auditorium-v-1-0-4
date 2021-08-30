@@ -20,6 +20,7 @@ import {GET_USERS} from "../../api/operations/queries/users";
 import Button from "../../components/button/Button";
 import {FOLLOW_USERS} from "../../api/operations/subscriptions/users";
 import {useSubscription} from "@apollo/client";
+import {usePopupWindow} from "../../components/popupWindow/PopupWindowProvider";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -29,6 +30,7 @@ const filters = [
 
 const Classrooms = () => {
   const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
+  const classnameKeys = useRef('');
   const {data, loading, error} = useSubscription(FOLLOW_USERS);
   const [filter, setFilter] = useState(filters[0].value);
   const [isNoWing, setIsNoWing] = useState(false);
@@ -59,37 +61,55 @@ const Classrooms = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('click', () => {
-      clearTimeout(timer.current);
-      timer.current = setTimeout(() => {
-        setShowResumePopup(true);
-      }, MINUTE * 15);
-    });
-
-    window.addEventListener('focus', () => {
-      getData();
-    });
-    window.addEventListener('freeze', () => {
-      setShowResumePopup(true);
-    });
-    window.addEventListener('resume', () => {
-      getData();
-    });
     const unsubscribeClassrooms = subscribeToMore({
       document: FOLLOW_CLASSROOMS,
     });
+
+    window.addEventListener('click', handleGlobalClick);
+    window.addEventListener('focus', handleWindowFocusEvent);
+    window.addEventListener('freeze', handleFreezeEvent);
+    window.addEventListener('resume', handleResumeEvent);
+    window.addEventListener('keydown', handleKeyDownEvent);
+
     return () => {
       unsubscribeClassrooms();
-      window.removeEventListener('click', () => {
-      });
-      window.removeEventListener('focus', () => {
-      });
-      window.removeEventListener('resume', () => {
-      });
-      window.removeEventListener('freeze', () => {
-      });
+
+      window.removeEventListener('click', handleGlobalClick);
+      window.removeEventListener('focus', handleWindowFocusEvent);
+      window.removeEventListener('resume', handleResumeEvent);
+      window.removeEventListener('freeze', handleFreezeEvent);
+      window.removeEventListener('freeze', handleKeyDownEvent);
     }
   }, []);
+
+  const handleGlobalClick = () => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      setShowResumePopup(true);
+    }, MINUTE * 15);
+  };
+
+  const handleWindowFocusEvent = () => {
+    getData();
+  };
+
+  const handleResumeEvent = () => {
+    getData();
+  };
+
+  const handleFreezeEvent = () => {
+
+  };
+
+  const handleKeyDownEvent = (e: any) => {
+    // if (e.key?.length === 1) {
+    //   const value = classnameKeys.current + e.key.toLowerCase();
+    //   classnameKeys.current = value;
+    // }
+    // if (e.key === 'Enter') {
+    //   classnameKeys.current = '';
+    // }
+  };
 
   const handleFilterChange = (event: any) => {
     setFilter(event.value);
@@ -116,7 +136,7 @@ const Classrooms = () => {
       </div>}
       <Header>
         <h1>Аудиторії</h1>
-        <HeaderSelect options={filters} onChange={handleFilterChange}/>
+        {/*<HeaderSelect options={filters} onChange={handleFilterChange}/>*/}
         <HeaderCheckbox label='Без флігеля' checked={isNoWing} setChecked={handleToggleWing}/>
         <HeaderCheckbox label='Тільки оперна студія' checked={isOperaStudioOnly}
                         setChecked={handleToggleOperaStudio}
