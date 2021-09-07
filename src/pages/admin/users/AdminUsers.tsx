@@ -39,7 +39,7 @@ const categories: CategoryType[] = [
   },
   {
     value: UserTypes.POST_GRADUATE,
-    label: 'Аистенти/Аспіранти'
+    label: 'Аситенти/Аспіранти'
   },
   {
     value: UserTypes.CONCERTMASTER,
@@ -47,7 +47,7 @@ const categories: CategoryType[] = [
   },
   {
     value: UserTypes.ILLUSTRATOR,
-    label: 'Іллюстратори'
+    label: 'Ілюстратори'
   }
 ];
 

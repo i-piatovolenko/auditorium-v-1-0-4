@@ -39,7 +39,7 @@ const categories: CategoryType[] = [
   },
   {
     value: UserTypes.POST_GRADUATE,
-    label: 'Аистенти/Аспіранти',
+    label: 'Аситенти/Аспіранти',
     accessRights: ACCESS_RIGHTS.DISPATCHER
   },
   {
@@ -49,7 +49,7 @@ const categories: CategoryType[] = [
   },
   {
     value: UserTypes.ILLUSTRATOR,
-    label: 'Іллюстратори',
+    label: 'Ілюстратори',
     accessRights: ACCESS_RIGHTS.USER
   }
 ];
