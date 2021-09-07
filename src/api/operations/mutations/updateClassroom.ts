@@ -41,6 +41,7 @@ export const UPDATE_CLASSROOM = gql`
             until
             state
           }
+          color
         }
     }
 `;

@@ -8,7 +8,7 @@ const useUsers = (): Array<User> => {
 
   useEffect(() => {
     client.query({query: GET_USERS}).then((data) => {
-        setUsers(data.data.users.slice().sort((a: User, b: User) => a.id - b.id));
+        setUsers(data.data.users);
       });
   }, []);
 

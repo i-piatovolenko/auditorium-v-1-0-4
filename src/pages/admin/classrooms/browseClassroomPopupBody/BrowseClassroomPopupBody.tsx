@@ -20,7 +20,8 @@ const BrowseClassroomPopupBody: React.FC<PropTypes> = ({classroom}) => {
       <div><span>Прихована: </span><span>{classroom.isHidden ? 'так' : 'ні'}</span></div>
       {classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS && (
         <div>
-          <span>Заблокована для всіх, окрім: </span>
+          <span>{classroom.queueInfo.queuePolicy.queueAllowedDepartments.length ?
+            'Заблокована для всіх, окрім: ' : 'Заблокована для всіх'}</span>
           <span>
          {classroom.queueInfo.queuePolicy.queueAllowedDepartments.map(({department}) => {
            return department.name

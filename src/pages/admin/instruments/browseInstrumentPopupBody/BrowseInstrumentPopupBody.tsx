@@ -7,7 +7,7 @@ interface PropTypes {
 }
 
 const BrowseInstrumentPopupBody: React.FC<PropTypes> = ({instrument}) => {
-  const {id, name, persNumber, type, rate, classroom: {name: classroomName}} = instrument;
+  const {id, name, persNumber, type, rate,} = instrument;
 
   return (
     <div className={styles.list}>
@@ -16,7 +16,12 @@ const BrowseInstrumentPopupBody: React.FC<PropTypes> = ({instrument}) => {
       <div><span>Інв. номер: </span><span>{persNumber}</span></div>
       <div><span>Тип: </span><span>{type}</span></div>
       <div><span>Рейтинг: </span><span>{rate}</span></div>
-      {classroomName && <div><span>Аудиторія: </span><span>{classroomName}</span></div>}
+      {instrument.classroom?.name && (
+        <div>
+          <span>Аудиторія: </span>
+          <span>{instrument?.classroom.name}</span>
+        </div>
+      )}
     </div>
   );
 }

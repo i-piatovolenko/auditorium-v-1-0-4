@@ -171,6 +171,14 @@ const AdminUsers = () => {
         })
       } else {
         showNotification(dispatchNotification, ['Успішно!', 'Користувача верифіковано', 'ok']);
+        try {
+          await client.query({
+            query: GET_USERS,
+            fetchPolicy: 'network-only'
+          })
+        } catch (e) {
+          showNotification(dispatchNotification, ['Помилка!', e.message.slice(0, 100), 'alert']);
+        }
       }
 
     } catch (e) {
@@ -213,3 +221,7 @@ const AdminUsers = () => {
 }
 
 export default AdminUsers;
+
+function useDispatch() {
+    throw new Error('Function not implemented.');
+}

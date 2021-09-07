@@ -31,6 +31,7 @@ export const DELETE_CLASSROOM = gql`
             until
             state
           }
+          color
           instruments {
             name
             type

@@ -18,29 +18,30 @@ interface PropTypes {
   dispatch: (value: any) => void;
 }
 
-const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, dispatch,
+const ClassroomInfo: React.FC<PropTypes> = ({
+                                              classroom, dispatchNotification, dispatch,
                                               dispatchPopupWindow
-}) => {
-  const { name, instruments, description, chair, occupied, id } = classroom;
+                                            }) => {
+  const {name, instruments, description, chair, occupied, id} = classroom;
   const [queueSize, setQueueSize] = useState(0);
-  const { data: {isPassed} } = useQuery(gql`
+  const {data: {isPassed}} = useQuery(gql`
     query isPassed {
       isPassed @client
     }
   `);
   useEffect(() => {
     try {
-    client.query({
-      query: GET_CLASSROOM,
-      variables: {
-        where: {
-          id
-        }
-      },
-      fetchPolicy: 'network-only'
-    }).then(res => {
-      setQueueSize(res.data.classroom.queue?.length);
-    });
+      client.query({
+        query: GET_CLASSROOM,
+        variables: {
+          where: {
+            id
+          }
+        },
+        fetchPolicy: 'network-only'
+      }).then(res => {
+        setQueueSize(res.data.classroom.queue?.length);
+      });
     } catch (e) {
       console.log(e);
     }
@@ -57,9 +58,13 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
     }
     if (queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
       && queuePolicy.queueAllowedDepartments.length) {
-      return `Аудиторія доступна для студентів: ${
-        queuePolicy.queueAllowedDepartments.map(({department: {name}}) => name)
-      }`
+      return <>
+        <span>Аудиторія доступна для студентів: </span>
+        {queuePolicy.queueAllowedDepartments.map(({department: {name}}) => {
+          return <span className={styles.specialChair}>{name}</span>
+        })}
+      </>
+
     }
     if (queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
       && !queuePolicy.queueAllowedDepartments.length) {
@@ -78,28 +83,28 @@ const ClassroomInfo: React.FC<PropTypes> = ({classroom, dispatchNotification, di
       </p>
       <p>Черга за цією аудиторію: {queueSize ? `${queueSize} люд.` : 'відсутня'}</p>
       <>
-        <Title title="Статус аудиторії" />
+        <Title title="Статус аудиторії"/>
         {defineStatus()}
       </>
       {/*<Title title="Розклад на сьогодні" />*/}
       {/*<ScheduleUnit classroomName={name} />*/}
       {instruments?.length > 0 && (
         <>
-          <Title title="Інструменти" />
-          <Instruments expanded instruments={instruments} />
+          <Title title="Інструменти"/>
+          <Instruments expanded instruments={instruments}/>
         </>
       )}
       {isClassroomNotFree(occupied) && !isPassed ? (
-        <OccupantInfo occupied={occupied} />
+        <OccupantInfo occupied={occupied}/>
       ) : (
         <>
-          <Title title="Запис в аудиторію" />
+          <Title title="Запис в аудиторію"/>
           <OccupantRegistration
-          dispatchNotification={dispatchNotification}
-          dispatchPopupWindow={dispatchPopupWindow}
-          classroomId={id}
-          classroomName={name}
-          dispatch={dispatch}
+            dispatchNotification={dispatchNotification}
+            dispatchPopupWindow={dispatchPopupWindow}
+            classroomId={id}
+            classroomName={name}
+            dispatch={dispatch}
           />
         </>
       )}

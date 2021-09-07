@@ -29,7 +29,7 @@ interface PropTypes {
 const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}) => {
   const {
     id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
-    isHidden, disabled
+    isHidden, disabled, queueInfo: {queuePolicy: {policy, queueAllowedDepartments}}
   } = classroom;
   const userFullName = fullName(occupied.user as User, true);
   const dispatchPopupWindow = usePopupWindow();
@@ -50,13 +50,16 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
   }, []);
 
   useEffect(() => {
-    if (classroom.occupied.state === OccupiedState.RESERVED) {
+    if (classroom.occupied.state === OccupiedState.RESERVED ||
+      (classroom.occupied.state === OccupiedState.OCCUPIED &&
+        (classroom.occupied.user.type === UserTypes.STUDENT
+          || classroom.occupied.user.type === UserTypes.POST_GRADUATE))) {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
 
-      if (diffInMs >= 0 && classroom.occupied.state === OccupiedState.RESERVED && !timeout.current) {
+      if (diffInMs >= 0 && !timeout.current) {
         timeout.current = setTimeout(() => setIsOverDue(true), diffInMs);
-      } else if (diffInMs <= 0 && classroom.occupied.state === OccupiedState.RESERVED) {
+      } else if (diffInMs <= 0) {
         setIsOverDue(true);
       } else {
         setIsOverDue(false);
@@ -64,11 +67,13 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
     } else {
       setIsOverDue(false);
     }
-    if (occupied.state !== OccupiedState.RESERVED && timeout.current) clearTimeout(timeout.current);
+    if (occupied.state !== OccupiedState.RESERVED
+      && occupied.state !== OccupiedState.OCCUPIED
+      && timeout.current) clearTimeout(timeout.current);
     defineStyle();
     defineStatus();
     defineStatusStiles();
-  }, [classroom.occupied.state]);
+  }, [classroom]);
 
   const defineStyle = () => {
     const occupiedStyle = {
@@ -77,7 +82,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
       border: isOverdue ? '4px solid red' : 'none'
     };
     const vacantStyle = {
-      background: "#4bfd63",
+      background: "#76e286",
       transition: "all .3s cubic-bezier(0.25, 0.8, 0.25, 1)",
     };
     const disableStyle = {
@@ -88,23 +93,23 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
 
     if (disabled?.state === DisabledState.DISABLED
       || (classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
-    && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length)) return disableStyle;
+        && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length)) return disableStyle;
     if (isClassroomNotFree(occupied)) return occupiedStyle;
     return vacantStyle;
   };
 
   const defineStatusStiles = () => {
     if (isOverdue) return styles.overdue;
-    if (!isOverdue && occupied.state === OccupiedState.RESERVED) return  styles.reserved;
+    if (!isOverdue && occupied.state === OccupiedState.RESERVED) return styles.reserved;
     else return ''
   };
 
   const defineStatus = () => {
     if (classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
       && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length) {
-      return 'Недоступно для видачі студенту';
+      return 'Обмежений доступ';
     }
-    if (isOverdue) return 'Резервація прострочена!';
+    if (isOverdue) return 'Просрочено!';
     if (disabled?.state === DisabledState.DISABLED) {
       return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');
     }
@@ -144,7 +149,8 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
       >
         <div className={styles.header}>
           {special === 'PIANO' && <img className={styles.special} src={specialPiano} alt="Special Piano"/>}
-          <h1 className={chair ? styles.isDepartment : ''}>{name}</h1>
+          <h1 className={(policy === QueuePolicyTypes.SELECTED_DEPARTMENTS &&
+            queueAllowedDepartments.length) ? styles.isDepartment : ''}>{name}</h1>
           {isClassroomNotFree(occupied) && (
             <div className={styles.occupantInfo}>
               <p className={styles.occupantName} title={userFullName}>{userFullName}</p>

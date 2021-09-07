@@ -43,6 +43,7 @@ export const GET_CLASSROOMS = gql`
         until
         state
       }
+      color
       queue {
         id
       }

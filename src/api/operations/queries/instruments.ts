@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_INSTRUMENTS = gql`
-    query getInstruments($where: InstrumentWhereInput!) {
-        instruments(where: $where) {
+    query getInstruments {
+        instruments {
             id
             persNumber
             type

@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
 import styles from './createClassroomPopupBody.module.css';
 import Select, {components} from "react-select";
 import {useMutation} from "@apollo/client";
@@ -6,7 +6,7 @@ import {
   ClassroomType,
   Department,
   ExclusivelyQueueAllowedDepartmentsInfo,
-  InstrumentType,
+  InstrumentType, InstrumentTypesE, InstrumentTypesEUa,
   QueuePolicyTypes,
   SpecialClassroomTypes
 } from "../../../../models/models";
@@ -28,21 +28,35 @@ interface PropTypes {
   item?: ClassroomType;
 }
 
+const colors = [
+  {value: '#ffffff00', label: 'Немає'},
+  {value: '#000000', label: 'Чорний'},
+  {value: '#ff0000', label: 'Червоний'},
+  {value: '#00ff00', label: 'Зелений'},
+  {value: '#0000ff', label: 'Синій'},
+]
+
 const CreateClassroomPopupBody: React.FC<PropTypes> = ({
                                                          item,
                                                          dispatchNotification, ...props
                                                        }) => {
-  const departmentsData = useDepartments(true);
-  const instrumentsData = useInstruments(true);
+  const departmentsData = useDepartments();
+  const instrumentsData = useInstruments();
   const [createClassroom] = useMutation(CREATE_CLASSROOM);
   const [departments, setDepartments] = useState<any>([]);
   const [selectedDepartment, setSelectedDepartment] = useState<any>();
+  const [selectedColor, setSelectedColor] = useState<any>(colors[0]);
   const [selectedAllowedDepartments, setSelectedAllowedDepartments] = useState([]);
   const [allowedForSelectedDepartments, setAllowedForSelectedDepartments] = useState(false);
   const [instruments, setInstruments] = useState<any>([]);
   const [selectedInstruments, setSelectedInstruments] = useState<any>([]);
   const [freeInstrumentsOnly, setFreeInstrumentsOnly] = useState(true);
   const {register, handleSubmit, setValue, watch, formState: {errors}} = useForm();
+  const firstFieldRef = useRef(null);
+
+  useEffect(() => {
+    firstFieldRef.current && firstFieldRef.current.focus();
+  }, [firstFieldRef]);
 
   useEffect(() => {
     setDepartments(departmentsData.map((dep: Department) => ({value: dep.id, label: dep.name})));
@@ -62,10 +76,16 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
   }, [freeInstrumentsOnly, instrumentsData]);
 
   useEffect(() => {
+    if (item && item.color) {
+      const color = colors.find(({value}) => value === item.color);
+      setSelectedColor(color ? color : colors[0]);
+    }
     if (item && item.instruments) {
       const itemInstruments = item.instruments
         .map(({id, name, type, persNumber}) => ({
-          value: id, label: name + ', ' + type + (persNumber ? ' - ' + persNumber : '')
+          value: id, label: name + ' ('
+            + InstrumentTypesEUa[type as InstrumentTypesE].toLowerCase() + ') '
+            + (persNumber ? ', ' + persNumber : '')
         }));
       setSelectedInstruments(itemInstruments);
     }
@@ -77,7 +97,9 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
 
   const setMappedInstruments = (data: InstrumentType[]) => {
     setInstruments(data.map((item) => ({
-      value: item.id, label: item.name + ', ' + item.type + ' - ' + item.persNumber
+      value: item.id, label: item.name + ' ('
+        + InstrumentTypesEUa[item.type as InstrumentTypesE].toLowerCase()
+        + ') ' + item.persNumber
     })));
   };
 
@@ -146,6 +168,9 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
               instruments: {
                 connect: newInstruments,
                 disconnect: removedInstruments
+              },
+              color: {
+                set: selectedColor.value
               },
               queueInfo: {
                 update: {
@@ -216,6 +241,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
                 ? {connect: selectedInstruments.map((item: any) => ({id: item.value}))} : undefined,
               orderIndex: 0,
               isHidden: data.isHidden,
+              color: selectedColor.value,
               queueInfo: {
                 create: {
                   queuePolicy: {
@@ -275,6 +301,10 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
     setSelectedInstruments([...e]);
   };
 
+  const handleSelectColor = (e: any) => {
+    setSelectedColor(e);
+  };
+
   const handleSelectAllowedDepartment = (e: any) => {
     setSelectedAllowedDepartments([...e]);
   };
@@ -289,7 +319,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
 
   const MenuList = (props: any) => {
     return (
-      <Fragment>
+      <>
         <div>
           <span className={styles.instrumentsCheckbox}>
           <input type="checkbox" checked={freeInstrumentsOnly} onChange={handleFreeInstruments}/>
@@ -297,7 +327,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
         </span>
         </div>
         <components.MenuList {...props}>{props.children}</components.MenuList>
-      </Fragment>
+      </>
     );
   };
 
@@ -311,6 +341,7 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
           onChange={(e) => setValue('name', e.target.value)}
           defaultValue={item ? item.name : undefined}
           {...register("name", {required: true})}
+          ref={ref => firstFieldRef.current = ref}
         />
       </label>
       <label>Опис
@@ -393,6 +424,16 @@ const CreateClassroomPopupBody: React.FC<PropTypes> = ({
                 isMulti
                 placeholder='Додати інструмент'
                 noOptionsMessage={() => 'Інструменти відсутні'}
+        />
+      </label>
+      <label>Колір
+        <Select options={colors}
+          //@ts-ignore
+                styles={selectLightStyles}
+                menuPortalTarget={document.body}
+                value={selectedColor}
+                onChange={handleSelectColor}
+                placeholder='Виберіть колір'
         />
       </label>
     </form>

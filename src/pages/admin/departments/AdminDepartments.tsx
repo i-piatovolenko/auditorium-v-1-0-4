@@ -18,8 +18,7 @@ const listHeader = ['ID', 'Назва'];
 
 const AdminDepartments = () => {
   const dispatchPopupWindow = usePopupWindow();
-  const [updateList, setUpdateList] = useState(false);
-  const departments = useDepartments(updateList);
+  const departments = useDepartments();
   const [deleteDepartment] = useMutation(DELETE_DEPARTMENT);
   const dispatchNotification = useNotification();
   const [listData, setListData] = useState<any>([]);
@@ -38,7 +37,7 @@ const AdminDepartments = () => {
   const handleAdd = (item: Department | null = null) => {
     dispatchPopupWindow({
       header: <h1>{item ? 'Редагування кафедри' : 'Створити кафедру'}</h1>,
-      body: <CreateDepartmentPopupBody setUpdateList={setUpdateList}
+      body: <CreateDepartmentPopupBody
               dispatchNotification={dispatchNotification} item={item}/>,
       footer: <Button type='submit' form='createDepartment'>
         {item ? 'Зберегти зміни' : 'Створити'}
@@ -52,7 +51,6 @@ const AdminDepartments = () => {
     if (confirm) {
       try {
         await deleteDepartment({variables: {where: {id}}});
-        setUpdateList(prevState => !prevState);
         dispatchNotification({
           header: "Успішно!",
           message: `Кафедру видалено.`,

@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Header from '../../../components/header/Header';
 import styles from './adminClassrooms.module.css';
-import {ClassroomType} from "../../../models/models";
-import useClassrooms from "../../../hooks/useClassrooms";
+import {ClassroomType, DisabledState, QueuePolicyTypes} from "../../../models/models";
 import {usePopupWindow} from "../../../components/popupWindow/PopupWindowProvider";
 import CreateClassroomPopupBody from "./createClassroomPopupBody/CreateClassroomPopupBody";
 import {useNotification} from "../../../components/notification/NotificationProvider";
@@ -16,7 +15,7 @@ import Button from "../../../components/button/Button";
 import BrowseClassroomPopupBody from "./browseClassroomPopupBody/BrowseClassroomPopupBody";
 import {GET_CLASSROOMS} from "../../../api/operations/queries/classrooms";
 
-const listHeader = ['ID', 'Назва', 'Кафедра', 'Спец.', 'Оп. студія', 'Флігель'];
+const listHeader = ['Назва', 'Кафедра', 'Прихована', 'Відключена', 'Спец.', 'Оп. студія', 'Флігель'];
 
 const AdminClassrooms = () => {
   const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
@@ -26,9 +25,23 @@ const AdminClassrooms = () => {
   const dispatchNotification = useNotification();
   const [deleteClassroom] = useMutation(DELETE_CLASSROOM);
   const dataItem = (item: ClassroomType) => <>
-    <span className={styles.centerText}>{item.id}</span>
-    <span className={styles.centerText}>{item.name}</span>
+    <span className={styles.centerText}
+          style={{
+            backgroundColor: item?.color ? item.color : '#ffffff00', borderRadius: 6,
+            color: item.color === '#000000' || item.color === '#ff0000' ||
+            item.color === '#0000ff' ? '#ffffff' : '#000000',
+            padding: '2px 0'
+          }}
+    >{item.name}</span>
     <span>{item.chair?.name}</span>
+    <span className={styles.centerText}>{item.isHidden ? 'Так' : 'Ні'}</span>
+    <span className={styles.centerText}>
+      {item.disabled.state === DisabledState.DISABLED ? 'Тимчасово'
+        : (item.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
+          && !item.queueInfo.queuePolicy.queueAllowedDepartments.length) ? 'Так' :
+          (item.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
+            && item.queueInfo.queuePolicy.queueAllowedDepartments.length) ? 'Частково' : 'Ні'}
+    </span>
     <span className={styles.centerText}>{item.special ? 'Так' : 'Ні'}</span>
     <span className={styles.centerText}>{item.isOperaStudio ? 'Так' : 'Ні'}</span>
     <span className={styles.centerText}>{item.isWing ? 'Так' : 'Ні'}</span>
@@ -117,8 +130,8 @@ const AdminClassrooms = () => {
     });
   };
 
-  const handleItemClick = (id: number) => {
-    const classroom = classrooms?.find(item => item.id === id);
+  const handleItemClick = (name: string) => {
+    const classroom = classrooms?.find(item => item.name === name);
 
     dispatchPopupWindow({
       header: <h1>{`Аудиторія ${classroom?.name}`}</h1>,
@@ -134,7 +147,7 @@ const AdminClassrooms = () => {
         <Add onClick={() => handleCreate()}/>
       </Header>
       <DataList header={listHeader} data={listData} handleItemClick={handleItemClick}
-                gridTemplateColumns={'40px 40px 1fr 100px 80px 80px 40px 40px'}/>
+                gridTemplateColumns={'55px 1fr 100px 100px 100px 80px 80px 40px 40px'}/>
     </div>
   );
 }

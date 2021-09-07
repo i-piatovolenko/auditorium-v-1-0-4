@@ -21,7 +21,6 @@ interface PropTypes {
   dispatchNotification: (value: any) => void;
   dispatch?: (value: any) => void;
   handleErrorDetails?: (error: any) => void;
-  onUpdate: () => void;
   addInstrument: (item: InstrumentType) => void;
   instrument: InstrumentType | null;
   isEditMode: boolean;
@@ -29,7 +28,8 @@ interface PropTypes {
 
 const CreateInstrumentPopupBody: React.FC<PropTypes> = ({
                                                           dispatchNotification, isEditMode,
-                                                          dispatch, addInstrument, instrument, onUpdate,
+                                                          dispatch,
+                                                          addInstrument, instrument,
                                                           handleErrorDetails
                                                         }) => {
   const {register, handleSubmit, watch, formState: {errors}} = useForm<FormData>();
@@ -83,7 +83,6 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({
             }
           }
         });
-        onUpdate();
         dispatchNotification({
           header: "Успішно!",
           message: `Дані змінені.`,
@@ -98,7 +97,6 @@ const CreateInstrumentPopupBody: React.FC<PropTypes> = ({
             }
           }
         });
-        onUpdate();
         dispatchNotification({
           header: "Успішно!",
           message: `Інструмент ${name}  створений.`,

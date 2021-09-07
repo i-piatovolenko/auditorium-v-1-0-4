@@ -269,7 +269,7 @@ const Footer: React.FC<PropTypes> = ({
             <DisabledButton/>
             <div>
               <Button onClick={handlePassClassroom}>
-                Передати {confirmSanctions ? '(з санкціями)' : ''}
+                Передати
               </Button>
               <Button onClick={confirmFreeClassroom} disabled={disabled} color='red'>
                 Звільнити {confirmSanctions ? '(з санкціями)' : ''}

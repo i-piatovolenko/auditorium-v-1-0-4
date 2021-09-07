@@ -186,6 +186,7 @@ export type ClassroomType = {
   schedule: Array<ScheduleUnitType>;
   isHidden: boolean;
   queueInfo: ClassroomQueueInfo;
+  color: string;
 };
 
 export type ClassroomQueueInfo = {
@@ -319,4 +320,14 @@ export enum QueuePolicyTypes {
 
 export enum SpecialClassroomTypes {
   PIANO = 'PIANO'
+}
+
+export enum InstrumentTypesE {
+  UpRightPiano = 'UpRightPiano',
+  GrandPiano = 'GrandPiano'
+}
+
+export enum InstrumentTypesEUa {
+  UpRightPiano = 'Піаніно',
+  GrandPiano = 'Рояль'
 }

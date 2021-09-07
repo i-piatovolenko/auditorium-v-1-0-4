@@ -1,5 +1,5 @@
 import React, {CSSProperties, useEffect, useState} from 'react';
-import {ClassroomType, DisabledState, OccupiedState, QueuePolicyTypes} from "../../models/models";
+import {ClassroomType, DisabledState, OccupiedState, QueuePolicyTypes, UserTypes} from "../../models/models";
 import Tag from "../tag/Tag";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Footer from "../footer/Footer";
@@ -21,13 +21,16 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   }, []);
 
   useEffect(() => {
-    if (classroom.occupied.state === OccupiedState.RESERVED) {
+    if (classroom.occupied.state === OccupiedState.RESERVED ||
+      (classroom.occupied.state === OccupiedState.OCCUPIED &&
+        (classroom.occupied.user.type === UserTypes.STUDENT
+          || classroom.occupied.user.type === UserTypes.POST_GRADUATE))) {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
 
-      if (diffInMs >= 0 && classroom.occupied.state === OccupiedState.RESERVED && !timeout) {
+      if (diffInMs >= 0 && !timeout) {
         timeout = setTimeout(() => setIsOverDue(true), diffInMs);
-      } else if (diffInMs <= 0 && classroom.occupied.state === OccupiedState.RESERVED) {
+      } else if (diffInMs <= 0) {
         setIsOverDue(true);
       } else {
         setIsOverDue(false);
@@ -35,8 +38,10 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     } else {
       setIsOverDue(false);
     }
-    if (classroom.occupied.state !== OccupiedState.RESERVED && timeout) clearTimeout(timeout);
-  }, [classroom.occupied.state]);
+    if (classroom.occupied.state !== OccupiedState.RESERVED
+      && classroom.occupied.state !== OccupiedState.OCCUPIED
+      && timeout) clearTimeout(timeout);
+  }, [classroom]);
 
   const calcStyle = (classroom: ClassroomType) => {
     const resStyles: CSSProperties = {};
@@ -47,7 +52,7 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       resStyles.background = '#b1b1b1';
     } else {
       classroom.occupied.state === OccupiedState.FREE ?
-        resStyles.background = '#4bfd63' : resStyles.background = '#fff';
+        resStyles.background = '#76e286' : resStyles.background = '#fff';
       if (isOverdue) {
         resStyles.background = '#f91354';
         resStyles.color = '#fff';

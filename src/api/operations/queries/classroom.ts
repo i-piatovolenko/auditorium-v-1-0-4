@@ -44,6 +44,7 @@ export const GET_CLASSROOM = gql`
         until
         state
       }
+      color
     }
   }
 `;

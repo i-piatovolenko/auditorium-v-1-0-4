@@ -3,7 +3,7 @@ import {client} from "../api/client";
 import {Department} from "../models/models";
 import {GET_DEPARTMENTS} from "../api/operations/queries/departments";
 
-const useDepartments = (updateList: boolean): Array<Department> => {
+const useDepartments = (): Array<Department> => {
   const [departments, setDepartments] = useState<Department[]>([]);
 
   useEffect(() => {

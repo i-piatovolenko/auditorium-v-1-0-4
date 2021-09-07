@@ -6,7 +6,7 @@ interface PropTypes {
   header: string[];
   data: Array<any>;
   gridTemplateColumns?: string;
-  handleItemClick?: (id: number) => void;
+  handleItemClick?: (id: any) => void;
   isSearching?: boolean;
 }
 

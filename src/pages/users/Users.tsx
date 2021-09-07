@@ -19,7 +19,7 @@ import {VERIFY_USER} from "../../api/operations/mutations/verifyUser";
 import {useNotification} from "../../components/notification/NotificationProvider";
 import CountUp from "react-countup";
 import {client} from "../../api/client";
-import {GET_USER_BY_ID} from "../../api/operations/queries/users";
+import {GET_USER_BY_ID, GET_USERS} from "../../api/operations/queries/users";
 
 const categories: CategoryType[] = [
   {
@@ -68,7 +68,7 @@ const Users = () => {
 
   useEffect(() => {
     const onlyExisting = users.filter(user => !user.nameTemp && isAvailableAccess(accessRights, user));
-    setFilteredUsers(onlyExisting);
+    setFilteredUsers(onlyExisting.slice().sort((a: User, b: User) => a.id - b.id));
   }, [users]);
 
   const handleClick = (user: User) => {
@@ -88,6 +88,14 @@ const Users = () => {
         })
       } else {
         showNotification(dispatchNotification, ['Успішно!', 'Користувача верифіковано', 'ok']);
+        try {
+          await client.query({
+            query: GET_USERS,
+            fetchPolicy: 'network-only'
+          })
+        } catch (e) {
+          showNotification(dispatchNotification, ['Помилка!', e.message.slice(0, 100), 'alert']);
+        }
       }
     } catch (e) {
       showNotification(dispatchNotification, ['Помилка!', e.message.slice(0, 100), 'alert']);
@@ -154,3 +162,7 @@ const Users = () => {
 };
 
 export default Users;
+function useDispatch() {
+    throw new Error("Function not implemented.");
+}
+
