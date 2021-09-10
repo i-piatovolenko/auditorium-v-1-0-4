@@ -105,6 +105,16 @@ export const client = new ApolloClient({
               return networkErrorVar();
             },
           },
+          disabledTime: {
+            read() {
+              return disabledTimeVar();
+            },
+          },
+          disableClassroomBeforeFree: {
+            read() {
+              return disableClassroomBeforeFreeVar();
+            },
+          },
         },
       },
     },
@@ -117,3 +127,5 @@ export const accessRightsVar = makeVar(ACCESS_RIGHTS.USER);
 export const isButtonDisabledVar = makeVar(false);
 export const isPassedVar = makeVar(false);
 export const networkErrorVar = makeVar(null);
+export const disabledTimeVar = makeVar(15);
+export const disableClassroomBeforeFreeVar = makeVar(false);

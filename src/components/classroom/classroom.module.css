@@ -146,3 +146,63 @@
 .sanctions input {
   border: 2px solid #f91354 !important;
 }
+
+.confirmText {
+  text-align: center;
+  color: #484848;
+}
+
+.timeButtonActive {
+  background: #00a6ff;
+  color: #fff;
+  border: none;
+  padding: 4px;
+  margin-right: 2px;
+  cursor: pointer;
+}
+
+.timeButton {
+  background: #ccc;
+  color: #000;
+  border: none;
+  padding: 4px;
+  margin-right: 2px;
+  cursor: pointer;
+}
+
+.customTimeInput, .customTimeInputActive {
+  display: inline-block;
+  position: relative;
+}
+
+.customTimeInput input {
+  padding: 4px 32px 4px 4px;
+  border: none;
+  background: #ccc;
+}
+
+.customTimeInputActive input {
+  padding: 4px 32px 4px 4px;
+  border: none;
+  background: #00a6ff;
+  color: #fff;
+}
+
+.customTimeInput span {
+  position: absolute;
+  right: 2px;
+  top: 4px;
+  font-size: 13px;
+}
+
+.customTimeInputActive span {
+  position: absolute;
+  right: 2px;
+  top: 4px;
+  font-size: 13px;
+  color: #fff;
+}
+
+.disableOptions {
+  padding-top: 16px;
+}

@@ -1,7 +1,13 @@
 import React, {useState} from "react";
 import Button from "../button/Button";
 import styles from "../classroom/classroom.module.css";
-import {client, isButtonDisabledVar, isPassedVar} from "../../api/client";
+import {
+  client,
+  disableClassroomBeforeFreeVar,
+  disabledTimeVar,
+  isButtonDisabledVar,
+  isPassedVar
+} from "../../api/client";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
 import {DisabledInfo, DisabledState, OccupiedInfo, OccupiedState} from "../../models/models";
@@ -12,6 +18,8 @@ import {fullName, isClassroomNotFree} from "../../helpers/helpers";
 import ConfirmFooter from "./ConfirmFooter";
 import moment from "moment";
 import {GIVE_OUT_CLASSROOM_KEY} from "../../api/operations/mutations/giveOutClassroomKey";
+import ConfirmBody from "./ConfirmBody";
+import {useLocal} from "../../hooks/useLocal";
 
 interface PropTypes {
   classroomName: string;
@@ -30,6 +38,8 @@ const Footer: React.FC<PropTypes> = ({
                                        classroomId, isOverdue, ...props
                                      }) => {
     const [confirmSanctions, setConfirmSanction] = useState(false);
+  const {data: {disabledTime}} = useLocal('disabledTime');
+  const {data: {disableClassroomBeforeFree}} = useLocal('disableClassroomBeforeFree');
     const [freeClassroom] = useMutation(FREE_CLASSROOM, {
       variables: {
         input: {
@@ -66,6 +76,33 @@ const Footer: React.FC<PropTypes> = ({
     const handleFreeClassroom = async () => {
       isButtonDisabledVar(true);
       try {
+        if (disableClassroomBeforeFree) {
+          const result = await client.mutate({
+            mutation: DISABLE_CLASSROOM,
+            variables: {
+              input: {
+                classroomName: String(classroomName),
+                comment: 'За розкладом',
+                until: moment().add(disabledTime, 'minutes').toISOString()
+              }
+            },
+          });
+          if (result.data.disableClassroom.userErrors.length) {
+            result.data.disableClassroom.userErrors.forEach(({message}: any) => {
+              dispatchNotification({
+                header: "Помилка",
+                message,
+                type: "alert",
+              });
+            })
+          } else {
+            dispatchNotification({
+              header: "Успішно!",
+              message: `Аудиторія ${classroomName} заблокована.`,
+              type: "ok",
+            });
+          }
+        }
         const result = await freeClassroom();
         if (result.data.freeClassroom.userErrors.length) {
           result.data.freeClassroom.userErrors.forEach(({message}: any) => {
@@ -95,6 +132,8 @@ const Footer: React.FC<PropTypes> = ({
         });
         isButtonDisabledVar(false);
       }
+      disabledTimeVar(15);
+      disableClassroomBeforeFreeVar(false);
     };
 
     const handlePassClassroom = () => {
@@ -210,7 +249,7 @@ const Footer: React.FC<PropTypes> = ({
     const confirmFreeClassroom = () => {
       dispatchPopupWindow({
         header: <h1>Увага!</h1>,
-        body: <span>Підтвердіть звільнення аудиторії</span>,
+        body: <ConfirmBody/>,
         footer: <ConfirmFooter onOk={handleFreeClassroom}/>,
         isConfirm: true
       });

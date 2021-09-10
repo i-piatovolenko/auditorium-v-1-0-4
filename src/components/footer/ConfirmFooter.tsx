@@ -6,7 +6,7 @@ type PropTypes = {
   onOk: () => void;
 }
 
-const Footer: React.FC<PropTypes> = (props) => {
+const ConfirmFooter: React.FC<PropTypes> = (props) => {
 
   const handleClose = () => {
     // @ts-ignore
@@ -29,4 +29,4 @@ const Footer: React.FC<PropTypes> = (props) => {
 }
 ;
 
-export default Footer;
+export default ConfirmFooter;
