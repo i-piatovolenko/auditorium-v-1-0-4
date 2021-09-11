@@ -74,9 +74,10 @@ const Footer: React.FC<PropTypes> = ({
   `);
 
     const handleFreeClassroom = async () => {
-      isButtonDisabledVar(true);
+      alert(disableClassroomBeforeFree)
       try {
         if (disableClassroomBeforeFree) {
+          alert('test')
           const result = await client.mutate({
             mutation: DISABLE_CLASSROOM,
             variables: {
@@ -220,7 +221,7 @@ const Footer: React.FC<PropTypes> = ({
         } else {
           dispatchNotification({
             header: "Успішно!",
-            message: `Аудиторія ${classroomName} разблокована.`,
+            message: `Аудиторія ${classroomName} розблокована.`,
             type: "ok",
           });
         }
@@ -290,7 +291,7 @@ const Footer: React.FC<PropTypes> = ({
     }
 
     const DisabledButton = () => disabledClassroom?.state === DisabledState.DISABLED ? (
-      <Button color="red" onClick={handleEnableClassroom}>Разблокувати</Button>
+      <Button color="red" onClick={handleEnableClassroom}>Розблокувати</Button>
     ) : (
       <Button color="red" onClick={handleDisableClassroom}>Заблокувати</Button>
     );

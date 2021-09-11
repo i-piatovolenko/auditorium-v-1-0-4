@@ -11,9 +11,9 @@ const ConfirmBody = () => {
     return (
       <div>
         <p className={styles.confirmText}>Підтвердіть звільнення аудиторії</p>
-        <div onClick={() => disableClassroomBeforeFreeVar(!disableClassroomBeforeFree)}>
+        <div>
           <input type="checkbox" checked={disableClassroomBeforeFree}
-                 onChange={() => disableClassroomBeforeFreeVar(!disableClassroomBeforeFree)}/>
+                 onChange={(e) => disableClassroomBeforeFreeVar(e.target.checked)}/>
           Заблокувати аудиторію {disableClassroomBeforeFree && (
             <span>на {disabledTime} хв.</span>
         )}
