@@ -238,3 +238,14 @@ export const checkVerified = (user: User) => {
   if (!user.studentInfo) return true;
   return user.studentInfo.accountStatus !== StudentAccountStatus.UNVERIFIED;
 };
+
+export const isStudent = (type: UserTypes) => {
+  return type === UserTypes.STUDENT || type === UserTypes.POST_GRADUATE
+}
+
+export const isTimeout = (time: string, returnDiffInMs = false) => {
+  const outerTime = moment(time);
+  const currentTime = moment();
+  if (returnDiffInMs) return currentTime.diff(outerTime);
+  return currentTime.diff(outerTime) > 0;
+}

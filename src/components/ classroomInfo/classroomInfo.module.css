@@ -10,3 +10,8 @@
     line-height: 2;
     padding: 2px 8px;
 }
+
+.overdue {
+    color: #f91354;
+    font-weight: bold;
+}

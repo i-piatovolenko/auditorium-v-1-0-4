@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Button from "../button/Button";
 import styles from "../classroom/classroom.module.css";
 import {
@@ -10,11 +10,11 @@ import {
 } from "../../api/client";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
-import {DisabledInfo, DisabledState, OccupiedInfo, OccupiedState} from "../../models/models";
+import {DisabledInfo, DisabledState, OccupiedInfo, OccupiedState, UserTypes} from "../../models/models";
 import DisableClassroom from "../DisableClassroom";
 import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom";
 import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
-import {fullName, isClassroomNotFree} from "../../helpers/helpers";
+import {fullName, isClassroomNotFree, isStudent, isTimeout} from "../../helpers/helpers";
 import ConfirmFooter from "./ConfirmFooter";
 import moment from "moment";
 import {GIVE_OUT_CLASSROOM_KEY} from "../../api/operations/mutations/giveOutClassroomKey";
@@ -38,8 +38,9 @@ const Footer: React.FC<PropTypes> = ({
                                        classroomId, isOverdue, ...props
                                      }) => {
     const [confirmSanctions, setConfirmSanction] = useState(false);
-  const {data: {disabledTime}} = useLocal('disabledTime');
-  const {data: {disableClassroomBeforeFree}} = useLocal('disableClassroomBeforeFree');
+    const {data: {disabledTime}} = useLocal('disabledTime');
+    const {data: {disableClassroomBeforeFree}} = useLocal('disableClassroomBeforeFree');
+    const [isOccupiedOverdue, setIsOccupiedOverdue] = useState(false);
     const [freeClassroom] = useMutation(FREE_CLASSROOM, {
       variables: {
         input: {
@@ -73,11 +74,15 @@ const Footer: React.FC<PropTypes> = ({
     }
   `);
 
+    useEffect(() => {
+      const isOverdueByStudent = occupied.state === OccupiedState.OCCUPIED &&
+        isStudent(occupied.user.type as UserTypes) && isTimeout(occupied.until);
+      setIsOccupiedOverdue(isOverdueByStudent as boolean);
+    }, [occupied.state, occupied.user, occupied.until]);
+
     const handleFreeClassroom = async () => {
-      alert(disableClassroomBeforeFree)
       try {
         if (disableClassroomBeforeFree) {
-          alert('test')
           const result = await client.mutate({
             mutation: DISABLE_CLASSROOM,
             variables: {
@@ -298,7 +303,7 @@ const Footer: React.FC<PropTypes> = ({
 
     return (
       <div className={styles.footer}>
-        {isOverdue && <span className={styles.sanctions}>
+        {(isOverdue || isOccupiedOverdue) && <span className={styles.sanctions}>
                 <label>З застосуванням санкцій</label>
                 <input type='checkbox' checked={confirmSanctions}
                        onChange={e => setConfirmSanction(e.target.checked)}

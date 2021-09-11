@@ -1,4 +1,4 @@
-import React, {CSSProperties, useEffect, useState} from 'react';
+import React, {CSSProperties, useEffect, useRef, useState} from 'react';
 import {ClassroomType, DisabledState, OccupiedState, QueuePolicyTypes, UserTypes} from "../../models/models";
 import Tag from "../tag/Tag";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
@@ -14,22 +14,19 @@ type PropTypes = {
 const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   const dispatchPopupWindow = usePopupWindow();
   const [isOverdue, setIsOverDue] = useState(false);
-  let timeout: ReturnType<typeof setTimeout>;
+  let timeout = useRef(null);
 
   useEffect(() => {
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(timeout.current);
   }, []);
 
   useEffect(() => {
-    if (classroom.occupied.state === OccupiedState.RESERVED ||
-      (classroom.occupied.state === OccupiedState.OCCUPIED &&
-        (classroom.occupied.user.type === UserTypes.STUDENT
-          || classroom.occupied.user.type === UserTypes.POST_GRADUATE))) {
+    if (classroom.occupied.state === OccupiedState.RESERVED) {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
 
-      if (diffInMs >= 0 && !timeout) {
-        timeout = setTimeout(() => setIsOverDue(true), diffInMs);
+      if (diffInMs >= 0 && !timeout.current) {
+        timeout.current = setTimeout(() => setIsOverDue(true), diffInMs);
       } else if (diffInMs <= 0) {
         setIsOverDue(true);
       } else {
@@ -38,9 +35,9 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     } else {
       setIsOverDue(false);
     }
-    if (classroom.occupied.state !== OccupiedState.RESERVED
-      && classroom.occupied.state !== OccupiedState.OCCUPIED
-      && timeout) clearTimeout(timeout);
+    if (classroom.occupied.state !== OccupiedState.RESERVED && timeout.current) {
+      clearTimeout(timeout.current);
+    }
   }, [classroom]);
 
   const calcStyle = (classroom: ClassroomType) => {

@@ -50,10 +50,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
   }, []);
 
   useEffect(() => {
-    if (classroom.occupied.state === OccupiedState.RESERVED ||
-      (classroom.occupied.state === OccupiedState.OCCUPIED &&
-        (classroom.occupied.user.type === UserTypes.STUDENT
-          || classroom.occupied.user.type === UserTypes.POST_GRADUATE))) {
+    if (classroom.occupied.state === OccupiedState.RESERVED) {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
 
@@ -67,9 +64,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
     } else {
       setIsOverDue(false);
     }
-    if (occupied.state !== OccupiedState.RESERVED
-      && occupied.state !== OccupiedState.OCCUPIED
-      && timeout.current) clearTimeout(timeout.current);
+    if (occupied.state !== OccupiedState.RESERVED && timeout.current) clearTimeout(timeout.current);
     defineStyle();
     defineStatus();
     defineStatusStiles();
@@ -109,7 +104,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
       && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length) {
       return 'Обмежений доступ';
     }
-    if (isOverdue) return 'Просрочено!';
+    if (isOverdue) return 'Резервація прострочена!';
     if (disabled?.state === DisabledState.DISABLED) {
       return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');
     }
