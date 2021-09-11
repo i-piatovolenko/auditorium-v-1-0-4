@@ -59,7 +59,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({
   const defineStatus = () => {
     const {isHidden, disabled, queueInfo: {queuePolicy}, occupied} = classroom;
     if (isOccupiedOverdue) return <span className={styles.overdue}>
-      {`Час занять в аудиторії прострочен на 
+      {`Час занять в аудиторії прострочений на 
     ${((isTimeout(occupied.until, true) as number) / 1000 / 60)
         .toFixed(0)} хв.`}
     </span>
