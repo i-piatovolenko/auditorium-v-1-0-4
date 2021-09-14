@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import Header from '../../../components/header/Header';
 import styles from './adminUsers.module.css';
 import {ACCESS_RIGHTS, StudentAccountStatus, User, UserTypes, UserTypesUa} from "../../../models/models";
@@ -10,10 +10,7 @@ import {checkVerified, fullName, showNotification} from "../../../helpers/helper
 import mainStyles from "../../../styles/main.module.css";
 import Select from "react-select";
 import {CategoryType, selectStyles} from "../../../styles/selectStyles";
-import {useHistory} from "react-router-dom";
-import UserProfile from "../../../components/userProfile/UserProfile";
 import Add from "../../../components/icons/add/Add";
-import Edit from "../../../components/icons/edit/Edit";
 import Delete from "../../../components/icons/delete/Delete";
 import DataList from "../../../components/dataList/DataList";
 import BrowseUserPopupBody from "./browseUserPopupBody/BrowseUserPopupBody";
@@ -23,6 +20,9 @@ import {useLocal} from "../../../hooks/useLocal";
 import EditUserPopupBody from "./editUserPopupBody/EditUserPopupBody";
 import {client} from "../../../api/client";
 import {DELETE_USER} from "../../../api/operations/mutations/deleteUser";
+import VerifyButton from "./verifyButton/VerifyButton";
+import HeaderCheckbox from "../../../components/headerCheckBox/HeaderCheckbox";
+import Loader from "../../../components/loader/Loader";
 
 const categories: CategoryType[] = [
   {
@@ -58,35 +58,20 @@ const AdminUsers = () => {
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
   const [searchValue, setSearchValue] = useState('');
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [listData, setListData] = useState<any[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [unverifiedOnly, setUnverifiedOnly] = useState(false);
   const [verifyUser] = useMutation(VERIFY_USER);
   const {data: {accessRights}} = useLocal('accessRights');
   const user = (user: User) => <>
     <span className={styles.alignText}>{user.id}</span>
     <span>{fullName(user)}</span>
     <span>{user.studentInfo?.accountStatus === StudentAccountStatus.UNVERIFIED && (
-      <Button color='red' onClick={() => verify(user.id)}>Верифікувати</Button>
+      <Button color='red'>Верифікувати</Button>
     )}
     </span>
     <span className={styles.alignText}>{UserTypesUa[user.type as UserTypes]}</span>
     {accessRights === ACCESS_RIGHTS.ADMIN && <Delete onClick={() => handleDelete(user.id)}/>}
   </>;
-
-  useEffect(() => {
-    setFilteredUsers(data?.users)
-  }, [data]);
-
-  useEffect(() => {
-    setListData(filteredUsers?.map(item => user(item)));
-  }, [filteredUsers]);
-
-  const handleClick = (user: User) => {
-    dispatchPopupWindow({
-      header: <h1>{fullName(user)}</h1>,
-      body: <UserProfile userId={user.id as number}/>,
-    });
-  };
 
   const handleErrorDetails = (e: any) => {
     dispatchPopupWindow({
@@ -142,24 +127,10 @@ const AdminUsers = () => {
 
   const handleSearch = (e: any) => {
     setSearchValue(e.target.value);
-    if (e.target.value) {
-      const filter = data.users
-        .filter((user: User) => (fullName(user).toLowerCase() + user.id)
-          .includes(e.target.value.toLowerCase()));
-
-      setFilteredUsers(filter);
-    } else {
-      setFilteredUsers(data.users);
-    }
   };
 
   const handleSelectCategory = (e: any) => {
-    const filter = data.users.filter((user: User) => user.type === e.value);
-    if (e.value !== 'ALL') {
-      setFilteredUsers(filter);
-    } else {
-      setFilteredUsers(data.users);
-    }
+    setCategoryFilter(e.value);
   }
 
   const verify = async (userId: number) => {
@@ -192,7 +163,7 @@ const AdminUsers = () => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <BrowseUserPopupBody user={user}/>,
-      footer: !checkVerified(user) && <Button onClick={() => verify(user.id)}>Верифікувати</Button>
+      footer: !checkVerified(user) && <VerifyButton verify={() => verify(user.id)}/>
     });
   };
 
@@ -211,17 +182,30 @@ const AdminUsers = () => {
           options={categories}
           defaultValue={categories[0]}
           onChange={handleSelectCategory}
-          styles={selectStyles}/>
+          styles={selectStyles}
+        />
+        <HeaderCheckbox
+          label='Тільки неверифіковані'
+          checked={unverifiedOnly}
+          setChecked={() => setUnverifiedOnly(prevState => !prevState)}
+        />
         {accessRights === ACCESS_RIGHTS.ADMIN && <Add onClick={handleCreate}/>}
       </Header>
-      <DataList header={listHeader} data={listData} handleItemClick={handleItemClick}
-                gridTemplateColumns='40px 1fr 100px 200px 40px 40px'/>
+      {loading ? <Loader/> : data?.users.length ? (
+        <DataList header={listHeader}
+                  data={data.users
+                    .filter((user: User) => (fullName(user).toLowerCase() + user.id).includes(searchValue.toLowerCase()))
+                    .filter((user: User) => categoryFilter === 'ALL' ? true : user.type === categoryFilter)
+                    .filter((user: User) => unverifiedOnly ? user.studentInfo?.accountStatus === StudentAccountStatus.UNVERIFIED : true)
+                    .map((item: User) => user(item))}
+                  handleItemClick={handleItemClick}
+                  gridTemplateColumns='40px 1fr 100px 200px 40px 40px'
+        />
+      ) : (
+        <p>Користувачів не знайдено</p>
+      )}
     </div>
   );
 }
 
 export default AdminUsers;
-
-function useDispatch() {
-    throw new Error('Function not implemented.');
-}

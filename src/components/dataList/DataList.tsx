@@ -45,13 +45,13 @@ const DataList: React.FC<PropTypes> = ({
   };
 
   return (
-    !data?.length && !isSearching ? <Loader/> : <div className={styles.container}>
+    <div className={styles.container}>
       <ul className={styles.list}>
         <li className={styles.headerRow} style={{gridTemplateColumns: columns}}>
           {header?.map((item, index) => <span
             onClick={() => handleClick(index)}>{item}</span>)}
         </li>
-        {isSearching && !data.length
+        {!data.length
           ? <li className={styles.emptyResult}>Нічого не знайдено</li>
           : sortedData?.map(item => <li
             onClick={() => handleItemClick && handleItemClick(item.props.children[0].props.children)}
