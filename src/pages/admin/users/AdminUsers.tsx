@@ -147,12 +147,12 @@ const AdminUsers = () => {
             query: GET_USERS,
             fetchPolicy: 'network-only'
           })
-        } catch (e) {
+        } catch (e: any) {
           showNotification(dispatchNotification, ['Помилка!', e.message.slice(0, 100), 'alert']);
         }
       }
 
-    } catch (e) {
+    } catch (e: any) {
       showNotification(dispatchNotification, ['Помилка!', e.message.slice(0, 100), 'alert']);
     }
   };

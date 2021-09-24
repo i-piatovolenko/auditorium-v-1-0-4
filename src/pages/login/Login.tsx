@@ -69,7 +69,7 @@ const Login = () => {
             history.push('/dashboard')
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         dispatchNotification({
           header: 'Помилка!',
           message: e.message,

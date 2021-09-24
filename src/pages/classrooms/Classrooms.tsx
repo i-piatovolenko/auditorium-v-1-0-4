@@ -6,7 +6,6 @@ import styles from "./classrooms.module.css";
 import Caviar from "../../components/caviar/Caviar";
 import {useNotification} from "../../components/notification/NotificationProvider";
 import Edit from "../../components/icons/edit/Edit";
-import HeaderSelect from "../../components/headerSelect/HeaderSelect";
 import useClassrooms from "../../hooks/useClassrooms";
 import {filterClassrooms} from "../../helpers/filterClassrooms";
 import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
@@ -18,9 +17,7 @@ import {client} from "../../api/client";
 import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
 import {GET_USERS} from "../../api/operations/queries/users";
 import Button from "../../components/button/Button";
-import {FOLLOW_USERS} from "../../api/operations/subscriptions/users";
-import {useSubscription} from "@apollo/client";
-import {usePopupWindow} from "../../components/popupWindow/PopupWindowProvider";
+import {DISPATCHER_STATUS} from "../../api/operations/queries/dispatcherActive";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -30,8 +27,6 @@ const filters = [
 
 const Classrooms = () => {
   const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
-  const classnameKeys = useRef('');
-  const {data, loading, error} = useSubscription(FOLLOW_USERS);
   const [filter, setFilter] = useState(filters[0].value);
   const [isNoWing, setIsNoWing] = useState(false);
   const [isOperaStudioOnly, setIsOperaStudioOnly] = useState(false);
@@ -48,6 +43,10 @@ const Classrooms = () => {
       });
       await client.query({
         query: GET_USERS,
+        fetchPolicy: 'network-only'
+      });
+      await client.query({
+        query: DISPATCHER_STATUS,
         fetchPolicy: 'network-only'
       })
     } catch (e) {

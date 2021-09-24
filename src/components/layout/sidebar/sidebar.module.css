@@ -130,3 +130,39 @@
   height: 18px;
   border-radius: 20px;
 }
+
+.finishButtonWrapper {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+}
+
+.finishButtonWrapperCollapsed {
+  position: absolute;
+  bottom: 16px;
+  left: 6px;
+  width: 60px;
+}
+
+.finishButtonWrapper svg, .finishButtonWrapperCollapsed svg {
+  width: 24px;
+  height: 24px;
+}
+
+.dispatcherInactive {
+  position: fixed;
+  z-index: 9999999;
+  background-color: rgba(0, 0, 0, .3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+}
+
+.dayFinishedTitle {
+  background-color: rgba(255, 0, 0, .3);
+  width: 100vw;
+  text-align: center;
+  padding: 16px 0;
+}

@@ -9,6 +9,7 @@ const wsLink: any = new WebSocketLink({
   uri: 'wss://api.auditoriu.me/',
   options: {
     reconnect: true,
+    lazy: true,
     connectionParams: () => {
       const token = localStorage.getItem('token')
       return {
@@ -57,7 +58,7 @@ const splitLink = split(
 const errorLink = onError(({graphQLErrors, networkError}) => {
   if (graphQLErrors)
     graphQLErrors.forEach(({message, locations, path, extensions}) => {
-        console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
+        console.log(`[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(locations)}, Path: ${path}`)
       }
     );
   if (networkError) networkErrorVar(networkError);

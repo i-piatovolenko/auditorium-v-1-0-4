@@ -182,7 +182,7 @@ const Footer: React.FC<PropTypes> = ({
           props.dispatch({
             type: "POP_POPUP_WINDOW",
           });
-        } catch (e) {
+        } catch (e: any) {
           dispatchNotification({
             header: "Помилка!",
             message: e.message,
@@ -234,7 +234,7 @@ const Footer: React.FC<PropTypes> = ({
         props.dispatch({
           type: "POP_POPUP_WINDOW",
         });
-      } catch (e) {
+      } catch (e: any) {
         dispatchNotification({
           header: "Помилка!",
           message: e.message,
@@ -285,10 +285,10 @@ const Footer: React.FC<PropTypes> = ({
           type: "POP_POPUP_WINDOW",
         });
         isButtonDisabledVar(false);
-      } catch (e) {
+      } catch (e: any) {
         dispatchNotification({
           header: "Помилка!",
-          message: e.message,
+          message: (e as any).message,
           type: "alert",
         });
         isButtonDisabledVar(false);

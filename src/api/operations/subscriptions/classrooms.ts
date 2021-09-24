@@ -16,9 +16,6 @@ export const FOLLOW_CLASSROOMS = gql`
           until
           state
         }
-        queue {
-          id
-        }
         disabled {
         comment
         state
