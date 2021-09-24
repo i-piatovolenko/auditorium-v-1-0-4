@@ -17,6 +17,7 @@ import {client} from "../../../api/client";
 import {DISABLE_DISPATCHER} from "../../../api/operations/mutations/disableDispatcher";
 import {useNotification} from "../../notification/NotificationProvider";
 import {DISPATCHER_STATUS} from "../../../api/operations/queries/dispatcherActive";
+import {handleLogout} from "../../../helpers/logout";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(true);
@@ -132,6 +133,7 @@ const Sidebar = () => {
       {isDispatcher && !isActive && (
         <div className={styles.dispatcherInactive}>
           <h1 className={styles.dayFinishedTitle}>Робочий день закінчено</h1>
+          <Button color='red' onClick={handleLogout}>Вийти з аккаунту</Button>
         </div>
       )}
       <div onClick={onMenuClick} className={styles.logoWrapper}>
