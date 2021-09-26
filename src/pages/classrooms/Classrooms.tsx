@@ -18,6 +18,8 @@ import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
 import {GET_USERS} from "../../api/operations/queries/users";
 import Button from "../../components/button/Button";
 import {DISPATCHER_STATUS} from "../../api/operations/queries/dispatcherActive";
+import {FOLLOW_USERS} from "../../api/operations/subscriptions/users";
+import {FOLLOW_DISPATCHER_STATUS} from "../../api/operations/subscriptions/dispatcherStatus";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -63,6 +65,12 @@ const Classrooms = () => {
     const unsubscribeClassrooms = subscribeToMore({
       document: FOLLOW_CLASSROOMS,
     });
+    const unsubscribeUsers = subscribeToMore({
+      document: FOLLOW_USERS,
+    });
+    const unsubscribeDispatcherStatus = subscribeToMore({
+      document: FOLLOW_DISPATCHER_STATUS,
+    });
 
     window.addEventListener('click', handleGlobalClick);
     window.addEventListener('focus', handleWindowFocusEvent);
@@ -72,6 +80,8 @@ const Classrooms = () => {
 
     return () => {
       unsubscribeClassrooms();
+      unsubscribeUsers();
+      unsubscribeDispatcherStatus();
 
       window.removeEventListener('click', handleGlobalClick);
       window.removeEventListener('focus', handleWindowFocusEvent);

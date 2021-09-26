@@ -1,12 +1,16 @@
 import React from 'react';
 import Button from "../../../../components/button/Button";
+import DeleteUserConfirmPopup from "../../../users/approveFooter/DeleteUserConfirmPopup";
 
 type PropTypes = {
   verify: () => void;
   dispatch?: any;
+  dispatchPopupWindow: (value: any) => any;
+  dispatchNotification: (value: any) => any;
+  userId: number;
 }
 
-const VerifyButton: React.FC<PropTypes> = ({verify, dispatch}) => {
+const VerifyButton: React.FC<PropTypes> = ({verify, dispatch, dispatchPopupWindow, dispatchNotification, userId}) => {
   const handleVerify = () => {
     verify();
     dispatch({
@@ -14,8 +18,30 @@ const VerifyButton: React.FC<PropTypes> = ({verify, dispatch}) => {
     });
   };
 
+  const handleConfirmDelete = () => {
+    dispatchPopupWindow({
+      header: <h1>Бажаєте видалити користувача?</h1>,
+      body: <p>Цю дію неможливо буде відмінити</p>,
+      footer: <DeleteUserConfirmPopup
+        dispatchNotification={dispatchNotification}
+        userId={userId}
+        dispatch={dispatch}
+      />,
+      isConfirm: true,
+    })
+  }
+
   return (
-    <Button onClick={handleVerify}>Верифікувати</Button>
+    <>
+      <Button
+        onClick={handleConfirmDelete}
+        style={{marginRight: 8, height: 40}}
+        color='red'
+      >
+        Видалити
+      </Button>
+      <Button onClick={handleVerify}>Верифікувати</Button>
+    </>
   );
 }
 

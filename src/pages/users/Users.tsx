@@ -68,7 +68,14 @@ const Users = () => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <BrowseUserPopupBody user={user}/>,
-      footer: !checkVerified(user) && <VerifyButton verify={() => verify(user.id)}/>
+      footer: !checkVerified(user) && (
+        <VerifyButton
+          verify={() => verify(user.id)}
+          dispatchPopupWindow={dispatchPopupWindow}
+          dispatchNotification={dispatchNotification}
+          userId={user.id}
+        />
+        )
     });
   };
 

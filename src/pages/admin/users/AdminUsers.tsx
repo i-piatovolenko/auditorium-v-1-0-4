@@ -102,7 +102,7 @@ const AdminUsers = () => {
           message: `Користувача видалено.`,
           type: "ok",
         });
-      } catch (e) {
+      } catch (e: any) {
         console.log(e);
         dispatchNotification({
           header: "Помилка!",
@@ -163,7 +163,14 @@ const AdminUsers = () => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <BrowseUserPopupBody user={user}/>,
-      footer: !checkVerified(user) && <VerifyButton verify={() => verify(user.id)}/>
+      footer: !checkVerified(user) && (
+        <VerifyButton
+          verify={() => verify(user.id)}
+          dispatchPopupWindow={dispatchPopupWindow}
+          dispatchNotification={dispatchNotification}
+          userId={user.id}
+        />
+        )
     });
   };
 

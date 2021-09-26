@@ -120,9 +120,10 @@ const Sidebar = () => {
 
   const handleFinishClick = () => {
     dispatchPopupWindow({
-      header: <h1>Ви дійсно бажаєте завершити роботу?</h1>,
+      header: <h1>Бажаєте завершити роботу?</h1>,
       body: <p>Цю дію неможливо буде відмінити</p>,
-      footer: <FinishFooter/>
+      footer: <FinishFooter/>,
+      isConfirm: true,
     });
   }
 
