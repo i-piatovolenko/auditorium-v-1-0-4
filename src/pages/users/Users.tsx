@@ -23,6 +23,7 @@ import {GET_USER_BY_ID, GET_USERS} from "../../api/operations/queries/users";
 import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../components/loader/Loader";
 import VerifyButton from "../admin/users/verifyButton/VerifyButton";
+import CompleteEmployeeAccountPopupBody from "./completeEmployeeAccount/CompleteEmployeeAccountPopupBody";
 
 const categories: CategoryType[] = [
   {
@@ -64,18 +65,37 @@ const Users = () => {
   const {data: {accessRights}} = useLocal('accessRights');
   const [verifyUser] = useMutation(VERIFY_USER);
 
+  const handleComplete = (userId: number) => {
+    dispatchPopupWindow({
+      header: <h1>Видати аккаунт співробітнику</h1>,
+      body: <CompleteEmployeeAccountPopupBody dispatchNotification={dispatchNotification} userId={userId} />,
+      footer: (
+        <Button
+          form='completeEmployeeAccount'
+          type='submit'
+        >
+          Підтвердити
+        </Button>
+      ),
+    });
+  };
+
   const handleClick = (user: User) => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <BrowseUserPopupBody user={user}/>,
-      footer: !checkVerified(user) && (
+      footer: !!user?.studentInfo ? !checkVerified(user) && (
         <VerifyButton
           verify={() => verify(user.id)}
           dispatchPopupWindow={dispatchPopupWindow}
           dispatchNotification={dispatchNotification}
           userId={user.id}
         />
-        )
+      ) : !user.employeeInfo.isInUsage ? (
+        <Button onClick={() => handleComplete(user.id)}>
+          Видати аккаунт
+        </Button>
+      ) : null
     });
   };
 

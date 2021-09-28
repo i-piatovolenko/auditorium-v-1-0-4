@@ -1,3 +1,5 @@
+import {bool} from "yup";
+
 export enum ACCESS_RIGHTS {
   USER,
   DISPATCHER,
@@ -106,6 +108,7 @@ export type StudentInfo = {
 export type EmployeeInfo = {
   employmentType: EmploymentTypes;
   accountStatus: string;
+  isInUsage: boolean;
 };
 
 export type OccupiedInfo = {

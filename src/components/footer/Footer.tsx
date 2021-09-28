@@ -39,7 +39,6 @@ const Footer: React.FC<PropTypes> = ({
                                      }) => {
     const [confirmSanctions, setConfirmSanction] = useState(false);
     const {data: {disabledTime}} = useLocal('disabledTime');
-    const {data: {disableClassroomBeforeFree}} = useLocal('disableClassroomBeforeFree');
     const [isOccupiedOverdue, setIsOccupiedOverdue] = useState(false);
     const [freeClassroom] = useMutation(FREE_CLASSROOM, {
       variables: {
@@ -82,7 +81,7 @@ const Footer: React.FC<PropTypes> = ({
 
     const handleFreeClassroom = async () => {
       try {
-        if (disableClassroomBeforeFree) {
+        if (disableClassroomBeforeFreeVar()) {
           const result = await client.mutate({
             mutation: DISABLE_CLASSROOM,
             variables: {
@@ -125,6 +124,8 @@ const Footer: React.FC<PropTypes> = ({
             type: "ok",
           });
           isButtonDisabledVar(false);
+          disabledTimeVar(15);
+          disableClassroomBeforeFreeVar(false);
           // @ts-ignore
           props.dispatch({
             type: "POP_POPUP_WINDOW",
@@ -137,9 +138,9 @@ const Footer: React.FC<PropTypes> = ({
           type: "alert",
         });
         isButtonDisabledVar(false);
+        disabledTimeVar(15);
+        disableClassroomBeforeFreeVar(false);
       }
-      disabledTimeVar(15);
-      disableClassroomBeforeFreeVar(false);
     };
 
     const handlePassClassroom = () => {

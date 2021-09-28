@@ -36,6 +36,7 @@ export const GET_USERS = gql`
       employeeInfo {
         employmentType
         accountStatus
+        isInUsage
       }
     }
   }

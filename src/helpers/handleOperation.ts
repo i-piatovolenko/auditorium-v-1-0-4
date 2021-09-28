@@ -4,7 +4,7 @@ type clientOperationHandlerType = (
   operation: any,
   operationName: string,
   dispatchNotification: (value: any) => void,
-  dispatch: (value: any) => void,
+  dispatch: (value: any) => void | null,
   successMessage?: string,
 ) => void;
 
@@ -28,7 +28,7 @@ const handleOperation: clientOperationHandlerType = async (
         message: successMessage,
         type: "ok",
       });
-      dispatch({type: "POP_ALL_POPUP_WINDOW"});
+      dispatch && dispatch({type: "POP_ALL_POPUP_WINDOW"});
     }
   } catch (e: any) {
     dispatchNotification({

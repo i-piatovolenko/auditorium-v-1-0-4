@@ -165,7 +165,7 @@ const Queue = () => {
             options={users.filter(user => {
               return !user.occupiedClassrooms.length
                 && (user.type === UserTypes.POST_GRADUATE || user.type === UserTypes.STUDENT) &&
-                user.studentInfo.accountStatus === StudentAccountStatus.ACTIVE
+                user?.studentInfo?.accountStatus === StudentAccountStatus.ACTIVE
             }).map((user: User) => ({
                 label: user.id + ": " + fullName(user),
                 value: user.id as number,
