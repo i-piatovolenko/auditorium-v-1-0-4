@@ -10,7 +10,7 @@ import {
 } from "../../api/client";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
-import {DisabledInfo, DisabledState, OccupiedInfo, OccupiedState, UserTypes} from "../../models/models";
+import {ClassroomType, DisabledInfo, DisabledState, OccupiedInfo, OccupiedState, UserTypes} from "../../models/models";
 import DisableClassroom from "../DisableClassroom";
 import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom";
 import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
@@ -20,6 +20,7 @@ import moment from "moment";
 import {GIVE_OUT_CLASSROOM_KEY} from "../../api/operations/mutations/giveOutClassroomKey";
 import ConfirmBody from "./ConfirmBody";
 import {useLocal} from "../../hooks/useLocal";
+import {GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID} from "../../api/operations/queries/users";
 
 interface PropTypes {
   classroomName: string;
@@ -79,14 +80,14 @@ const Footer: React.FC<PropTypes> = ({
       setIsOccupiedOverdue(isOverdueByStudent as boolean);
     }, [occupied.state, occupied.user, occupied.until]);
 
-    const handleFreeClassroom = async () => {
+    const handleFreeClassroom = async (name: string, freeMutationOnly = true) => {
       try {
-        if (disableClassroomBeforeFreeVar()) {
+        if (disableClassroomBeforeFreeVar() && freeMutationOnly) {
           const result = await client.mutate({
             mutation: DISABLE_CLASSROOM,
             variables: {
               input: {
-                classroomName: String(classroomName),
+                classroomName: String(name),
                 comment: 'За розкладом',
                 until: moment().add(disabledTime, 'minutes').toISOString()
               }
@@ -103,12 +104,20 @@ const Footer: React.FC<PropTypes> = ({
           } else {
             dispatchNotification({
               header: "Успішно!",
-              message: `Аудиторія ${classroomName} заблокована.`,
+              message: `Аудиторія ${name} заблокована.`,
               type: "ok",
             });
           }
         }
-        const result = await freeClassroom();
+        const result = await client.mutate({
+          mutation: FREE_CLASSROOM,
+          variables: {
+            input: {
+              classroomName: String(name),
+              applySanction: isOverdue ? confirmSanctions : false
+            },
+          },
+        });
         if (result.data.freeClassroom.userErrors.length) {
           result.data.freeClassroom.userErrors.forEach(({message}: any) => {
             dispatchNotification({
@@ -120,14 +129,14 @@ const Footer: React.FC<PropTypes> = ({
         } else {
           dispatchNotification({
             header: "Успішно!",
-            message: `Аудиторія ${classroomName} звільнена.`,
+            message: `Аудиторія ${name} звільнена.`,
             type: "ok",
           });
           isButtonDisabledVar(false);
           disabledTimeVar(15);
           disableClassroomBeforeFreeVar(false);
           // @ts-ignore
-          props.dispatch({
+          freeMutationOnly && props.dispatch({
             type: "POP_POPUP_WINDOW",
           });
         }
@@ -244,11 +253,33 @@ const Footer: React.FC<PropTypes> = ({
       }
     }
 
-    const confirmGiveOutKey = () => {
+    const confirmGiveOutKey = async () => {
+      let occupiedClassroom: any;
+      const result = await client.query({
+        query: GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID,
+        variables: {
+          where: {
+            id: occupied.user.id
+          }
+        }
+      })
+      if (!result.data.user) {
+        alert('error')
+      } else {
+        occupiedClassroom = result.data.user.occupiedClassrooms.find(({state}: any) => state === OccupiedState.OCCUPIED)
+      }
       dispatchPopupWindow({
         header: <h1>Увага!</h1>,
-        body: <span>{`Підтвердіть видачу ключа для ${fullName(occupied.user, true)}`}</span>,
-        footer: <ConfirmFooter onOk={handleGiveOutKey}/>,
+        body: occupiedClassroom ? (
+            <>
+              <p>{`В даний момент користувач займає аудиторію ${occupiedClassroom.classroom.name}, з якої він буде автоматично виписаний.`}</p>
+              <p>{`Переконайтесь, що ключі від попередньої аудиторії (${occupiedClassroom.classroom.name}) були здані.`}</p>
+            </>
+          ) :
+          (
+            <span>{`Підтвердіть видачу ключа для ${fullName(occupied.user, true)}`}</span>
+          ),
+        footer: <ConfirmFooter onOk={() => handleGiveOutKey(occupiedClassroom)}/>,
         isConfirm: true
       });
     }
@@ -257,14 +288,17 @@ const Footer: React.FC<PropTypes> = ({
       dispatchPopupWindow({
         header: <h1>Увага!</h1>,
         body: <ConfirmBody/>,
-        footer: <ConfirmFooter onOk={handleFreeClassroom}/>,
+        footer: <ConfirmFooter onOk={() => handleFreeClassroom(classroomName)}/>,
         isConfirm: true
       });
     }
 
-    const handleGiveOutKey = async () => {
+    const handleGiveOutKey = async (occupiedClassroom: any) => {
       isButtonDisabledVar(true);
       try {
+        if (occupiedClassroom) {
+          await handleFreeClassroom(occupiedClassroom.classroom.name, true);
+        }
         const result = await giveOutKey();
         if (result.data.giveOutClassroomKey.userErrors.length) {
           result.data.giveOutClassroomKey.userErrors.forEach(({message}: any) => {
