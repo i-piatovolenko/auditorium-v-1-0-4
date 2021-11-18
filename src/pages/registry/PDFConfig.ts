@@ -1,5 +1,7 @@
 import {TDocumentDefinitions} from "pdfmake/interfaces";
 import {RegisterUnit} from "../../models/models";
+import moment from "moment";
+import {getMinutesWithZero} from "../../helpers/getMinutsWithZero";
 
 export const getDocumentDefinition = (registerDate: Date, registerData: any): TDocumentDefinitions => ({
   pageSize: "A4",
@@ -28,10 +30,10 @@ export const getDocumentDefinition = (registerDate: Date, registerData: any): TD
             {},
           ],
           [
-            { text: "Ауд.", style: "tableHeader", alignment: "center" },
-            { text: "П.І.Б.", style: "tableHeader" },
-            { text: "Від", style: "tableHeader", alignment: "center" },
-            { text: "До", style: "tableHeader", alignment: "center" },
+            {text: "Ауд.", style: "tableHeader", alignment: "center"},
+            {text: "П.І.Б.", style: "tableHeader"},
+            {text: "Від", style: "tableHeader", alignment: "center"},
+            {text: "До", style: "tableHeader", alignment: "center"},
           ],
           ...registerData,
           [
@@ -71,20 +73,24 @@ export const getDocumentDefinition = (registerDate: Date, registerData: any): TD
 });
 
 export const getFormattedData = (data: any) => {
-  return data.register.map((unit: RegisterUnit) => {
+  return data.register.slice().sort((a: RegisterUnit, b: RegisterUnit) => {
+    const aStart = moment(a.start).valueOf();
+    const bStart = moment(b.start).valueOf();
+    return bStart - aStart;
+  }).map((unit: RegisterUnit) => {
     const start =
       new Date(unit.start).getHours() +
       ":" +
-      new Date(unit.start).getMinutes();
+      getMinutesWithZero(new Date(unit.start).getMinutes());
     const end =
       unit.end !== null
         ? new Date(unit.end).getHours() +
         ":" +
-        new Date(unit.end).getMinutes()
+        getMinutesWithZero(new Date(unit.end).getMinutes())
         : "—";
 
     return [
-      { text: unit.classroom.name, alignment: "center" },
+      {text: unit.classroom.name, alignment: "center"},
       {
         text:
           unit.nameTemp === null
@@ -95,8 +101,8 @@ export const getFormattedData = (data: any) => {
             ].join(" ")
             : unit.nameTemp,
       },
-      { text: start, alignment: "center" },
-      { text: end, alignment: "center" },
+      {text: start, alignment: "center"},
+      {text: end, alignment: "center"},
     ];
   })
 };

@@ -7,7 +7,7 @@ import Title from "../../title/Title";
 import Select from 'react-select';
 import {
   EmployeeAccountStatus,
-  OccupiedState,
+  OccupiedState, ScheduleUnitType,
   StudentAccountStatus,
   User,
   UserTypes,
@@ -17,6 +17,8 @@ import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroo
 import {client, isButtonDisabledVar} from "../../../api/client";
 import ConfirmFooter from "../../footer/ConfirmFooter";
 import moment from "moment";
+import {GET_SCHEDULE_UNIT} from "../../../api/operations/queries/schedule";
+import Button from "../../button/Button";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
@@ -37,6 +39,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
   const {data, loading, error} = useQuery(GET_USERS);
   const [occupyClassroom] = useMutation(OCCUPY_CLASSROOM);
   const [users, setUsers] = useState();
+  const [scheduleUsers, setScheduleUsers] = useState([]);
   const newUserTypes: any = [
     {value: UserTypes.STUDENT, label: UserTypesUa.STUDENT},
     {value: UserTypes.POST_GRADUATE, label: UserTypesUa.POST_GRADUATE},
@@ -51,15 +54,35 @@ const OccupantRegistration: React.FC<PropTypes> = ({
   const existingUserInput = useRef(null);
 
   //@ts-ignore
-  useEffect(() => existingUserInput.current.focus(), []);
+  useEffect(() => {
+    client.query({
+      query: GET_SCHEDULE_UNIT,
+      variables: {
+        classroomName,
+        date: moment().toISOString(),
+      }
+    }).then(({data: schedule}) => {
+      setScheduleUsers(schedule.schedule.filter((unit: ScheduleUnitType) => {
+        const date = moment().format('YYYY-MM-DD');
+        const diff = moment(date + ' ' + unit.to).diff(moment());
+        return diff > 0;
+      })
+        .map((unit: ScheduleUnitType) => {
+          return ({name: fullName(unit.user, true), id: unit.user.id});
+        }));
+    });
+    existingUserInput.current.focus();
+  }, []);
 
   useEffect(() => {
     if (!loading && !error) {
-      setUsers(data.users.filter(({studentInfo, employeeInfo, nameTemp}: User) => {
-        return (studentInfo && studentInfo.accountStatus === StudentAccountStatus.ACTIVE) ||
-          (employeeInfo && employeeInfo.accountStatus === EmployeeAccountStatus.ACTIVE) &&
-          !nameTemp
-      })
+      setUsers(data.users.slice()
+        .sort((a: User, b: User) => a.id - b.id)
+        .filter(({studentInfo, employeeInfo, nameTemp}: User) => {
+          return (studentInfo && studentInfo.accountStatus === StudentAccountStatus.ACTIVE) ||
+            (employeeInfo && employeeInfo.accountStatus === EmployeeAccountStatus.ACTIVE) &&
+            !nameTemp
+        })
         .map((user: User) => ({label: user.id + ": " + fullName(user), value: user.id})));
     }
   }, [data, error, loading]);
@@ -228,6 +251,16 @@ const OccupantRegistration: React.FC<PropTypes> = ({
           />}
         </div>
       </form>
+      <div>
+        {scheduleUsers.map((user: any) => {
+          const data = {value: user.id, label: user.name}
+          return (
+            <Button style={{height: 30, marginRight: 5}} onClick={() => handleExistingUser(data)}>
+              {user.name}
+            </Button>
+          );
+        })}
+      </div>
       <Title title="Вибраний користувач"/>
       <p>П.І.Б.: {chosenUserName}</p>
       {/*@ts-ignore*/}
