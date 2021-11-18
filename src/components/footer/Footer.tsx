@@ -10,7 +10,7 @@ import {
 } from "../../api/client";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
-import {ClassroomType, DisabledInfo, DisabledState, OccupiedInfo, OccupiedState, UserTypes} from "../../models/models";
+import {DisabledInfo, DisabledState, OccupiedInfo, OccupiedState, UserTypes} from "../../models/models";
 import DisableClassroom from "../DisableClassroom";
 import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom";
 import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
