@@ -12,6 +12,7 @@ import {getDocumentDefinition, getFormattedData} from "./PDFConfig";
 import {fullName, getTimeHHMM} from "../../helpers/helpers";
 import UserProfile from "../../components/userProfile/UserProfile";
 import {usePopupWindow} from "../../components/popupWindow/PopupWindowProvider";
+import moment from "moment";
 
 const Registry = () => {
   const dispatchPopupWindow = usePopupWindow();
@@ -28,7 +29,11 @@ const Registry = () => {
   });
   const {vfs} = vfsFonts.pdfMake;
   pdfMake.vfs = vfs;
-  const registerData = !loading && !error ? getFormattedData(data) : [];
+  const registerData = !loading && !error ? getFormattedData(data.slice().sort((a: RegisterUnit, b: RegisterUnit) => {
+    const aStart = moment(a.start).valueOf();
+    const bStart = moment(b.start).valueOf();
+    return bStart - aStart;
+  })) : [];
   const registerDate = new Date(date);
   const documentDefinition = getDocumentDefinition(registerDate, registerData);
   const readableDate = new Date(date).getDate() + "."
@@ -94,7 +99,11 @@ const Registry = () => {
         <ul className={styles.container}>
           {data?.register?.length === 0 &&
           <p className={styles.noItemsText}>За {readableDate} у журналі відвідувань записи відсутні</p>}
-          {data.register && data.register.map((unit: RegisterUnit) => {
+          {data.register && data.register.slice().sort((a: RegisterUnit, b: RegisterUnit) => {
+            const aStart = moment(a.start).valueOf();
+            const bStart = moment(b.start).valueOf();
+            return bStart - aStart;
+          }).map((unit: RegisterUnit) => {
             const userName = unit.nameTemp === null ? fullName(unit.user) : unit.nameTemp;
 
             return <li
