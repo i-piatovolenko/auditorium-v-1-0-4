@@ -1,18 +1,52 @@
 import React, {useState} from 'react';
 import styles from "./classroom/classroom.module.css";
+import Button from "./button/Button";
+import moment from "moment";
 
 type PropTypes = {
   onSubmit: (comment: string, until: string) => void;
 };
 
+const TIME_VALUES = ['На 3 години', 'До 20:00', 'До кінця дня', 'До кінця тижня', 'До кінця місяця'];
+
 const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
   const [comment, setComment] = useState('');
   const [until, setUntil] = useState('');
+  const [selectedUntilIndex, setSelectedUntilIndex] = useState(-1);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     onSubmit(comment, until);
   };
+
+  const handleCommentButtonClick = (e: any) => {
+    e.preventDefault();
+    setComment(e.target.innerHTML);
+  };
+
+  const handleUntilChange = (e: any) => {
+    setUntil(e.target.value);
+    setSelectedUntilIndex(-1);
+  };
+
+  const handleExactTime = (value: string, index: number) => {
+    const plus3 = moment().add(3, 'hours').format('YYYY-MM-DDTHH:mm');
+    const until20 = moment().set({hours: 20, minutes: 0, seconds: 0, millisecond: 0}).format('YYYY-MM-DDTHH:mm');
+    const untilEndOfDay = moment().endOf('day').format('YYYY-MM-DDTHH:mm');
+    const untilEndOfWeek = moment().endOf('week').format('YYYY-MM-DDTHH:mm');
+    const untilEndOfMonth = moment().endOf('month').format('YYYY-MM-DDTHH:mm');
+
+    setSelectedUntilIndex(index);
+
+    switch (value) {
+      case TIME_VALUES[0]: return setUntil(plus3 as unknown as string);
+      case TIME_VALUES[1]: return setUntil(until20 as unknown as string);
+      case TIME_VALUES[2]: return setUntil(untilEndOfDay as unknown as string);
+      case TIME_VALUES[3]: return setUntil(untilEndOfWeek as unknown as string);
+      case TIME_VALUES[4]: return setUntil(untilEndOfMonth as unknown as string);
+      default: return setUntil('');
+    }
+  }
 
   return (
     <div>
@@ -26,13 +60,37 @@ const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
                  name='disableComment'
           />
         </label>
+        <div className={styles.buttonsRow}>
+          <Button
+            onClick={handleCommentButtonClick}
+            disabled={comment === 'За розкладом'}
+          >
+            За розкладом
+          </Button>
+          <Button
+            onClick={handleCommentButtonClick}
+            disabled={comment === 'Сесія'}
+          >
+            Сесія
+          </Button>
+        </div>
         <label className={styles.disableClassroomInput}>
           <span>До:</span>
           <input type="datetime-local" value={until}
-                 onChange={(e => setUntil(e.target.value))}
+                 onChange={handleUntilChange}
                  name='disableUntil'
           />
         </label>
+        <div className={styles.buttonsRow}>
+          {TIME_VALUES.map((value, index) => (
+            <Button
+              onClick={() => handleExactTime(value, index)}
+              disabled={selectedUntilIndex === index}
+            >
+              {value}
+            </Button>
+          ))}
+        </div>
       </form>
     </div>
   );
