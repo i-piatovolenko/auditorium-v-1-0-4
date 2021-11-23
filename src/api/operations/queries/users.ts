@@ -25,6 +25,9 @@ export const GET_USERS = gql`
       extraPhoneNumbers
       nameTemp
       expireDate
+      queueInfo {
+        sanctionedUntil
+      }
       studentInfo {
         degree {
           id

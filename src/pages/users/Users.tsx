@@ -22,6 +22,7 @@ import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../components/loader/Loader";
 import VerifyButton from "../admin/users/verifyButton/VerifyButton";
 import CompleteEmployeeAccountPopupBody from "./completeEmployeeAccount/CompleteEmployeeAccountPopupBody";
+import moment from "moment";
 
 const categories: CategoryType[] = [
   {
@@ -78,11 +79,24 @@ const Users = () => {
     });
   };
 
+  const cancelSanctions = (userId: number) => {
+
+  };
+
+  const confirmCancelSanctions = () => {
+
+  }
+
   const handleClick = (user: User) => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <BrowseUserPopupBody user={user}/>,
-      footer: !!user?.studentInfo ? !checkVerified(user) && (
+      footer: !! user.queueInfo.sanctionedUntil ? (
+        <Button onClick={() => cancelSanctions(user.id)}>
+          Зняти санкції
+        </Button>
+        )
+        : !!user?.studentInfo ? !checkVerified(user) && (
         <VerifyButton
           verify={() => verify(user.id)}
           dispatchPopupWindow={dispatchPopupWindow}
@@ -134,6 +148,9 @@ const Users = () => {
       <span onClick={() => handleClick(user)}>
         {fullName(user)}
         {!checkVerified(user) && <span className={styles.unverified}>Не верифіковано</span>}
+        {!!user.queueInfo.sanctionedUntil && <span className={styles.sanctioned}>
+            Під санкціями до {moment(user.queueInfo.sanctionedUntil).format('DD-MM-YYYY HH:mm')}
+        </span>}
     </span>
       <span className={styles.userType} style={{backgroundColor: UserTypeColors[user.type as UserTypes]}}>
         {UserTypesUa[user.type as UserTypes]}

@@ -7,7 +7,7 @@ type PropTypes = {
   onSubmit: (comment: string, until: string) => void;
 };
 
-const TIME_VALUES = ['На 3 години', 'До 20:00', 'До кінця дня', 'До кінця тижня', 'До кінця місяця'];
+const TIME_VALUES = ['До 20:00', 'До кінця дня'];
 
 const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
   const [comment, setComment] = useState('');
@@ -30,20 +30,14 @@ const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
   };
 
   const handleExactTime = (value: string, index: number) => {
-    const plus3 = moment().add(3, 'hours').format('YYYY-MM-DDTHH:mm');
     const until20 = moment().set({hours: 20, minutes: 0, seconds: 0, millisecond: 0}).format('YYYY-MM-DDTHH:mm');
     const untilEndOfDay = moment().endOf('day').format('YYYY-MM-DDTHH:mm');
-    const untilEndOfWeek = moment().endOf('week').format('YYYY-MM-DDTHH:mm');
-    const untilEndOfMonth = moment().endOf('month').format('YYYY-MM-DDTHH:mm');
 
     setSelectedUntilIndex(index);
 
     switch (value) {
-      case TIME_VALUES[0]: return setUntil(plus3 as unknown as string);
-      case TIME_VALUES[1]: return setUntil(until20 as unknown as string);
-      case TIME_VALUES[2]: return setUntil(untilEndOfDay as unknown as string);
-      case TIME_VALUES[3]: return setUntil(untilEndOfWeek as unknown as string);
-      case TIME_VALUES[4]: return setUntil(untilEndOfMonth as unknown as string);
+      case TIME_VALUES[0]: return setUntil(until20 as unknown as string);
+      case TIME_VALUES[1]: return setUntil(untilEndOfDay as unknown as string);
       default: return setUntil('');
     }
   }

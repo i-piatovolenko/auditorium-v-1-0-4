@@ -24,6 +24,11 @@ const BrowseUserPopupBody: React.FC<PropTypes> = ({user}) => {
           <p>Перед верифікацією користувача звірте правильність даних з офіційном документом.</p>
       </div>}
       <div className={styles.list}>
+        {!!user.queueInfo.sanctionedUntil && (
+          <p className={styles.sanctioned}>
+            Під санкціями до {moment(user.queueInfo.sanctionedUntil).format('DD-MM-YYYY HH:mm')}
+          </p>
+        )}
         <div><span>ID: </span><span>{user.id}</span></div>
         <div><span>П.І.Б.: </span><span>{fullName(user)}</span></div>
         <div><span>Статус: </span><span>{UserTypesUa[user.type as UserTypes]}</span></div>

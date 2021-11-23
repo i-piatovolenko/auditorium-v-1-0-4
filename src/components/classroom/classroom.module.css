@@ -207,6 +207,14 @@
   padding-top: 16px;
 }
 
+.buttonsRow {
+  padding-left: 24%;
+  margin-bottom: 32px;
+  margin-top: -4px;
+}
+
 .buttonsRow button {
-  margin: 8px 8px 16px 0;
+  margin: 4px 4px 0 0;
+  font-size: 12px;
+  height: 24px;
 }
