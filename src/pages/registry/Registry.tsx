@@ -20,9 +20,15 @@ const Registry = () => {
   const {data, loading, error} = useQuery(GET_REGISTER, {
     variables: {
       where: {
-        start: {
-          gte: new Date(new Date(date).setHours(0, 0, 0, 0))
-        }
+        AND: [{
+          start: {
+            gte: new Date(new Date(date).setHours(0, 0, 0, 0))
+          },
+        }, {
+          start: {
+            lte: new Date(new Date(date).setHours(23, 59, 59, 0))
+          }
+        }],
       }
     },
     fetchPolicy: "network-only"
