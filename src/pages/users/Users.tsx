@@ -23,6 +23,8 @@ import Loader from "../../components/loader/Loader";
 import VerifyButton from "../admin/users/verifyButton/VerifyButton";
 import CompleteEmployeeAccountPopupBody from "./completeEmployeeAccount/CompleteEmployeeAccountPopupBody";
 import moment from "moment";
+import {UPDATE_USER} from "../../api/operations/mutations/updateUser";
+import handleOperation from "../../helpers/handleOperation";
 
 const categories: CategoryType[] = [
   {
@@ -63,6 +65,7 @@ const Users = () => {
   const [isSearching, setIsSearching] = useState(false);
   const {data: {accessRights}} = useLocal('accessRights');
   const [verifyUser] = useMutation(VERIFY_USER);
+  const [cancelSanctionsMutation] = useMutation(UPDATE_USER);
 
   const handleComplete = (userId: number) => {
     dispatchPopupWindow({
@@ -79,19 +82,50 @@ const Users = () => {
     });
   };
 
-  const cancelSanctions = (userId: number) => {
+  const CancelSanctionsFooter = ({dispatch, userId}: any) => (
+    <div className={styles.cancelSanctionFooter}>
+      <Button color='red' onClick={() => dispatch({type: 'POP_POPUP_WINDOW'})}>Ні</Button>
+      <Button onClick={() => confirmCancelSanctions(dispatch, userId)}>Так</Button>
+    </div>
+  )
 
+  const cancelSanctions = (userId: number) => {
+    dispatchPopupWindow({
+      header: <h1>Ви дійсно бажаєте зняти санкції?</h1>,
+      body: <></>,
+      footer: <CancelSanctionsFooter userId={userId}/>
+    })
   };
 
-  const confirmCancelSanctions = () => {
-
-  }
+  const confirmCancelSanctions = async (dispatch: any, userId: number) => {
+    try {
+      const result = cancelSanctionsMutation({
+        variables: {
+          where: {
+            id: userId
+          },
+          data: {
+            queueInfo: {
+              update: {
+                sanctionedUntil: {
+                  set: null
+                }
+              }
+            }
+          }
+        },
+      });
+      handleOperation(result, 'updateOneUser', dispatchNotification, dispatch, 'Санкції успішно знято!');
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const handleClick = (user: User) => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <BrowseUserPopupBody user={user}/>,
-      footer: !! user.queueInfo.sanctionedUntil ? (
+      footer: !!user.queueInfo.sanctionedUntil ? (
         <Button onClick={() => cancelSanctions(user.id)}>
           Зняти санкції
         </Button>

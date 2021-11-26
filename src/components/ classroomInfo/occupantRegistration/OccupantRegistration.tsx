@@ -50,7 +50,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
     {value: UserTypes.STAFF, label: UserTypesUa.STAFF},
     {value: UserTypes.OTHER, label: UserTypesUa.OTHER},
   ];
-  const [chosenUserType, setChosenUserType] = useState(newUserTypes[0]);
+  const [chosenUserType, setChosenUserType] = useState(newUserTypes[7]);
   const existingUserInput = useRef(null);
 
   //@ts-ignore
@@ -103,7 +103,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
 
   const handleNewUser = (e: any) => {
     if (e.target.value.length === 1) {
-      setChosenUserType(newUserTypes[0]);
+      setChosenUserType(newUserTypes[7]);
     }
 
     setChosenUserId(-1);
@@ -244,7 +244,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
           {value && <Select
               options={newUserTypes}
               value={chosenUserType}
-              placeholder={UserTypesUa.STUDENT}
+              placeholder={UserTypesUa.OTHER}
               onChange={handleTypeSelect}
               menuPortalTarget={document.body}
               styles={{menuPortal: base => ({...base, zIndex: 9999})}}

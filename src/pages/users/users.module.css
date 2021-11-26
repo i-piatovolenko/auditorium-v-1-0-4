@@ -24,3 +24,9 @@
     padding: 6px;
     margin: 0 8px;
 }
+
+.cancelSanctionFooter {
+    display: grid;
+    grid-template-columns: 100px 100px;
+    grid-gap: 16px;
+}
