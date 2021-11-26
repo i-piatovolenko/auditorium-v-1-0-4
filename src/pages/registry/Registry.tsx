@@ -16,7 +16,7 @@ import moment from "moment";
 
 const Registry = () => {
   const dispatchPopupWindow = usePopupWindow();
-  const [date, setDate] = useState(new Date().toString());
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
   const {data, loading, error} = useQuery(GET_REGISTER, {
     variables: {
       where: {
