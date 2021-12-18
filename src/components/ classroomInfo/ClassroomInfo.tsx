@@ -10,7 +10,8 @@ import {isClassroomNotFree, isStudent, isTimeout} from "../../helpers/helpers";
 import {client} from "../../api/client";
 import {GET_CLASSROOM} from "../../api/operations/queries/classroom";
 import moment from "moment";
-import {MINUTE, SECOND} from "../../helpers/constants";
+import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
+import handleOperation from "../../helpers/handleOperation";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -39,6 +40,21 @@ const ClassroomInfo: React.FC<PropTypes> = ({
   }, [occupied.state, occupied.user, occupied.until]);
 
   useEffect(() => {
+    if (occupied.state !== OccupiedState.FREE && !occupied.user) {
+      alert('test')
+      try {
+        client.mutate({
+          mutation: FREE_CLASSROOM,
+          variables: {
+            input: {
+              classroomName: String(name)
+            }
+          }
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    }
     try {
       client.query({
         query: GET_CLASSROOM,

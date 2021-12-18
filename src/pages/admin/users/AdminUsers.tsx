@@ -23,6 +23,7 @@ import {DELETE_USER} from "../../../api/operations/mutations/deleteUser";
 import VerifyButton from "./verifyButton/VerifyButton";
 import HeaderCheckbox from "../../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../../components/loader/Loader";
+import Edit from "../../../components/icons/edit/Edit";
 
 const categories: CategoryType[] = [
   {
@@ -70,6 +71,7 @@ const AdminUsers = () => {
     )}
     </span>
     <span className={styles.alignText}>{UserTypesUa[user.type as UserTypes]}</span>
+    {accessRights === ACCESS_RIGHTS.ADMIN && <Edit dark onClick={() => handleCreate(user)}/>}
     {accessRights === ACCESS_RIGHTS.ADMIN && <Delete onClick={() => handleDelete(user.id)}/>}
   </>;
 
@@ -115,9 +117,9 @@ const AdminUsers = () => {
     }
   };
 
-  const handleCreate = (user: User) => {
+  const handleCreate = (user?: User) => {
     dispatchPopupWindow({
-      header: <h1>Створити новий аккаунт співробітника</h1>,
+      header: <h1>{user ? 'Редагувати аккаунт користувача' : 'Створити новий аккаунт співробітника'}</h1>,
       //@ts-ignore
       body: <EditUserPopupBody user={user} dispatchNotification={dispatchNotification}
                                dispatchPopupWindow={dispatchPopupWindow}/>,
@@ -196,7 +198,7 @@ const AdminUsers = () => {
           checked={unverifiedOnly}
           setChecked={() => setUnverifiedOnly(prevState => !prevState)}
         />
-        {accessRights === ACCESS_RIGHTS.ADMIN && <Add onClick={handleCreate}/>}
+        {accessRights === ACCESS_RIGHTS.ADMIN && <Add onClick={() => handleCreate()}/>}
       </Header>
       {loading ? <Loader/> : data?.users.length ? (
         <DataList header={listHeader}
@@ -206,7 +208,7 @@ const AdminUsers = () => {
                     .filter((user: User) => unverifiedOnly ? user.studentInfo?.accountStatus === StudentAccountStatus.UNVERIFIED : true)
                     .map((item: User) => user(item))}
                   handleItemClick={handleItemClick}
-                  gridTemplateColumns='40px 1fr 100px 200px 40px 40px'
+                  gridTemplateColumns='40px 1fr 100px 200px 40px 40px 40px'
         />
       ) : (
         <p>Користувачів не знайдено</p>

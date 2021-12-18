@@ -46,3 +46,20 @@ label {
     opacity: .3;
     width: 12px;
 }
+
+.extraPhoneWrapper {
+    position: relative;
+}
+
+.extraPhoneWrapper img {
+    position: absolute;
+    width: 20px;
+    right: 8px;
+    top: 10px;
+    cursor: pointer;
+    opacity: .5;
+}
+
+.extraPhoneWrapper img:hover {
+    opacity: 1;
+}
