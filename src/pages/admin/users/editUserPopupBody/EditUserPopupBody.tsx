@@ -198,9 +198,9 @@ const EditUserPopupBody: React.FC<PropTypes> = ({
               }
             } : undefined,
             employeeInfo: isStudent(user) ? undefined : {
-              create: {
-                employmentType: selectedEmploymentType.value,
-                accountStatus: EmployeeAccountStatus.ACTIVE
+              update: {
+                employmentType: {set: selectedEmploymentType.value},
+                accountStatus: {set: EmployeeAccountStatus.ACTIVE},
               }
             },
           },
