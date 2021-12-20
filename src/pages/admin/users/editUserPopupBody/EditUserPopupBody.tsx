@@ -156,7 +156,7 @@ const EditUserPopupBody: React.FC<PropTypes> = ({
         })
         dispatchNotification({
           header: "Успішно!",
-          message: `Новий аккаунт співробітника створено.`,
+          message: `Новий акаунт співробітника створено.`,
           type: "ok",
         });
         dispatch({
@@ -280,7 +280,7 @@ const EditUserPopupBody: React.FC<PropTypes> = ({
               onChange={(e) => setPatronymic(e.target.value)}
             />
           </label>
-          <label>Тип аккаунту
+          <label>Тип акаунту
             <Select
               value={selectedUserType}
               onChange={e => setSelectedUserType(e)}
@@ -365,13 +365,13 @@ const EditUserPopupBody: React.FC<PropTypes> = ({
           )}
           {user ? (
             <Button onClick={handleUpdateUser} style={{marginTop: 16, height: 40}}
-                    disabled={!firstName || !lastName || !patronymic}>
+                    disabled={!firstName || !lastName}>
               Зберегти зміни
             </Button>
           ) : (
             <Button onClick={handleSignUpEmployee} style={{marginTop: 16, height: 40}}
-                    disabled={!firstName || !lastName || !patronymic}>
-              Створити новий аккаунт
+                    disabled={!firstName || !lastName}>
+              Створити новий акаунт
             </Button>
           )}
         </form>

@@ -4,6 +4,7 @@ import {EMAIL_VALID} from "../../../helpers/validators";
 import handleOperation from "../../../helpers/handleOperation";
 import {client} from "../../../api/client";
 import {COMPLETE_EMPLOYEE_ACCOUNT} from "../../../api/operations/mutations/completeEmployeeAccountRequestEmail";
+import {GET_USERS} from "../../../api/operations/queries/users";
 
 type PropTypes = {
   dispatchNotification: (value: any) => void;
@@ -27,6 +28,9 @@ const CompleteEmployeeAccountPopupBody: React.FC<PropTypes> = ({dispatchNotifica
       });
       await handleOperation(completeEmployeeAccountRequestEmail, 'completeEmployeeAccountRequestEmail',
         dispatchNotification, props.dispatch, 'Лист надіслано')
+      await client.query({
+        query: GET_USERS
+      });
     } else {
       dispatchNotification({
         header: "Помилка",

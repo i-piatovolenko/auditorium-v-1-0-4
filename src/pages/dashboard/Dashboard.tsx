@@ -110,7 +110,7 @@ function Dashboard() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.hiddenLogout}>
-        <Button onClick={handleLogoutClick} color='red'>Вийти з аккаунту</Button>
+        <Button onClick={handleLogoutClick} color='red'>Вийти з акаунту</Button>
       </div>
       <Header>
         <div className={styles.header}>

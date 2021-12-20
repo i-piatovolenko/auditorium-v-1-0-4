@@ -50,7 +50,7 @@ export enum UserTypesUa {
   PIANO_TUNER = "Настроювач фортепіано",
   STAFF = "Співробітник",
   CONCERTMASTER = "Концертмейстер",
-  ILLUSTRATOR = "Іллюстратор",
+  ILLUSTRATOR = "Ілюстратор",
   OTHER = "Користувач",
 }
 

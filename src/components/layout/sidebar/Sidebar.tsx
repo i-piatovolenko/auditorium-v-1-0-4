@@ -134,7 +134,7 @@ const Sidebar = () => {
       {isDispatcher && !isActive && (
         <div className={styles.dispatcherInactive}>
           <h1 className={styles.dayFinishedTitle}>Робочий день закінчено</h1>
-          <Button color='red' onClick={handleLogout}>Вийти з аккаунту</Button>
+          <Button color='red' onClick={handleLogout}>Вийти з акаунту</Button>
         </div>
       )}
       <div onClick={onMenuClick} className={styles.logoWrapper}>

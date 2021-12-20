@@ -35,7 +35,7 @@ const BrowseUserPopupBody: React.FC<PropTypes> = ({user}) => {
         {user.expireDate && (
           <div>
             <span>
-              Термін дії аккаунту:
+              Термін дії акаунту:
             </span>
             <span>
               {moment(user.expireDate).format('DD.MM.YYYY')}

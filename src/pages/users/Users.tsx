@@ -69,7 +69,7 @@ const Users = () => {
 
   const handleComplete = (userId: number) => {
     dispatchPopupWindow({
-      header: <h1>Видати аккаунт співробітнику</h1>,
+      header: <h1>Видати акаунт співробітнику</h1>,
       body: <CompleteEmployeeAccountPopupBody dispatchNotification={dispatchNotification} userId={userId} />,
       footer: (
         <Button
@@ -139,7 +139,7 @@ const Users = () => {
         />
       ) : !user.employeeInfo.isInUsage ? (
         <Button onClick={() => handleComplete(user.id)}>
-          Видати аккаунт
+          Видати акаунт
         </Button>
       ) : null
     });

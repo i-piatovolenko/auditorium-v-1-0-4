@@ -8,6 +8,10 @@ const ConfirmBody = () => {
     const {data: {disabledTime}} = useLocal('disabledTime');
     const {data: {disableClassroomBeforeFree}} = useLocal('disableClassroomBeforeFree');
 
+    useEffect(() => {
+      disableClassroomBeforeFreeVar(false);
+    }, []);
+
     return (
       <div>
         <p className={styles.confirmText}>Підтвердіть звільнення аудиторії</p>

@@ -11,6 +11,9 @@ interface PropTypes {
   userId: number;
 }
 
+const NO_EMAIL = 'No email';
+const NO_PHONE_NUMBER = 'No phone number';
+
 const UserProfile: React.FC<PropTypes> = ({userId}) => {
   const {data, loading, error} = useQuery(GET_USER_BY_ID, {
     variables: {
@@ -35,17 +38,17 @@ const UserProfile: React.FC<PropTypes> = ({userId}) => {
         )}
         <Title title="E-mail"/>
         <p>
-          <Button>
+          <Button disabled={data.user.email === NO_EMAIL}>
             <a className={styles.link} href={`mailto:${data.user.email}`}>
-              {data.user.email}
+              {data.user.email === NO_EMAIL ? 'Немає даних' : data.user.email}
             </a>
           </Button>
         </p>
         <Title title="Телефон"/>
         <p>
-          <Button>
+          <Button disabled={data.user.phoneNumber === NO_PHONE_NUMBER}>
             <a className={styles.link} href={`tel:${data.user.phoneNumber}`}>
-              {data.user.phoneNumber}
+              {data.user.phoneNumber === NO_PHONE_NUMBER ? 'Немає даних' : data.user.phoneNumber}
             </a>
           </Button>
         </p>

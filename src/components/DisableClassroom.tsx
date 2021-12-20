@@ -73,6 +73,7 @@ const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
           <input type="datetime-local" value={until}
                  onChange={handleUntilChange}
                  name='disableUntil'
+                 min={moment().format('YYYY-MM-DDTHH:mm')}
           />
         </label>
         <div className={styles.buttonsRow}>

@@ -119,7 +119,7 @@ const AdminUsers = () => {
 
   const handleCreate = (user?: User) => {
     dispatchPopupWindow({
-      header: <h1>{user ? 'Редагувати аккаунт користувача' : 'Створити новий аккаунт співробітника'}</h1>,
+      header: <h1>{user ? 'Редагувати акаунт користувача' : 'Створити новий акаунт співробітника'}</h1>,
       //@ts-ignore
       body: <EditUserPopupBody user={user} dispatchNotification={dispatchNotification}
                                dispatchPopupWindow={dispatchPopupWindow}/>,
