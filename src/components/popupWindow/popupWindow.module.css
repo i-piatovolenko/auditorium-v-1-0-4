@@ -60,7 +60,14 @@
     overflow: hidden;
     overflow-x: hidden;
     overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
+
+  .modal::-webkit-scrollbar {
+    display: none;
+  }
+
   .confirm {
     width: 450px !important;
   }

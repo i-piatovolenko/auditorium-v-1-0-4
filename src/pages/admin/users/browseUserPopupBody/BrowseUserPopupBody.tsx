@@ -30,7 +30,9 @@ const BrowseUserPopupBody: React.FC<PropTypes> = ({user}) => {
           </p>
         )}
         <div><span>ID: </span><span>{user.id}</span></div>
-        <div><span>П.І.Б.: </span><span>{fullName(user)}</span></div>
+        <div><span>Прізвище: </span><span>{user?.lastName || '-'}</span></div>
+        <div><span>Ім'я: </span><span>{user?.firstName || '-'}</span></div>
+        <div><span>По-батькові: </span><span>{user?.patronymic || '-'}</span></div>
         <div><span>Статус: </span><span>{UserTypesUa[user.type as UserTypes]}</span></div>
         {user.expireDate && (
           <div>
