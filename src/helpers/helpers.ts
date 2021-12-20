@@ -72,7 +72,12 @@ export const formatMinutesToMM = (value: number) => {
 
 export const fullName = (user: User, withInitials = false) => {
   if (user) {
-    if (user.nameTemp) return user.nameTemp
+    if (user.nameTemp) {
+      const withSpaces = user.nameTemp.toLowerCase().replaceAll(/\./gmi, '. ')
+      const words = withSpaces.split(' ');
+      const capitalizedWords = words.map(word => word[0]?.toUpperCase()  === undefined ? '' : word[0].toUpperCase() + word.slice(1, word.length))
+      return capitalizedWords.join(' ')
+    }
     if (withInitials) {
       return `${user.lastName} ${user.firstName.charAt(0)}. ${
         user.patronymic ? user.patronymic.charAt(0) + "." : ""

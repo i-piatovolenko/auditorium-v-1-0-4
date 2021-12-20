@@ -41,7 +41,6 @@ const ClassroomInfo: React.FC<PropTypes> = ({
 
   useEffect(() => {
     if (occupied.state !== OccupiedState.FREE && !occupied.user) {
-      alert('test')
       try {
         client.mutate({
           mutation: FREE_CLASSROOM,
