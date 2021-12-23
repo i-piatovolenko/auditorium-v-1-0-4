@@ -19,6 +19,11 @@ import Tag from "../tag/Tag";
 import Footer from "../footer/Footer";
 import specialPiano from "../../assets/images/specialPiano.svg";
 import moment from "moment";
+import unlockIcon from "../../assets/images/unlock.svg";
+import lockIcon from "../../assets/images/lock.svg";
+import {client} from "../../api/client";
+import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
+import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -133,6 +138,45 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
     });
   };
 
+  const toggleDisable = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (disabled?.state === DisabledState.DISABLED) {
+      try {
+        await client.mutate({
+          mutation: ENABLE_CLASSROOM,
+          variables: {
+            input: {
+              classroomName: String(name)
+            }
+          }
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    } else {
+      try {
+        await client.mutate({
+          mutation: DISABLE_CLASSROOM,
+          variables: {
+            input: {
+              classroomName: String(name),
+              until: moment().set({
+                hours: 23,
+                minutes: 59,
+                seconds: 59
+              }).toISOString(),
+              comment: 'За розкладом'
+            }
+          }
+        })
+      } catch (e) {
+
+      }
+    }
+  }
+
   return (
     <>
       <li
@@ -143,7 +187,18 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
         tabIndex={index}
       >
         <div className={styles.header}>
-          {special === 'PIANO' && <img className={styles.special} src={specialPiano} alt="Special Piano"/>}
+          {special === 'PIANO' && (
+            <img className={styles.special} src={specialPiano} alt="Special Piano"/>
+          )}
+          {!isHidden && (
+            <img
+              src={disabled?.state === DisabledState.DISABLED ? lockIcon : unlockIcon}
+              alt={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати'}
+              className={disabled?.state === DisabledState.DISABLED ? styles.lockIcon : styles.unlockIcon}
+              title={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати за розкладом до кінця дня'}
+              onClick={toggleDisable}
+            />
+          )}
           <h1 className={(policy === QueuePolicyTypes.SELECTED_DEPARTMENTS &&
             queueAllowedDepartments.length) ? styles.isDepartment : ''}>{name}</h1>
           {isClassroomNotFree(occupied) && (

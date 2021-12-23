@@ -119,7 +119,14 @@
   left: 16px;
 }
 
+.disableClassroomInput {
+  display: grid;
+  grid-template-columns: .4fr 1fr .2fr .2fr;
+  grid-gap: 8px;
+}
+
 .disableClassroomInput input{
+  height: 20px;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #656565;
@@ -217,4 +224,26 @@
   margin: 4px 4px 0 0;
   font-size: 12px;
   height: 24px;
+}
+
+.unlockIcon {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 14px;
+  opacity: .2;
+  cursor: pointer;
+  transition: all .1s linear;
+}
+
+.unlockIcon:hover {
+  opacity: .7;
+}
+
+.lockIcon {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 14px;
+  cursor: pointer;
 }

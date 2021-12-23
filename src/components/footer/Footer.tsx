@@ -39,7 +39,6 @@ const Footer: React.FC<PropTypes> = ({
                                        classroomId, isOverdue, ...props
                                      }) => {
     const [confirmSanctions, setConfirmSanction] = useState(false);
-    const {data: {disabledTime}} = useLocal('disabledTime');
     const [isOccupiedOverdue, setIsOccupiedOverdue] = useState(false);
     const [freeClassroom] = useMutation(FREE_CLASSROOM, {
       variables: {
@@ -81,6 +80,10 @@ const Footer: React.FC<PropTypes> = ({
     }, [occupied.state, occupied.user, occupied.until]);
 
     const handleFreeClassroom = async (name: string, freeMutationOnly = true) => {
+      const {data: {disabledTime}} = await client.query({
+        query: gql`query disabledTime { disabledTime @client }`
+      });
+
       try {
         if (disableClassroomBeforeFreeVar() && freeMutationOnly) {
           const result = await client.mutate({
@@ -157,14 +160,13 @@ const Footer: React.FC<PropTypes> = ({
     };
 
     const submitDisable = async (comment: string, until: string) => {
-      if (comment && until) {
         try {
           const result = await client.mutate({
             mutation: DISABLE_CLASSROOM,
             variables: {
               input: {
                 classroomName: String(classroomName),
-                comment,
+                comment: comment || 'За розкладом',
                 until: moment(until).toISOString()
               }
             },
@@ -199,13 +201,6 @@ const Footer: React.FC<PropTypes> = ({
             type: "alert",
           });
         }
-      } else {
-        dispatchNotification({
-          header: "Помилка!",
-          message: "Заповніть всі поля.",
-          type: "alert",
-        });
-      }
     };
 
     const handleDisableClassroom = () => {

@@ -5,6 +5,7 @@ import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Footer from "../footer/Footer";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import moment from "moment";
+import {useLocal} from "../../hooks/useLocal";
 
 type PropTypes = {
   classroom: ClassroomType;
@@ -14,6 +15,7 @@ type PropTypes = {
 const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   const dispatchPopupWindow = usePopupWindow();
   const [isOverdue, setIsOverDue] = useState(false);
+
   let timeout = useRef(null);
 
   useEffect(() => {

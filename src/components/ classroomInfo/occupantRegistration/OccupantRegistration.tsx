@@ -2,7 +2,7 @@ import React, {FormEvent, useEffect, useRef, useState,} from "react";
 import styles from "./occupantRegistration.module.css";
 import {useMutation, useQuery} from "@apollo/client";
 import {GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID, GET_USERS} from "../../../api/operations/queries/users";
-import {fullName} from "../../../helpers/helpers";
+import {formatTempName, fullName} from "../../../helpers/helpers";
 import Title from "../../title/Title";
 import Select from 'react-select';
 import {
@@ -167,7 +167,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
     const newUser = {
       userId: chosenUserId,
       tempUser: {
-        name: chosenUserName,
+        name: formatTempName(chosenUserName),
         type: chosenUserType.value
       }
     };

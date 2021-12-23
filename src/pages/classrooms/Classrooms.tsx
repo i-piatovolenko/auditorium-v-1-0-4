@@ -72,6 +72,12 @@ const Classrooms = () => {
       document: FOLLOW_DISPATCHER_STATUS,
     });
 
+    const interval = setInterval(() => {
+      client.query({
+        query: GET_CLASSROOMS
+      })
+    }, 40000);
+
     window.addEventListener('click', handleGlobalClick);
     window.addEventListener('focus', handleWindowFocusEvent);
     window.addEventListener('freeze', handleFreezeEvent);
@@ -82,6 +88,8 @@ const Classrooms = () => {
       unsubscribeClassrooms();
       unsubscribeUsers();
       unsubscribeDispatcherStatus();
+
+      clearInterval(interval);
 
       window.removeEventListener('click', handleGlobalClick);
       window.removeEventListener('focus', handleWindowFocusEvent);

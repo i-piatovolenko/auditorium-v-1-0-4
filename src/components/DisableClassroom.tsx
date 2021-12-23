@@ -11,12 +11,18 @@ const TIME_VALUES = ['До 20:00', 'До кінця дня'];
 
 const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
   const [comment, setComment] = useState('');
-  const [until, setUntil] = useState('');
+  const [hours, setHours] = useState(23);
+  const [minutes, setMinutes] = useState(59);
+  const [until, setUntil] = useState(moment().format('YYYY-MM-DD'));
   const [selectedUntilIndex, setSelectedUntilIndex] = useState(-1);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    onSubmit(comment, until);
+    const untilDateTime = moment(until).set({
+      hours,
+      minutes
+    }).format('YYYY-MM-DDTHH:mm');
+    onSubmit(comment, untilDateTime);
   };
 
   const handleCommentButtonClick = (e: any) => {
@@ -30,15 +36,23 @@ const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
   };
 
   const handleExactTime = (value: string, index: number) => {
-    const until20 = moment().set({hours: 20, minutes: 0, seconds: 0, millisecond: 0}).format('YYYY-MM-DDTHH:mm');
-    const untilEndOfDay = moment().endOf('day').format('YYYY-MM-DDTHH:mm');
-
     setSelectedUntilIndex(index);
 
     switch (value) {
-      case TIME_VALUES[0]: return setUntil(until20 as unknown as string);
-      case TIME_VALUES[1]: return setUntil(untilEndOfDay as unknown as string);
-      default: return setUntil('');
+      case TIME_VALUES[0]: {
+        setHours(20);
+        setMinutes(0)
+        setUntil(moment().format('YYYY-MM-DD'));
+        return;
+      }
+      case TIME_VALUES[1]: {
+        setHours(23);
+        setMinutes(59);
+        setUntil(moment().format('YYYY-MM-DD'));
+        return;
+      }
+      default:
+        return setUntil('');
     }
   }
 
@@ -70,10 +84,25 @@ const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
         </div>
         <label className={styles.disableClassroomInput}>
           <span>До:</span>
-          <input type="datetime-local" value={until}
+          <input type="date"
+                 value={until}
                  onChange={handleUntilChange}
                  name='disableUntil'
-                 min={moment().format('YYYY-MM-DDTHH:mm')}
+                 min={moment().format('YYYY-MM-DD')}
+          />
+          <input
+            type="number"
+            min={0}
+            max={23}
+            value={hours}
+            onChange={(e) => setHours(+e.target.value)}
+          />
+          <input
+            type="number"
+            min={0}
+            max={59}
+            value={minutes}
+            onChange={(e) => setMinutes(+e.target.value)}
           />
         </label>
         <div className={styles.buttonsRow}>
