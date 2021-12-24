@@ -20,6 +20,9 @@ import Button from "../../components/button/Button";
 import {DISPATCHER_STATUS} from "../../api/operations/queries/dispatcherActive";
 import {FOLLOW_USERS} from "../../api/operations/subscriptions/users";
 import {FOLLOW_DISPATCHER_STATUS} from "../../api/operations/subscriptions/dispatcherStatus";
+import {useQuery} from "@apollo/client";
+import {CRASH_MODE} from "../../api/operations/queries/crashMode";
+import CrashModeAlert from "./CrashModeAlert";
 
 const filters = [
   {value: ClassroomsFilterTypes.ALL, label: 'Всі'},
@@ -29,6 +32,7 @@ const filters = [
 
 const Classrooms = () => {
   const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
+  const {data: dataCrashMode} = useQuery(CRASH_MODE);
   const [filter, setFilter] = useState(filters[0].value);
   const [isNoWing, setIsNoWing] = useState(false);
   const [isOperaStudioOnly, setIsOperaStudioOnly] = useState(false);
@@ -169,6 +173,12 @@ const Classrooms = () => {
                   classrooms={filterClassrooms(classrooms, filter, isOperaStudioOnly, isNoWing,
                     isAvailableForStudentOnly)}
           />
+          {dataCrashMode?.crashMode.isActive && (
+            <CrashModeAlert
+              comment={dataCrashMode.crashMode.comment}
+              until={dataCrashMode.crashMode.until}
+             />
+          )}
           <ul className={styles.classroomsList}>
             {filterClassrooms(classrooms, filter, isOperaStudioOnly, isNoWing,
               isAvailableForStudentOnly)

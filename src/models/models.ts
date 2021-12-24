@@ -334,3 +334,10 @@ export enum InstrumentTypesEUa {
   UpRightPiano = 'Піаніно',
   GrandPiano = 'Рояль'
 }
+
+export type CrashModeT = {
+  isActive: boolean;
+  comment: string;
+  until: Date | null;
+  globalMessage?: string;
+}

@@ -16,8 +16,10 @@ const ENV = {
   }
 }
 
+const CURRENT_ENV = ENV.prod;
+
 const wsLink: any = new WebSocketLink({
-  uri: ENV.prod.wss,
+  uri: CURRENT_ENV.wss,
   options: {
     reconnect: true,
     lazy: true,
@@ -41,7 +43,7 @@ const subscriptionMiddleware = {
 wsLink.subscriptionClient.use([subscriptionMiddleware]);
 
 const httpLink = createHttpLink({
-  uri: ENV.prod.https
+  uri: CURRENT_ENV.https
 });
 
 const authLink = setContext((_, {headers}) => {

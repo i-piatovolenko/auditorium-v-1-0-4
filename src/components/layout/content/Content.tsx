@@ -17,6 +17,7 @@ import Login from "../../../pages/login/Login";
 import Dashboard from "../../../pages/dashboard/Dashboard";
 import Queue from "../../../pages/queue/Queue";
 import {User, UserTypes} from "../../../models/models";
+import DispatcherSettings from "../../../pages/admin/dispatcherSettings/DispatcherSettings";
 
 interface PropTypes {
   isLogged: boolean;
@@ -49,6 +50,7 @@ const Content: React.FC<PropTypes> = ({isLogged}) => {
               <Route path="/adminDegrees" component={AdminDegrees}/>
               <Route path="/dashboard" component={Dashboard}/>
               <Route path="/queue" component={Queue}/>
+              <Route path="/dispatcherSettings" component={DispatcherSettings}/>
             </Switch>
           ) : (
             <Switch>

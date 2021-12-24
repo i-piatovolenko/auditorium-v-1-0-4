@@ -31,6 +31,7 @@ const Admin = () => {
       <div>
         <Header><h1>Налаштування</h1></Header>
         <ul className={styles.list}>
+          <li><NavLink to='/dispatcherSettings'>Налаштування</NavLink></li>
           {accessRights === ACCESS_RIGHTS.ADMIN && <li><NavLink to='/adminClassrooms'>Аудиторії</NavLink>
           </li>}
           <li><NavLink to='/adminUsers'>Користувачі
