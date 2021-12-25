@@ -81,6 +81,12 @@ const DisableClassroom: React.FC<PropTypes> = ({onSubmit}) => {
           >
             Сесія
           </Button>
+          <Button
+            onClick={handleCommentButtonClick}
+            disabled={comment === 'Відсутній ключ'}
+          >
+            Відсутній ключ
+          </Button>
         </div>
         <label className={styles.disableClassroomInput}>
           <span>До:</span>

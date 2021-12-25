@@ -211,7 +211,7 @@ const Users = () => {
           checked={unverifiedOnly}
           setChecked={() => setUnverifiedOnly(prevState => !prevState)}
         />
-        {accessRights === ACCESS_RIGHTS.ADMIN && <Edit path='/adminUsers'/>}
+        <Edit path='/adminUsers'/>
       </Header>
       {loading ? <Loader/> : data?.users.length ? (
         <DataList header={listHeader} data={data.users

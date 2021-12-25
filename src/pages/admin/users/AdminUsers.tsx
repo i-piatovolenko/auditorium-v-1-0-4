@@ -71,8 +71,8 @@ const AdminUsers = () => {
     )}
     </span>
     <span className={styles.alignText}>{UserTypesUa[user.type as UserTypes]}</span>
-    {accessRights === ACCESS_RIGHTS.ADMIN && <Edit dark onClick={() => handleCreate(user)}/>}
-    {accessRights === ACCESS_RIGHTS.ADMIN && <Delete onClick={() => handleDelete(user.id)}/>}
+    <Edit dark onClick={() => handleCreate(user)}/>
+    <Delete onClick={() => handleDelete(user.id)}/>
   </>;
 
   const handleErrorDetails = (e: any) => {
@@ -198,7 +198,7 @@ const AdminUsers = () => {
           checked={unverifiedOnly}
           setChecked={() => setUnverifiedOnly(prevState => !prevState)}
         />
-        {accessRights === ACCESS_RIGHTS.ADMIN && <Add onClick={() => handleCreate()}/>}
+        <Add onClick={() => handleCreate()}/>
       </Header>
       {loading ? <Loader/> : data?.users.length ? (
         <DataList header={listHeader}

@@ -52,8 +52,6 @@ const Sidebar = () => {
     }
   }, [data]);
 
-  const onMenuClick = () => setCollapsed((prevState) => !prevState);
-
   const onClick = () => {
     const screenWidth = window.screen.width;
 
@@ -129,6 +127,8 @@ const Sidebar = () => {
 
   return (
     <div
+      onMouseEnter={() => setCollapsed(false)}
+      onMouseLeave={() => setCollapsed(true)}
       className={[styles[collapsed.toString()], styles.navigation].join(" ")}
     >
       {isDispatcher && !isActive && (
@@ -137,7 +137,7 @@ const Sidebar = () => {
           <Button color='red' onClick={handleLogout}>Вийти з акаунту</Button>
         </div>
       )}
-      <div onClick={onMenuClick} className={styles.logoWrapper}>
+      <div className={styles.logoWrapper}>
         <Logo
           title={collapsed ? "Au" : "Auditorium"}
           description="Система управління видачею аудиторій"
@@ -145,7 +145,6 @@ const Sidebar = () => {
         />
       </div>
       <img
-        onClick={onMenuClick}
         className={styles.menuIcon}
         src={menuIcon}
         alt="menu"
@@ -155,8 +154,8 @@ const Sidebar = () => {
           <Route exact path="/classrooms">
             Аудиторії
           </Route>
-          <Route exact path="/queue">
-            Черга
+          <Route exact path="/users">
+            Користувачі
           </Route>
           <Route exact path="/registry">
             Журнал
@@ -164,8 +163,8 @@ const Sidebar = () => {
           {/*<Route exact path="/schedule">*/}
           {/*  Розклад*/}
           {/*</Route>*/}
-          <Route exact path="/users">
-            Користувачі
+          <Route exact path="/queue">
+            Черга
           </Route>
           <Route exact path="/profile">
             Мій профіль
@@ -188,15 +187,15 @@ const Sidebar = () => {
           </NavLink>
         </li>
         <li>
+          {unverifiedCounter !== 0 && <span className={styles.alert}>!</span>}
           <NavLink
             activeClassName={styles.linkActive}
             className={styles.link}
             onClick={onClick}
-            to="/queue"
+            to="/users"
           >
-            {/*TODO change PNG icon to SVG*/}
-            <img className={styles.icon} src={queueIcon} alt="queue"/>
-            Черга
+            <img className={styles.icon} src={usersIcon} alt="users"/>
+            Користувачі
           </NavLink>
         </li>
         <li>
@@ -222,15 +221,15 @@ const Sidebar = () => {
         {/*  </NavLink>*/}
         {/*</li>*/}
         <li>
-          {unverifiedCounter !== 0 && <span className={styles.alert}>!</span>}
           <NavLink
             activeClassName={styles.linkActive}
             className={styles.link}
             onClick={onClick}
-            to="/users"
+            to="/queue"
           >
-            <img className={styles.icon} src={usersIcon} alt="users"/>
-            Користувачі
+            {/*TODO change PNG icon to SVG*/}
+            <img className={styles.icon} src={queueIcon} alt="queue"/>
+            Черга
           </NavLink>
         </li>
         {/*<li>*/}
