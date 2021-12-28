@@ -1,30 +1,70 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./schedule.module.css";
 import Header from "../../components/header/Header";
 import ScheduleUnit from "../../components/scheduleUnit/ScheduleUnit";
-import {useQuery} from "@apollo/client";
 import {GET_CLASSROOMS} from "../../api/operations/queries/classrooms";
 import {ACCESS_RIGHTS, ClassroomType} from "../../models/models";
 import mainStyles from "../../styles/main.module.css";
 import {useLocal} from "../../hooks/useLocal";
 import Edit from "../../components/icons/edit/Edit";
 import moment from "moment";
+import {client} from "../../api/client";
+import {WORKING_DAY_END, WORKING_DAY_START} from "../../helpers/constants";
 
-const timePeriods = [
-  '9:00', '10:00', '11:00', '12:00', '13:00', '14:00',
-  '15:00', '16:00', '17:00', '18:00', '19:00'
-];
+const timePeriods = {
+  from: WORKING_DAY_START,
+  to: WORKING_DAY_END - 1,
+}
+
+// @ts-ignore
+timePeriods[Symbol.iterator] = function() {
+  return {
+    current: this.from,
+    last: this.to,
+    next() {
+      if (this.current <= this.last) {
+        return { done: false, value: `${this.current++}:00` }
+      } else {
+        return { done: true }
+      }
+    }
+  }
+}
 
 const Schedule = () => {
-  const [date, setDate] = useState(new Date());
-  const {data, loading, error} = useQuery(GET_CLASSROOMS, {
-    variables: {date: moment(date).toISOString()}
-  });
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
+  const [classrooms, setClassrooms] = useState([]);
   const { data: {accessRights}} = useLocal('accessRights');
+  const [userNameSearch, setUserNameSearch] = useState('');
+
+  const getClassrooms = () => {
+    setClassrooms(null);
+    client.query({
+      query: GET_CLASSROOMS,
+      fetchPolicy: 'network-only'
+    }).then(data => {
+      const sortedClassrooms = data.data.classrooms.slice().sort(sort);
+      setClassrooms(sortedClassrooms);
+    });
+  }
+
+  useEffect(() => {
+   getClassrooms();
+  }, []);
+
+  useEffect(() => {
+    getClassrooms();
+  }, [date]);
 
   const handleChangeDate = (e: any) => {
-    setDate(e.target.value);
-  }
+    setDate(moment(e.target.value).format('YYYY-MM-DD'));
+  };
+
+  const handleChangeSearch = (e: any) => {
+    setUserNameSearch(e.target.value);
+  };
+
+  const sort = (a: ClassroomType, b: ClassroomType) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'});
 
   return (
     <div>
@@ -32,8 +72,15 @@ const Schedule = () => {
         <h1>Розклад</h1>
         <input
           type="date"
-          value={date as unknown as string}
+          value={date}
           onChange={handleChangeDate}
+          className={mainStyles.headerDateInput}
+        />
+        <input
+          type="text"
+          placeholder='Пошук викладачів'
+          value={userNameSearch}
+          onChange={handleChangeSearch}
           className={mainStyles.headerDateInput}
         />
         {accessRights === ACCESS_RIGHTS.ADMIN && <Edit path='/adminSchedule'/>}
@@ -42,16 +89,14 @@ const Schedule = () => {
         <div className={styles.scheduleHeader}>
           <span className={styles.space}/>
           <div className={styles.timeline}>
-            {timePeriods.map(el => <span>{el}</span>)}
+            {/*@ts-ignore*/}
+            {[...timePeriods].map(el => <span>{el}</span>)}
           </div>
         </div>
         <div className={styles.scheduleUnits}>
-        {!loading && !error && data.classrooms.slice().sort((a: ClassroomType, b: ClassroomType) => {
-          return parseInt(a.name) - parseInt(b.name)
-        })
-          .map((classroom: ClassroomType) => <div className={styles.row}>
-            <span>{classroom.name}</span>
-            <ScheduleUnit classroomName={classroom.name}/>
+        {classrooms?.map((classroom: ClassroomType) => <div className={styles.row}>
+            <span className={styles.className}>{classroom.name}</span>
+            <ScheduleUnit classroomName={classroom.name} userNameSearch={userNameSearch} date={date}/>
           </div>)}
         </div>
       </div>

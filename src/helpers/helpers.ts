@@ -138,25 +138,54 @@ const simpleIntFromScheduleUnit = (time: string) => {
     .reduce(reducer);
 };
 
+export const isFirstScheduleUnitEmpty = (units: Array<ScheduleUnitType>) => {
+  const firstItem = {
+    from: WORKING_DAY_START + ':00',
+    to: units[0].from,
+  }
+  return scheduleUnitSize(firstItem as ScheduleUnitType) > 0
+}
+
+export const scheduleUnitSize = (unit: ScheduleUnitType) => {
+  const fromArr = unit.from.split(':');
+  const toArr = unit.to.split(':');
+  const from = moment().set('hours', parseInt(fromArr[0])).set('minutes', parseInt(fromArr[1]));
+  const to = moment().set('hours', parseInt(toArr[0])).set('minutes', parseInt(toArr[1]));
+  const diff = to.diff(from);
+  return diff / 1000 / 60 / 60
+}
+
 //get schedule units size in fr units for grids
 export const getScheduleUnitSize = (
   units: Array<ScheduleUnitType>,
   fillEmpty = true
 ) => {
+  if (!units.length) return '';
   const items = [];
-  if (fillEmpty) {
-    items.push(parseInt(units[0].from) - WORKING_DAY_START);
-  }
+
+  let lastPeriodEnd = WORKING_DAY_START + ':00';
+
   for (let item of units) {
-    const from = simpleIntFromScheduleUnit(item.from);
-    const to = simpleIntFromScheduleUnit(item.to);
-    items.push((to as number) - (from as number));
-  }
-  if (fillEmpty) {
-    items.push(WORKING_DAY_END - parseInt(units[units.length - 1].to));
+    const spaceItem = {
+      from: lastPeriodEnd,
+      to: item.from
+    }
+    const spaceSize = scheduleUnitSize(spaceItem as ScheduleUnitType);
+    spaceSize && items.push(spaceSize);
+
+    const time = scheduleUnitSize(item);
+    items.push(time);
+
+    lastPeriodEnd = item.to;
   }
 
-  return items.map((item) => `${item}fr`).join(" ");
+  if (fillEmpty) {
+    items.push(WORKING_DAY_END - parseFloat(units[units.length - 1].to));
+  }
+
+  const percent = (WORKING_DAY_END - WORKING_DAY_START) / 100
+
+  return items.map((item) => `${(item / percent).toFixed(1)}%`).join(" ");
 };
 
 export const ISODateString = (d: Date) => {

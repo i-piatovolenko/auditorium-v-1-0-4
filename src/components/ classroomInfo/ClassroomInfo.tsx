@@ -12,6 +12,7 @@ import {GET_CLASSROOM} from "../../api/operations/queries/classroom";
 import moment from "moment";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
 import handleOperation from "../../helpers/handleOperation";
+import ScheduleUnit from "../scheduleUnit/ScheduleUnit";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -115,8 +116,8 @@ const ClassroomInfo: React.FC<PropTypes> = ({
         <Title title="Статус аудиторії"/>
         {defineStatus()}
       </>
-      {/*<Title title="Розклад на сьогодні" />*/}
-      {/*<ScheduleUnit classroomName={name} />*/}
+      <Title title="Розклад на сьогодні" />
+      <ScheduleUnit classroomName={name} />
       {instruments?.length > 0 && (
         <>
           <Title title="Інструменти"/>

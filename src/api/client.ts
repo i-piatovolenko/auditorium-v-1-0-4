@@ -16,7 +16,7 @@ const ENV = {
   }
 }
 
-const CURRENT_ENV = ENV.stg;
+const CURRENT_ENV = ENV.prod;
 
 const wsLink: any = new WebSocketLink({
   uri: CURRENT_ENV.wss,

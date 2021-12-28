@@ -7,6 +7,11 @@
 .row {
     display: grid;
     grid-template-columns: 60px auto;
+    /*height: 35px;*/
+}
+
+.className {
+    /*position: absolute;*/
 }
 
 .row span {
@@ -44,7 +49,7 @@
 .timeline {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(11, 9.09%);
+    grid-template-columns: repeat(15, 6.6%);
 }
 
 .timeline span {
@@ -66,4 +71,8 @@
     height: calc(100vh - 100px);
     overflow-x: hidden;
     overflow-y: scroll;
+}
+
+.scheduleUnits::-webkit-scrollbar {
+    display: none;
 }

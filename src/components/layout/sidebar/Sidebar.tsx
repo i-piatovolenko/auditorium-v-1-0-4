@@ -8,6 +8,7 @@ import registryIcon from "../../../assets/images/registry.svg";
 import usersIcon from "../../../assets/images/users.svg";
 import controlIcon from "../../../assets/images/settings.svg";
 import queueIcon from "../../../assets/images/queue.png";
+import scheduleIcon from "../../../assets/images/schedule.svg";
 import {useQuery} from "@apollo/client";
 import {GET_USERS} from "../../../api/operations/queries/users";
 import {StudentAccountStatus, User, UserTypes} from "../../../models/models";
@@ -209,17 +210,17 @@ const Sidebar = () => {
             Журнал
           </NavLink>
         </li>
-        {/*<li>*/}
-        {/*  <NavLink*/}
-        {/*    activeClassName={styles.linkActive}*/}
-        {/*    className={styles.link}*/}
-        {/*    onClick={onClick}*/}
-        {/*    to="/schedule"*/}
-        {/*  >*/}
-        {/*    <img className={styles.icon} src={scheduleIcon} alt="schedule" />*/}
-        {/*    Розклад*/}
-        {/*  </NavLink>*/}
-        {/*</li>*/}
+        <li>
+          <NavLink
+            activeClassName={styles.linkActive}
+            className={styles.link}
+            onClick={onClick}
+            to="/schedule"
+          >
+            <img className={styles.icon} src={scheduleIcon} alt="schedule" />
+            Розклад
+          </NavLink>
+        </li>
         <li>
           <NavLink
             activeClassName={styles.linkActive}
