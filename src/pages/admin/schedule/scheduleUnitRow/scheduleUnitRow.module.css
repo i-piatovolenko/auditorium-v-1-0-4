@@ -1,0 +1,38 @@
+.wrapper {
+    width: calc(100% - 100px);
+    position: relative;
+    height: 20px;
+    margin-left: 100px;
+}
+
+.unit {
+    position: absolute;
+    background-color: #00a6ff;
+    border-radius: 4px;
+    border: 2px solid #fff;
+    box-sizing: border-box;
+    padding: 2px 4px;
+    color: #fff;
+}
+
+.unit:hover {
+    background-color: #008ddc;
+    border: 2px solid #00000033;
+    color: #000;
+    cursor: pointer;
+}
+
+.dates {
+    position: absolute;
+    list-style-type: none;
+    margin: 0 0 0 -100px;
+    padding: 0;
+    width: calc(100% + 100px);
+}
+
+.dates li {
+    height: 20px;
+    border-bottom: 1px solid #00000011;
+    width: 100%;
+    box-sizing: border-box;
+}

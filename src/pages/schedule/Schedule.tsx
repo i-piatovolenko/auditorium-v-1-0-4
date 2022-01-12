@@ -10,6 +10,7 @@ import Edit from "../../components/icons/edit/Edit";
 import moment from "moment";
 import {client} from "../../api/client";
 import {WORKING_DAY_END, WORKING_DAY_START} from "../../helpers/constants";
+import HeaderCheckbox from "../../components/headerCheckBox/HeaderCheckbox";
 
 const timePeriods = {
   from: WORKING_DAY_START,
@@ -36,6 +37,7 @@ const Schedule = () => {
   const [classrooms, setClassrooms] = useState([]);
   const { data: {accessRights}} = useLocal('accessRights');
   const [userNameSearch, setUserNameSearch] = useState('');
+  // const [showEmpty, setShowEmpty] = useState(false);
 
   const getClassrooms = () => {
     setClassrooms(null);
@@ -64,6 +66,10 @@ const Schedule = () => {
     setUserNameSearch(e.target.value);
   };
 
+  // const toggleShowEmpty = () => {
+  //   setShowEmpty(prev => !prev);
+  // };
+
   const sort = (a: ClassroomType, b: ClassroomType) => a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'});
 
   return (
@@ -83,6 +89,11 @@ const Schedule = () => {
           onChange={handleChangeSearch}
           className={mainStyles.headerDateInput}
         />
+        {/*<HeaderCheckbox*/}
+        {/*  label='Приховати пусті'*/}
+        {/*  checked={showEmpty}*/}
+        {/*  setChecked={toggleShowEmpty}*/}
+        {/*/>*/}
         {accessRights === ACCESS_RIGHTS.ADMIN && <Edit path='/adminSchedule'/>}
       </Header>
       <div className={styles.wrapper}>
@@ -95,8 +106,12 @@ const Schedule = () => {
         </div>
         <div className={styles.scheduleUnits}>
         {classrooms?.map((classroom: ClassroomType) => <div className={styles.row}>
-            <span className={styles.className}>{classroom.name}</span>
-            <ScheduleUnit classroomName={classroom.name} userNameSearch={userNameSearch} date={date}/>
+            <ScheduleUnit
+              classroomName={classroom.name}
+              userNameSearch={userNameSearch}
+              date={date}
+              // showEmpty={showEmpty}
+            />
           </div>)}
         </div>
       </div>

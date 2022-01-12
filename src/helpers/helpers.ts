@@ -1,8 +1,8 @@
 import {HOUR, MINUTE, TIME_SNIPPETS, WORKING_DAY_END, WORKING_DAY_START,} from "./constants";
 import {
-  ACCESS_RIGHTS,
+  ACCESS_RIGHTS, ClassroomType, DisabledState,
   OccupiedInfo,
-  OccupiedState,
+  OccupiedState, OccupiedStateUa, QueuePolicyTypes,
   ScheduleUnitType,
   StudentAccountStatus,
   User,
@@ -73,7 +73,7 @@ export const formatMinutesToMM = (value: number) => {
 export const formatTempName = (tempName: string) => {
   const withSpaces = tempName.toLowerCase().replaceAll(/\./gmi, '. ')
   const words = withSpaces.split(' ');
-  const capitalizedWords = words.map(word => word[0]?.toUpperCase()  === undefined ? '' : word[0].toUpperCase() + word.slice(1, word.length))
+  const capitalizedWords = words.map(word => word[0]?.toUpperCase() === undefined ? '' : word[0].toUpperCase() + word.slice(1, word.length))
   return capitalizedWords.join(' ')
 };
 
@@ -276,7 +276,7 @@ export const checkVerified = (user: User) => {
 };
 
 export const isStudent = (type: UserTypes) => {
-  return type === UserTypes.STUDENT || type === UserTypes.POST_GRADUATE
+  return type === UserTypes.STUDENT || type === UserTypes.POST_GRADUATE;
 }
 
 export const isTimeout = (time: string, returnDiffInMs = false) => {
@@ -285,3 +285,50 @@ export const isTimeout = (time: string, returnDiffInMs = false) => {
   if (returnDiffInMs) return currentTime.diff(outerTime);
   return currentTime.diff(outerTime) > 0;
 }
+
+export const shouldOccupiedByTeacherDate = (classroomName: string, scheduleUnits: ScheduleUnitType[]) => {
+  let endH = moment().set('hours', WORKING_DAY_END).set('minutes', 0).set('seconds', 0);
+  if (!scheduleUnits.length) return endH;
+  const occupiedOnSchedule = scheduleUnits.some(scheduleUnit => {
+    const [fromH, fromM] = scheduleUnit.from.split(':');
+    const [toH, toM] = scheduleUnit.to.split(':');
+    const fromDate = moment().set('hours', +fromH).set('minutes', +fromM);
+    const toDate = moment().set('hours', +toH).set('minutes', +toM);
+    const currentDate = moment();
+
+    const hasIntersection = currentDate.isBetween(fromDate, toDate)
+    if (hasIntersection) endH = fromDate;
+    return endH;
+  });
+}
+
+export const shouldOccupiedByTeacher = (classroomName: string, scheduleUnits: ScheduleUnitType[]) => {
+  if (!scheduleUnits.length) return 'Вільно'
+  const occupiedOnSchedule = scheduleUnits.some(scheduleUnit => {
+    const [fromH, fromM] = scheduleUnit.from.split(':');
+    const [toH, toM] = scheduleUnit.to.split(':');
+    const fromDate = moment().set('hours', +fromH).set('minutes', +fromM);
+    const toDate = moment().set('hours', +toH).set('minutes', +toM);
+    const currentDate = moment();
+
+    const hasIntersection = currentDate.isBetween(fromDate, toDate)
+
+    return hasIntersection;
+  });
+  if (occupiedOnSchedule) return 'Зайнято за розкладом';
+  return 'Вільно';
+};
+
+export const defineOccupyStatus = (classroom: ClassroomType, scheduleUnits: ScheduleUnitType[], isOverdue: boolean) => {
+  const {queueInfo: {queuePolicy: {policy, queueAllowedDepartments}}, disabled, occupied} = classroom;
+
+  if (policy === QueuePolicyTypes.SELECTED_DEPARTMENTS && !queueAllowedDepartments.length) {
+    return 'Обмежений доступ';
+  }
+  if (isOverdue) return 'Резервація прострочена!';
+  if (disabled?.state === DisabledState.DISABLED) {
+    return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');
+  }
+  if (isClassroomNotFree(occupied)) return OccupiedStateUa[occupied?.state as OccupiedState];
+  return shouldOccupiedByTeacher(classroom.name, scheduleUnits)
+};

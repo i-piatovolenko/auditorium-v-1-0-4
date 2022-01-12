@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import styles from "./scheduleUnit.module.css";
 import {GET_SCHEDULE_UNIT} from "../../api/operations/queries/schedule";
 import {
@@ -16,9 +16,10 @@ interface PropTypes {
   classroomName: string;
   userNameSearch?: string;
   date?: string;
+  showEmpty?: boolean;
 }
 
-const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date}) => {
+const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date, showEmpty}) => {
 
   const [schedule, setSchedule] = useState<ScheduleUnitType[]>(null);
   const [searched, setSearched] = useState(false);
@@ -61,8 +62,8 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date}
 
   useEffect(() => {
     if (schedule) {
-      const allUserNames = schedule.map(unit => fullName(unit.user).toLowerCase()).join('');
-      if (allUserNames.includes(userNameSearch.toLowerCase())) {
+      const allUserNames = schedule.map(unit => fullName(unit.user)?.toLowerCase()).join('');
+      if (allUserNames.includes(userNameSearch?.toLowerCase())) {
         setSearched(true);
       } else {
         setSearched(false);
@@ -79,9 +80,11 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date}
     });
   };
 
+  if (!schedule?.length) return <></>;
 
-  if (schedule && searched)
-    return (
+  return schedule && schedule.length && searched && (
+    <div className={styles.scheduleRowWrapper}>
+      <span>{classroomName}</span>
       <ul
         style={{
           gridTemplateColumns: document.body.clientWidth >= 1024 ? getScheduleUnitSize(schedule
@@ -107,16 +110,20 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date}
                     backgroundColor: ActivityTypes[unit.activity],
                     //@ts-ignore
                     border: `1px solid ${ActivityTypes[unit.activity]}`,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
+                  title={fullName(unit.user, true) + " " + unit.from + " - " + unit.to}
                 >
-                  {unit.from + " - " + unit.to + ' ' + fullName(unit.user, true)}
+                  {fullName(unit.user, true) + " " + unit.from + " - " + unit.to}
                 </Button>
               )}
             </li>
           ))}
       </ul>
-    );
-  return <p></p>;
+    </div>
+  );
 };
 
 export default ScheduleUnit;

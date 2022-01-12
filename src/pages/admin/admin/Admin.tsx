@@ -38,13 +38,15 @@ const Admin = () => {
             {unverifiedCounter !== 0 && <span className={styles.unverified} title="Неверифіковані">
             <CountUp end={unverifiedCounter} duration={1}/></span>}
           </NavLink></li>
-          {accessRights === ACCESS_RIGHTS.ADMIN && <>
+          {accessRights === ACCESS_RIGHTS.ADMIN && (
+            <>
               <li><NavLink to='/adminInstruments'>Інструменти</NavLink></li>
               <li><NavLink to='/adminDepartments'>Кафедри</NavLink></li>
               <li><NavLink to='/adminFaculties'>Факультети</NavLink></li>
               <li><NavLink to='/adminDegrees'>Навчальні ступені</NavLink></li>
-            {/*<li><NavLink to='/adminSchedule'>Розклад</NavLink></li>*/}
-          </>}
+              <li><NavLink to='/adminSchedule'>Розклад</NavLink></li>
+            </>
+          )}
         </ul>
         <div className={styles.settings}>
           <Button onClick={handleLogout}>Вийти з профілю</Button>

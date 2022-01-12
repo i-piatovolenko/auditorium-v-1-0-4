@@ -112,18 +112,10 @@ const ClassroomInfo: React.FC<PropTypes> = ({
         {chair ? chair.name + ". " + description : description}
       </p>
       <p>Черга за цією аудиторію: {queueSize ? `${queueSize} люд.` : 'відсутня'}</p>
-      <>
-        <Title title="Статус аудиторії"/>
-        {defineStatus()}
-      </>
-      <Title title="Розклад на сьогодні" />
-      <ScheduleUnit classroomName={name} />
-      {instruments?.length > 0 && (
-        <>
-          <Title title="Інструменти"/>
-          <Instruments expanded instruments={instruments}/>
-        </>
-      )}
+      {defineStatus()}
+      <Title title="Розклад на сьогодні"/>
+      <ScheduleUnit classroomName={name}/>
+      {instruments?.length > 0 && <Instruments expanded instruments={instruments}/>}
       {isClassroomNotFree(occupied) && !isPassed ? (
         <OccupantInfo occupied={occupied}/>
       ) : (

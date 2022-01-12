@@ -5,21 +5,8 @@ import {setContext} from "@apollo/client/link/context";
 import {getMainDefinition} from "@apollo/client/utilities";
 import {onError} from "@apollo/client/link/error";
 
-const ENV = {
-  prod: {
-    wss: 'wss://api.auditoriu.me/',
-    https: 'https://api.auditoriu.me/',
-  },
-  stg: {
-    wss: 'wss://staging.api.auditoriu.me/',
-    https: 'https://staging.api.auditoriu.me/',
-  }
-}
-
-const CURRENT_ENV = ENV.prod;
-
 const wsLink: any = new WebSocketLink({
-  uri: CURRENT_ENV.wss,
+  uri: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_WSS_BASE_URL : process.env.REACT_APP_STG_WSS_BASE_URL,
   options: {
     reconnect: true,
     lazy: true,
@@ -43,7 +30,7 @@ const subscriptionMiddleware = {
 wsLink.subscriptionClient.use([subscriptionMiddleware]);
 
 const httpLink = createHttpLink({
-  uri: CURRENT_ENV.https
+  uri: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_HTTPS_BASE_URL : process.env.REACT_APP_STG_HTTPS_BASE_URL
 });
 
 const authLink = setContext((_, {headers}) => {

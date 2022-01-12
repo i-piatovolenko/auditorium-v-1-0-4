@@ -5,6 +5,7 @@
         margin: 0;
         list-style-type: none;
         grid-gap: 1px;
+        border-bottom: 1px solid #cccccc33;
     }
 }
 
@@ -16,6 +17,7 @@
         list-style-type: none;
         grid-gap: .5px;
         box-sizing: content-box;
+        border-bottom: 1px solid #cccccc33;
     }
 }
 
@@ -36,4 +38,10 @@
 
 .unitTime {
     font-weight: 900;
+}
+
+.scheduleRowWrapper {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    min-height: 35px;
 }

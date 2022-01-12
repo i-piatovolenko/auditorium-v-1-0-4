@@ -1,0 +1,11 @@
+.wrapper {
+    overflow-x: scroll;
+    height: calc(100vh - 120px);
+    padding: 16px;
+}
+
+.days {
+    display: grid;
+    grid-template-columns: repeat(24, 4.16%);
+    padding: 16px 16px 0 116px;
+}

@@ -172,7 +172,13 @@ export type ScheduleUnitType = {
   from: string;
   to: string;
   activity: string;
+  type: ScheduleUnitTypeT;
 };
+
+export enum ScheduleUnitTypeT {
+  INDIVIDUAL_LESSON = 'Індивідуальні заняття',
+  LECTURE = 'Лекція'
+}
 
 export type ClassroomType = {
   id: number;

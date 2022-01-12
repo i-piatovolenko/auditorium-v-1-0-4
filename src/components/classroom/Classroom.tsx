@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import styles from "./classroom.module.css";
 import {
   ClassroomType,
@@ -6,12 +6,18 @@ import {
   OccupiedInfo,
   OccupiedState,
   OccupiedStateUa,
-  QueuePolicyTypes,
+  QueuePolicyTypes, ScheduleUnitType,
   User,
   UserTypes,
   UserTypesUa,
 } from "../../models/models";
-import {fullName, isClassroomNotFree, typeStyle} from "../../helpers/helpers";
+import {
+  defineOccupyStatus,
+  fullName,
+  isClassroomNotFree,
+  shouldOccupiedByTeacher,
+  typeStyle
+} from "../../helpers/helpers";
 import Instruments from "../instruments/Instruments";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
@@ -24,6 +30,7 @@ import lockIcon from "../../assets/images/lock.svg";
 import {client} from "../../api/client";
 import {ENABLE_CLASSROOM} from "../../api/operations/mutations/enableClassroom";
 import {DISABLE_CLASSROOM} from "../../api/operations/mutations/disableClassroom";
+import {GET_SCHEDULE_UNIT} from "../../api/operations/queries/schedule";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -41,6 +48,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
   const [isOverdue, setIsOverDue] = useState(false);
   // const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
   let timeout = useRef(null);
+  const [scheduleUnits, setScheduleUnits] = useState<ScheduleUnitType[]>([]);
 
   const header = (
     <>
@@ -51,6 +59,15 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
   );
 
   useEffect(() => {
+    client.query({
+      query: GET_SCHEDULE_UNIT,
+      variables: {
+        classroomName: classroom.name,
+        date: moment().toISOString()
+      }
+    }).then(result => {
+      setScheduleUnits(result.data.schedule);
+    });
     return () => clearTimeout(timeout.current);
   }, []);
 
@@ -104,18 +121,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
     else return ''
   };
 
-  const defineStatus = () => {
-    if (classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
-      && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length) {
-      return 'Обмежений доступ';
-    }
-    if (isOverdue) return 'Резервація прострочена!';
-    if (disabled?.state === DisabledState.DISABLED) {
-      return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');
-    }
-    if (isClassroomNotFree(occupied)) return OccupiedStateUa[occupied?.state as OccupiedState];
-    return "Вільно";
-  }
+  const defineStatus = useCallback(() => defineOccupyStatus(classroom, scheduleUnits, isOverdue), [scheduleUnits, classroom, isOverdue]);
 
   const handleClick = () => {
     dispatchPopupWindow({
@@ -162,11 +168,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
           variables: {
             input: {
               classroomName: String(name),
-              until: moment().set({
-                hours: 23,
-                minutes: 59,
-                seconds: 59
-              }).toISOString(),
+              until: moment().add(1, 'hours').toISOString(),
               comment: 'За розкладом'
             }
           }
@@ -195,7 +197,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
               src={disabled?.state === DisabledState.DISABLED ? lockIcon : unlockIcon}
               alt={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати'}
               className={disabled?.state === DisabledState.DISABLED ? styles.lockIcon : styles.unlockIcon}
-              title={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати за розкладом до кінця дня'}
+              title={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати за розкладом на 1 год.'}
               onClick={toggleDisable}
             />
           )}

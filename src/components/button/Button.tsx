@@ -9,6 +9,7 @@ interface PropTypes {
   disabled?: boolean;
   style?: CSSProperties | undefined;
   form?: string;
+  title?: string;
 }
 
 const Button: React.FC<PropTypes> = ({
@@ -20,10 +21,11 @@ const Button: React.FC<PropTypes> = ({
   disabled = false,
   style = undefined,
   form= "",
-
+  title,
 }) => {
   return (
     <button
+      title={title}
       form={form}
       style={style}
       disabled={disabled}

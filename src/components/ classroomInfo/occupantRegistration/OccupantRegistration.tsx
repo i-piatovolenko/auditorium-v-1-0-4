@@ -2,7 +2,7 @@ import React, {FormEvent, useEffect, useRef, useState,} from "react";
 import styles from "./occupantRegistration.module.css";
 import {useMutation, useQuery} from "@apollo/client";
 import {GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID, GET_USERS} from "../../../api/operations/queries/users";
-import {formatTempName, fullName} from "../../../helpers/helpers";
+import {formatTempName, fullName, isStudent} from "../../../helpers/helpers";
 import Title from "../../title/Title";
 import Select from 'react-select';
 import {
@@ -19,6 +19,8 @@ import ConfirmFooter from "../../footer/ConfirmFooter";
 import moment from "moment";
 import {GET_SCHEDULE_UNIT} from "../../../api/operations/queries/schedule";
 import Button from "../../button/Button";
+import clockIcon from "../../../assets/images/clock.svg";
+import ChooseTime from "./chooseTime/ChooseTime";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
@@ -40,6 +42,8 @@ const OccupantRegistration: React.FC<PropTypes> = ({
   const [occupyClassroom] = useMutation(OCCUPY_CLASSROOM);
   const [users, setUsers] = useState();
   const [scheduleUsers, setScheduleUsers] = useState([]);
+  const [scheduleUnits, setScheduleUnits] = useState<ScheduleUnitType[]>([]);
+  const [until, setUntil] = useState(3);
   const newUserTypes: any = [
     {value: UserTypes.STUDENT, label: UserTypesUa.STUDENT},
     {value: UserTypes.POST_GRADUATE, label: UserTypesUa.POST_GRADUATE},
@@ -62,6 +66,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         date: moment().toISOString(),
       }
     }).then(({data: schedule}) => {
+      setScheduleUnits(schedule);
       setScheduleUsers(schedule.schedule.filter((unit: ScheduleUnitType) => {
         const date = moment().format('YYYY-MM-DD');
         const diff = moment(date + ' ' + unit.to).diff(moment());
@@ -86,6 +91,15 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         .map((user: User) => ({label: user.id + ": " + fullName(user), value: user.id})));
     }
   }, [data, error, loading]);
+
+  const handleTimeSettingsModalShow = () => {
+    dispatchPopupWindow({
+      header: <ChooseTime.Header/>,
+      body: <ChooseTime.Body until={until} setUntil={setUntil}/>,
+      footer: <ChooseTime.Footer/>,
+      isConfirm: true
+    });
+  };
 
   const handleReset = () => {
     setExistingUserValue(null);
@@ -179,7 +193,9 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         variables: {
           input: {
             classroomName: classroomName.toString(),
-            until: moment().add(3, 'hours').toISOString(),
+            until: !isStudent(chosenUserType.value) || until === -1
+              ? moment().set('hours', 23).set('minutes', 59).set('seconds', 59).toISOString()
+              : moment().add(until, 'hours').toISOString(),
             ...occupant
           }
         }
@@ -265,6 +281,16 @@ const OccupantRegistration: React.FC<PropTypes> = ({
       <p>П.І.Б.: {chosenUserName}</p>
       {/*@ts-ignore*/}
       <p>Статус: {chosenUserType && chosenUserName?.length !== 0 && UserTypesUa[chosenUserType.value]}</p>
+      <div className={styles.time} onClick={handleTimeSettingsModalShow}>
+        {isStudent(chosenUserType.value) && (
+          <>
+            <img src={clockIcon} width={24} height={24} alt='time'/>
+            <span>До {until !== -1
+              ? moment().add(until, 'hours').format('HH:mm')
+              : 'кінця дня'}</span>
+          </>
+        )}
+      </div>
     </div>
   );
 };

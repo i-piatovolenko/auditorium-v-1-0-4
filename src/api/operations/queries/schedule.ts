@@ -10,6 +10,8 @@ export const GET_SCHEDULE_UNIT = gql`
         firstName
         patronymic
       }
+      dateStart
+      dateEnd
       from
       to
       activity

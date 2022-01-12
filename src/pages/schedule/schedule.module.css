@@ -5,9 +5,6 @@
 }
 
 .row {
-    display: grid;
-    grid-template-columns: 60px auto;
-    /*height: 35px;*/
 }
 
 .className {
