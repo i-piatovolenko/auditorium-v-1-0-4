@@ -1,7 +1,6 @@
 import React, {FC} from 'react';
 import styles from './scheduleUnitRow.module.css';
-import {WORKING_DAY_END, WORKING_DAY_START} from "../../../../helpers/constants";
-import {ScheduleUnitType} from "../../../../models/models";
+import {ScheduleUnitType, ScheduleUnitTypeT} from "../../../../models/models";
 import {fullName} from "../../../../helpers/helpers";
 import moment from "moment";
 import {usePopupWindow} from "../../../../components/popupWindow/PopupWindowProvider";
@@ -10,24 +9,35 @@ import ScheduleUnitPopup from "../scheduleUnitPopup/ScheduleUnitPopup";
 
 type PropTypes = {
   units: ScheduleUnitType[];
+  classroomName: string;
+  selectedDay: number;
 }
 
-const DAY_LENGTH_MIN = (WORKING_DAY_END - WORKING_DAY_START) * 60;
 const FULL_DAY_LENGTH_MIN = 24 * 60;
 const COLUMN_HEIGHT = +((365 * 2) / 7).toFixed(0)
-const hours = new Array(24).fill(true, WORKING_DAY_START, WORKING_DAY_END)
-  .map((item, index) => item ? index : false).filter(item => item);
 const daysAmount = new Array(COLUMN_HEIGHT).fill(null);
 
-const ScheduleUnitRow: FC<PropTypes> = ({units}) => {
+const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay}) => {
   const now = moment();
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
 
   const handleClick = (unit: ScheduleUnitType) => {
+    const isSubstitution = unit.type === ScheduleUnitTypeT.SUBSTITUTION;
+    const primary = isSubstitution ? units.find(({id}) => unit.primaryScheduleUnit.id === id) : null;
     dispatchPopupWindow({
       header: <ScheduleUnitPopup.Header title={fullName(unit.user)}/>,
-      body: <ScheduleUnitPopup.Body unit={unit} dispatchPopupWindow={dispatchPopupWindow} allUnits={units}/>,
+      body: (
+        <ScheduleUnitPopup.Body
+          unit={unit}
+          dispatchPopupWindow={dispatchPopupWindow}
+          dispatchNotification={dispatchNotification}
+          allUnits={isSubstitution ? null : units}
+          selectedDay={selectedDay}
+          classroomName={classroomName}
+          primaryUnit={primary}
+        />
+      ),
       footer: <ScheduleUnitPopup.Footer/>,
     });
   };
@@ -35,10 +45,11 @@ const ScheduleUnitRow: FC<PropTypes> = ({units}) => {
   return (
     <div className={styles.wrapper}>
       <ul className={styles.dates}>
-        {daysAmount.map((_, index) => {
-          if ((index % 7)) return <li>{moment().add(index * 6, 'days').format('DD.MM.YYYY')}</li>
-          return null;
-        })}
+        {daysAmount.map((_, index) => index % 7 ? (
+          <li>
+            {moment().add(index * 6, 'days').format('DD.MM.YYYY')}
+          </li>
+        ) : null)}
       </ul>
       {units.map((unit) => {
         const {from, to, user, dateStart, dateEnd} = unit;
@@ -53,7 +64,9 @@ const ScheduleUnitRow: FC<PropTypes> = ({units}) => {
           left: `${startPos}%`,
           width: `${width}%`,
           height: 20 * (amountOfWeeks - vertStart),
-          top: vertStart < 0 ? vertStart * 20 : 0
+          top: vertStart < 0 ? vertStart * 20 : 0,
+          backgroundColor: unit.type === ScheduleUnitTypeT.PRIMARY ? '#00a6ff' : '#ff8c00',
+          zIndex: unit.type === ScheduleUnitTypeT.PRIMARY ? 1 : 2,
         };
 
         return (

@@ -14,8 +14,17 @@ const handleOperation: clientOperationHandlerType = async (
 ) => {
   try {
     const result = await operation;
-    if (result.data?.[operationName].userErrors?.length) {
-      result.data?.[operationName].userErrors.forEach(({code}: any) => {
+    if (!result?.data && result?.errors) {
+      result.errors.forEach(({message}: any) => {
+        dispatchNotification({
+          header: "Помилка",
+          message: message,
+          type: "alert",
+        });
+      });
+    }
+    if (result.data?.[operationName]?.userErrors?.length) {
+      result.data?.[operationName]?.userErrors.forEach(({code}: any) => {
         dispatchNotification({
           header: "Помилка",
           message: ErrorCodesUa[code as ErrorCodes],

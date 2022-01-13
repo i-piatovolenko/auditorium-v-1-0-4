@@ -1,5 +1,5 @@
 import React, {ChangeEvent, FC, useEffect, useState} from 'react';
-import {ScheduleUnitType, ScheduleUnitTypeT} from "../../../../models/models";
+import {ScheduleUnitActivityT, ScheduleUnitType, ScheduleUnitTypeT} from "../../../../models/models";
 import {fullName} from "../../../../helpers/helpers";
 import Select from "react-select";
 import useUsers from "../../../../hooks/useUsers";
@@ -9,7 +9,19 @@ import removeIcon from '../../../../assets/images/delete.svg';
 import styles from './scheduleUnitPopup.module.css';
 import moment from "moment";
 import Button from "../../../../components/button/Button";
-import {hasUnitDateTimeIntersection} from "../../../../helpers/scheduleHelpers";
+import {
+  hasOverlappedUnits,
+  hasUnitDateTimeIntersection,
+  isBiggerThanSubstitutions,
+  withinPrimaryUnitBoundaries
+} from "../../../../helpers/scheduleHelpers";
+import {client} from "../../../../api/client";
+import {DELETE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/deleteScheduleUnit";
+import handleOperation from "../../../../helpers/handleOperation";
+import {GET_SCHEDULE_UNITS} from "../../../../api/operations/queries/scheduleUnits";
+import {UPDATE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/updateScheduleUnit";
+import {CREATE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/createScheduleUnit";
+import {GET_SCHEDULE_SUBSTITUTIONS_UNITS} from "../../../../api/operations/queries/scheduleSubUnits";
 
 type HeaderPropTypes = {
   title: string
@@ -19,28 +31,59 @@ type BodyPropTypes = {
   unit?: ScheduleUnitType;
   allUnits?: ScheduleUnitType[];
   dispatchPopupWindow: (config: any) => void;
+  dispatchNotification: any;
   dispatch?: (config: { type: string }) => void;
+  primary?: boolean;
+  primaryUnit?: ScheduleUnitType;
+  classroomName: string;
+  selectedDay: number;
 }
 
 const ScheduleUnitPopupHeader: FC<HeaderPropTypes> = ({title}) => {
   return <h1>{title}</h1>
 };
 
-const ScheduleUnitPopupBody: FC<BodyPropTypes> = ({unit, dispatchPopupWindow, allUnits, dispatch}) => {
+const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
+  {
+    unit,
+    dispatchPopupWindow,
+    dispatchNotification,
+    allUnits,
+    dispatch,
+    primary = true,
+    primaryUnit,
+    classroomName,
+    selectedDay
+  }
+) => {
+  const primaryCreateMode = primary && !unit;
+  const substitutionCreateMode = !primary && !unit;
+  const primaryUpdateMode = unit && unit.type === ScheduleUnitTypeT.PRIMARY;
+  const substitutionUpdateMode = unit && unit.type === ScheduleUnitTypeT.SUBSTITUTION;
+
   const [editMode, setEditMode] = useState(false);
   const [selectUserData, setSelectUserdata] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const selectTypesData = [
-    {value: Object.keys(ScheduleUnitTypeT)[0], label: ScheduleUnitTypeT.INDIVIDUAL_LESSON},
-    {value: Object.keys(ScheduleUnitTypeT)[1], label: ScheduleUnitTypeT.LECTURE}
+    {value: Object.keys(ScheduleUnitActivityT)[0], label: ScheduleUnitActivityT.INDIVIDUAL_LESSON},
+    {value: Object.keys(ScheduleUnitActivityT)[1], label: ScheduleUnitActivityT.LECTURE}
   ];
   const [selectedType, setSelectedType] = useState(selectTypesData[0]);
   const users = useUsers();
   const [dateError, setDateError] = useState(null);
+  const [updatePrimaryError, setUpdatePrimaryError] = useState(false);
+  const [substitutionError, setSubstitutionError] = useState(false);
+  const [overlapsError, setOverLapsError] = useState(false);
   const [dateStart, setDateStart] = useState(moment(unit?.dateStart).format('YYYY-MM-DD'));
   const [dateEnd, setDateEnd] = useState(moment(unit?.dateEnd).format('YYYY-MM-DD'));
-  const [timeFrom, setTimeFrom] = useState(unit?.from || moment().format('HH:mm'));
-  const [timeTo, setTimeTo] = useState(unit?.to || moment().format('HH:mm'));
+  const [timeFrom, setTimeFrom] = useState(unit?.from || moment().set('h', 8).set('m', 0).format('HH:mm'));
+  const [timeTo, setTimeTo] = useState(unit?.to || moment().set('h', 15).set('m', 0).format('HH:mm'));
+  const [substitutions, setSubstitutions] = useState(null);
+
+  useEffect(() => {
+    const error = hasOverlappedUnits(dateStart, dateEnd, timeFrom, timeTo, allUnits)
+    setOverLapsError(error as any);
+  }, [dateStart, dateEnd, timeTo, timeFrom]);
 
   useEffect(() => {
     if (users?.length) {
@@ -56,10 +99,58 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = ({unit, dispatchPopupWindow, al
   }, [users]);
 
   useEffect(() => {
-    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, allUnits, timeFrom, timeTo)
-      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, allUnits, timeTo, timeTo);
+    const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
+
+    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, timeFrom, timeTo)
+      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, timeTo, timeTo)
+      || hasOverlappedUnits(dateStart, dateEnd, timeFrom, timeTo, allUnits);
     setDateError(isError);
+    isPrimaryUnitUpdateError(undefined, undefined, undefined, undefined);
+    isSubstitutionUpdateOrCreateError(undefined, undefined, undefined, undefined);
+
+    if (unit) {
+      client.query({
+        query: GET_SCHEDULE_SUBSTITUTIONS_UNITS,
+        variables: {
+          where: {
+            id: unit.id
+          }
+        }
+      }).then(response => {
+        setSubstitutions(response.data.scheduleUnit.substitutions);
+      });
+    }
+
+    return () => {
+      setSubstitutions(null);
+    }
   }, []);
+
+  const isPrimaryUnitUpdateError = (start: string, end: string, f: string, t: string) => {
+    if (primaryUpdateMode) {
+      const updatedPrimaryUnit: ScheduleUnitType = {
+        ...unit,
+        dateStart: (start || dateStart) as unknown as Date,
+        dateEnd: (end || dateEnd) as unknown as Date,
+        from: f || timeFrom,
+        to: t || timeTo
+      }
+      setUpdatePrimaryError(!isBiggerThanSubstitutions(updatedPrimaryUnit, substitutions));
+    }
+  };
+
+  const isSubstitutionUpdateOrCreateError = (start: string, end: string, f: string, t: string) => {
+    if (substitutionCreateMode || substitutionUpdateMode) {
+      const updatedSubstitutionUnit: ScheduleUnitType = {
+        ...unit,
+        dateStart: (start || dateStart) as unknown as Date,
+        dateEnd: (end || dateEnd) as unknown as Date,
+        from: f || timeFrom,
+        to: t || timeTo
+      }
+      setSubstitutionError(!withinPrimaryUnitBoundaries(updatedSubstitutionUnit, primaryUnit));
+    }
+  };
 
   const handleSelectUser = (e: any) => {
     setSelectedUser(e);
@@ -71,46 +162,133 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = ({unit, dispatchPopupWindow, al
 
   const handleDateStartChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDateStart(e.target.value);
-    setDateError(hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, allUnits, timeFrom, timeTo));
+
+    const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
+    const error = hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, units, timeFrom, timeTo)
+      || hasOverlappedUnits(e.target.value, dateEnd, timeFrom, timeTo, units);
+    setDateError(error);
+    isPrimaryUnitUpdateError(e.target.value, undefined, undefined, undefined);
+    isSubstitutionUpdateOrCreateError(e.target.value, undefined, undefined, undefined);
   };
 
   const handleDateEndChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDateEnd(e.target.value);
-    setDateError(hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, allUnits, timeFrom, timeTo));
+
+    const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
+    const error = hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, units, timeFrom, timeTo)
+      || hasOverlappedUnits(dateStart, e.target.value, timeFrom, timeTo, units);
+    setDateError(error);
+    setDateError(hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, units, timeFrom, timeTo));
+    isPrimaryUnitUpdateError(undefined, e.target.value, undefined, undefined);
+    isSubstitutionUpdateOrCreateError(undefined, e.target.value, undefined, undefined);
   };
 
   const handleFromTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTimeFrom(e.target.value);
-    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, allUnits, e.target.value, timeTo)
-      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, allUnits, e.target.value, timeTo);
+
+    const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
+    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, e.target.value, timeTo)
+      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, e.target.value, timeTo)
+      || hasOverlappedUnits(dateStart, dateEnd, e.target.value, timeTo, units);
     setDateError(isError);
+    isPrimaryUnitUpdateError(undefined, undefined, e.target.value, undefined);
+    isSubstitutionUpdateOrCreateError(undefined, undefined, e.target.value, undefined);
   };
+
   const handleToTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTimeTo(e.target.value);
-    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, allUnits, timeFrom, e.target.value)
-      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, allUnits, timeFrom, e.target.value);
+
+    const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
+    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, timeFrom, e.target.value)
+      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, timeFrom, e.target.value)
+      || hasOverlappedUnits(dateStart, dateEnd, timeFrom, e.target.value, units);
+    ;
     setDateError(isError);
+    isPrimaryUnitUpdateError(undefined, undefined, undefined, e.target.value);
+    isSubstitutionUpdateOrCreateError(undefined, undefined, undefined, e.target.value);
   };
 
   const handleCreateUnit = () => {
     dispatchPopupWindow({
-      header: <ScheduleUnitPopupHeader title='Створити новий відрізок'/>,
-      body: <ScheduleUnitPopupBody dispatchPopupWindow={dispatchPopupWindow}/>,
+      header: <ScheduleUnitPopupHeader title='Створити новий тимчасовий відрізок'/>,
+      body: (
+        <ScheduleUnitPopupBody
+          dispatchPopupWindow={dispatchPopupWindow}
+          dispatchNotification={dispatchNotification}
+          allUnits={substitutions}
+          selectedDay={selectedDay}
+          classroomName={classroomName}
+          primary={false}
+          primaryUnit={unit}
+        />
+      ),
       footer: ''
     });
   };
 
-  const RemoveUnitFooter = ({dispatch}: any) => {
+  const RemoveUnitFooter = () => {
     const onCancel = () => dispatch({type: "POP_POPUP_WINDOW"});
-    const onOk = () => {
-    }
+
+    const onOk = async () => {
+      try {
+        const result = await client.mutate({
+          mutation: DELETE_SCHEDULE_UNIT,
+          variables: {
+            input: {
+              scheduleUnitId: unit.id
+            }
+          },
+          update(cache) {
+            cache.modify({
+              fields: {
+                scheduleUnits(existingScheduleUnitsRefs, {readField}) {
+                  return existingScheduleUnitsRefs.filter(
+                    (scheduleUnitRef: any) => unit.id !== readField('id', scheduleUnitRef),
+                  );
+                },
+                schedule(existingScheduleUnitsRefs, {readField}) {
+                  return existingScheduleUnitsRefs.filter(
+                    (scheduleUnitRef: any) => unit.id !== readField('id', scheduleUnitRef),
+                  );
+                },
+              },
+            })
+          }
+        });
+        await handleOperation(result, 'deleteOneScheduleUnit', dispatchNotification, dispatch, 'Відрізок видалено!');
+        await client.query({
+          query: GET_SCHEDULE_UNITS,
+          fetchPolicy: 'network-only',
+          variables: {
+            where: {
+              classroom: {
+                name: {
+                  equals: unit.classroom.name
+                }
+              },
+              dayOfWeek: {
+                equals: unit.dayOfWeek
+              },
+            }
+          }
+        });
+      } catch (e: any) {
+        dispatchNotification({
+          header: "Помилка",
+          message: e?.message,
+          type: "alert",
+
+        });
+      }
+    };
+
     return (
       <div className={styles.removeFooter}>
         <Button color='red' onClick={onCancel}>Ні</Button>
         <Button onClick={onOk}>Так</Button>
       </div>
-    )
-  }
+    );
+  };
 
   const handleConfirmRemoveUnit = () => {
     dispatchPopupWindow({
@@ -121,47 +299,152 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = ({unit, dispatchPopupWindow, al
     });
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     try {
-
-    } catch (e) {
-
+      const result = await client.mutate({
+        mutation: UPDATE_SCHEDULE_UNIT,
+        variables: {
+          where: {
+            id: unit.id
+          },
+          data: {
+            user: {
+              connect: {
+                id: +selectedUser.value
+              }
+            },
+            dateStart: {
+              set: moment(dateStart).set('hours', 0).set('minutes', 0).set('seconds', 0).set('milliseconds', 0).toISOString()
+            },
+            dateEnd: {
+              set: moment(dateEnd).set('hours', 0).set('minutes', 0).set('seconds', 0).set('milliseconds', 0).toISOString()
+            },
+            from: {set: timeFrom},
+            to: {set: timeTo},
+            activity: {set: selectedType.value}
+          }
+        }
+      });
+      await handleOperation(result, 'updateOneScheduleUnit', dispatchNotification, dispatch,
+        'Відрізок змінено');
+    } catch (e: any) {
+      dispatchNotification({
+        header: "Помилка",
+        message: e?.message,
+        type: "alert",
+      });
     }
   };
 
-  const submitCreateUnit = () => {
+  const submitCreateUnit = async () => {
     try {
+      if (primary) {
 
-    } catch (e) {
-
+        const result = await client.mutate({
+          mutation: CREATE_SCHEDULE_UNIT,
+          variables: {
+            data: {
+              type: ScheduleUnitTypeT.PRIMARY,
+              dateStart: moment(dateStart).set('hours', 0).set('minutes', 0).set('seconds', 0)
+                .set('milliseconds', 0).toISOString(),
+              dateEnd: moment(dateEnd).set('hours', 0).set('minutes', 0).set('seconds', 0)
+                .set('milliseconds', 0).toISOString(),
+              dayOfWeek: selectedDay,
+              from: timeFrom,
+              to: timeTo,
+              activity: selectedType.value,
+              user: {
+                connect: {
+                  id: +selectedUser.value
+                }
+              },
+              classroom: {
+                connect: {
+                  name: classroomName
+                }
+              }
+            }
+          }
+        });
+        await handleOperation(result, 'createOneScheduleUnit', dispatchNotification, dispatch,
+          'Відрізок створено');
+      } else {
+        const result = client.mutate({
+          mutation: UPDATE_SCHEDULE_UNIT,
+          variables: {
+            where: {
+              id: +primaryUnit.id
+            },
+            data: {
+              substitutions: {
+                create: {
+                  type: ScheduleUnitTypeT.SUBSTITUTION,
+                  dateStart: moment(dateStart).set('hours', 0).set('minutes', 0).set('seconds', 0)
+                    .set('milliseconds', 0).toISOString(),
+                  dateEnd: moment(dateEnd).set('hours', 0).set('minutes', 0).set('seconds', 0)
+                    .set('milliseconds', 0).toISOString(),
+                  dayOfWeek: selectedDay,
+                  from: timeFrom,
+                  to: timeTo,
+                  activity: selectedType.value,
+                  user: {
+                    connect: {
+                      id: +selectedUser.value
+                    }
+                  },
+                  classroom: {
+                    connect: {
+                      name: classroomName
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+        await handleOperation(result, 'createOneScheduleUnit', dispatchNotification, dispatch,
+          'Тимчасовий відрізок створено');
+      }
+    } catch (e: any) {
+      dispatchNotification({
+        header: "Помилка",
+        message: e?.message,
+        type: "alert",
+      });
     }
   };
 
   return (
     <>
-      <img
-        src={addIcon}
-        alt="create"
-        className={styles.addIcon}
-        title='Додати відрізок'
-        onClick={handleCreateUnit}
-      />
-      <img
-        src={removeIcon}
-        alt="delete"
-        className={styles.removeIcon}
-        title='Видалити'
-        onClick={handleConfirmRemoveUnit}
-      />
-      {!editMode && (
+      {/*{primaryCreateMode && <p>primaryCreateMode</p>}*/}
+      {/*{substitutionCreateMode && <p>substitutionCreateMode</p>}*/}
+      {/*{primaryUpdateMode && <p>primaryUpdateMode</p>}*/}
+      {/*{substitutionUpdateMode && <p>substitutionUpdateMode</p>}*/}
+      <div className={styles.controlButtons}>
+        {primary && <img
+            src={addIcon}
+            alt="create"
+            className={styles.controlIcon}
+            title='Додати відрізок'
+            onClick={handleCreateUnit}
+        />}
         <img
-          src={editIcon}
-          alt="edit"
-          className={styles.editIcon}
-          onClick={() => setEditMode(true)}
-          title='Редагувати'
+          src={removeIcon}
+          alt="delete"
+          className={styles.controlIcon}
+          title='Видалити'
+          onClick={handleConfirmRemoveUnit}
         />
-      )}
+        {!editMode && (
+          <img
+            src={editIcon}
+            alt="edit"
+            className={styles.controlIcon}
+            onClick={() => setEditMode(true)}
+            title='Редагувати'
+          />
+        )}
+      </div>
       <div>
         {!editMode && !!unit ? (
           <div className={styles.unitData}>
@@ -172,7 +455,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = ({unit, dispatchPopupWindow, al
             <div><span>Час (до): </span><span>{unit.to}</span></div>
             <div><span>Тип: </span><span>{
               /*@ts-ignore*/
-              ScheduleUnitTypeT[unit.activity]}</span></div>
+              ScheduleUnitActivityT[unit.activity]}</span></div>
           </div>
         ) : (
           <div className={styles.editWrapper}>
@@ -224,19 +507,52 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = ({unit, dispatchPopupWindow, al
               </p>
             ))
             }
+            {!!overlapsError && (overlapsError as unknown as ScheduleUnitType[]).map((error: ScheduleUnitType) => (
+              <p className={styles.errorMessage}>
+                Перекриває відрізок [ {
+                fullName(error.user, true) + ' | '
+                + moment(error.dateStart).format('DD.MM.YY') + ' - '
+                + moment(error.dateEnd).format('DD.MM.YY') + ' | '
+                + error.from + ' - ' + error.to
+              } ]
+              </p>
+            ))
+            }
+            {updatePrimaryError && (
+              <p className={styles.errorMessage}>Тимчасові відрізки не можуть виходити за рамки постійного відрізку.</p>
+            )}
+            {substitutionError && (
+              <p className={styles.errorMessage}>Тимчасовий відрізок не може бути більшим за постйний відрізок [ {
+                fullName(primaryUnit.user, true)} | {
+                moment(primaryUnit.dateStart).format('DD.MM.YYYY') + ' - ' +
+                moment(primaryUnit.dateEnd).format('DD.MM.YYYY')
+              } | {
+                primaryUnit.from + ' - ' + primaryUnit.to
+              }]</p>
+            )}
           </div>
         )}
         <div className={styles.buttons}>
           {editMode && (
             <>
               <Button onClick={() => setEditMode(false)} color='red'>Відміна</Button>
-              <Button disabled={!!dateError} onClick={handleSaveChanges}>Зберегти</Button>
+              <Button
+                disabled={!!dateError || !!overlapsError || !selectedUser}
+                onClick={handleSaveChanges}
+              >
+                Зберегти
+              </Button>
             </>
           )}
           {!unit && (
             <>
               <Button onClick={() => dispatch({type: 'POP_POPUP_WINDOW'})} color='red'>Відміна</Button>
-              <Button disabled={!!dateError} onClick={submitCreateUnit}>Створити</Button>
+              <Button
+                disabled={!!dateError || !!overlapsError || !selectedUser}
+                onClick={submitCreateUnit}
+              >
+                Створити
+              </Button>
             </>
           )}
         </div>

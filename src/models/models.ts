@@ -171,13 +171,19 @@ export type ScheduleUnitType = {
   dayOfWeek: number;
   from: string;
   to: string;
-  activity: string;
+  activity: ScheduleUnitActivityT;
   type: ScheduleUnitTypeT;
+  primaryScheduleUnit: ScheduleUnitType;
 };
 
-export enum ScheduleUnitTypeT {
+export enum ScheduleUnitActivityT {
   INDIVIDUAL_LESSON = 'Індивідуальні заняття',
   LECTURE = 'Лекція'
+}
+
+export enum ScheduleUnitTypeT {
+  PRIMARY = 'PRIMARY',
+  SUBSTITUTION = 'SUBSTITUTION'
 }
 
 export type ClassroomType = {
