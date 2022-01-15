@@ -1,4 +1,4 @@
-import React, {FC} from 'react';
+import React, {FC, useRef} from 'react';
 import styles from './scheduleUnitRow.module.css';
 import {ScheduleUnitType, ScheduleUnitTypeT} from "../../../../models/models";
 import {fullName} from "../../../../helpers/helpers";
@@ -11,13 +11,14 @@ type PropTypes = {
   units: ScheduleUnitType[];
   classroomName: string;
   selectedDay: number;
+  refetch: () => void;
 }
 
 const FULL_DAY_LENGTH_MIN = 24 * 60;
 const COLUMN_HEIGHT = +((365 * 2) / 7).toFixed(0)
 const daysAmount = new Array(COLUMN_HEIGHT).fill(null);
 
-const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay}) => {
+const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay, refetch}) => {
   const now = moment();
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
@@ -36,6 +37,7 @@ const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay}) => 
           selectedDay={selectedDay}
           classroomName={classroomName}
           primaryUnit={primary}
+          refetch={refetch}
         />
       ),
       footer: <ScheduleUnitPopup.Footer/>,
@@ -64,7 +66,7 @@ const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay}) => 
           left: `${startPos}%`,
           width: `${width}%`,
           height: 20 * (amountOfWeeks - vertStart),
-          top: vertStart < 0 ? vertStart * 20 : 0,
+          top: vertStart < 0 ? -(vertStart * 20) : 0,
           backgroundColor: unit.type === ScheduleUnitTypeT.PRIMARY ? '#00a6ff' : '#ff8c00',
           zIndex: unit.type === ScheduleUnitTypeT.PRIMARY ? 1 : 2,
         };
@@ -75,9 +77,7 @@ const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay}) => 
             style={cssStyles}
             onClick={() => handleClick(unit as ScheduleUnitType)}
           >
-            <span>{fullName(user, true)} | </span>
-            <span>{from} - {to} | </span>
-            <span>{moment(dateStart).format('DD.MM.YY')} - {moment(dateEnd).format('DD.MM.YY')}</span>
+            <span>{fullName(user, true)} | {from} - {to} | {moment(dateStart).format('DD.MM.YY')} - {moment(dateEnd).format('DD.MM.YY')}</span>
           </div>
         )
       })}

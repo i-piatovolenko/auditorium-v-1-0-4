@@ -11,12 +11,17 @@ export const CREATE_SCHEDULE_UNIT = gql`
               patronymic
               type
             }
+            classroom {
+              id
+              name
+            }
             type
             dateStart
             dateEnd
             from
             to
             activity
+            dayOfWeek
         }
     }
 `;

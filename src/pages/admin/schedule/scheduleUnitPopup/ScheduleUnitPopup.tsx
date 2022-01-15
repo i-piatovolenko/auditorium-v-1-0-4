@@ -37,6 +37,7 @@ type BodyPropTypes = {
   primaryUnit?: ScheduleUnitType;
   classroomName: string;
   selectedDay: number;
+  refetch: () => void;
 }
 
 const ScheduleUnitPopupHeader: FC<HeaderPropTypes> = ({title}) => {
@@ -53,7 +54,8 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
     primary = true,
     primaryUnit,
     classroomName,
-    selectedDay
+    selectedDay,
+    refetch
   }
 ) => {
   const primaryCreateMode = primary && !unit;
@@ -220,6 +222,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
           classroomName={classroomName}
           primary={false}
           primaryUnit={unit}
+          refetch={refetch}
         />
       ),
       footer: ''
@@ -256,22 +259,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
           }
         });
         await handleOperation(result, 'deleteOneScheduleUnit', dispatchNotification, dispatch, 'Відрізок видалено!');
-        await client.query({
-          query: GET_SCHEDULE_UNITS,
-          fetchPolicy: 'network-only',
-          variables: {
-            where: {
-              classroom: {
-                name: {
-                  equals: unit.classroom.name
-                }
-              },
-              dayOfWeek: {
-                equals: unit.dayOfWeek
-              },
-            }
-          }
-        });
+        await refetch();
       } catch (e: any) {
         dispatchNotification({
           header: "Помилка",
@@ -368,6 +356,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
         });
         await handleOperation(result, 'createOneScheduleUnit', dispatchNotification, dispatch,
           'Відрізок створено');
+        await refetch();
       } else {
         const result = client.mutate({
           mutation: UPDATE_SCHEDULE_UNIT,
@@ -404,6 +393,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
         });
         await handleOperation(result, 'createOneScheduleUnit', dispatchNotification, dispatch,
           'Тимчасовий відрізок створено');
+        await refetch();
       }
     } catch (e: any) {
       dispatchNotification({
@@ -421,13 +411,15 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
       {/*{primaryUpdateMode && <p>primaryUpdateMode</p>}*/}
       {/*{substitutionUpdateMode && <p>substitutionUpdateMode</p>}*/}
       <div className={styles.controlButtons}>
-        {primary && <img
+        {primaryUpdateMode && !editMode && (
+          <img
             src={addIcon}
             alt="create"
             className={styles.controlIcon}
             title='Додати відрізок'
             onClick={handleCreateUnit}
-        />}
+          />
+        )}
         <img
           src={removeIcon}
           alt="delete"
@@ -507,7 +499,8 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
               </p>
             ))
             }
-            {!!overlapsError && (overlapsError as unknown as ScheduleUnitType[]).map((error: ScheduleUnitType) => (
+            {!!overlapsError && !dateError && (overlapsError as unknown as ScheduleUnitType[])
+              .map((error: ScheduleUnitType) => (
               <p className={styles.errorMessage}>
                 Перекриває відрізок [ {
                 fullName(error.user, true) + ' | '

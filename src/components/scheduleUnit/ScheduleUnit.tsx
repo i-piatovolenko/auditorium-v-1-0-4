@@ -1,16 +1,15 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./scheduleUnit.module.css";
 import {GET_SCHEDULE_UNIT} from "../../api/operations/queries/schedule";
-import {
-  fullName, getScheduleUnitSize, scheduleUnitSize,
-} from "../../helpers/helpers";
-import {ActivityTypes, ScheduleUnitType} from "../../models/models";
+import {fullName, getScheduleUnitSize, scheduleUnitSize,} from "../../helpers/helpers";
+import {ActivityTypes, ScheduleUnitType, ScheduleUnitTypeT} from "../../models/models";
 import Button from "../button/Button";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import UserProfile from "../userProfile/UserProfile";
 import moment from "moment";
 import {client} from "../../api/client";
 import {WORKING_DAY_END, WORKING_DAY_START} from "../../helpers/constants";
+import ScheduleUnitList from "../../pages/schedule/ScheduleUnitList";
 
 interface PropTypes {
   classroomName: string;
@@ -22,6 +21,7 @@ interface PropTypes {
 const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date, showEmpty}) => {
 
   const [schedule, setSchedule] = useState<ScheduleUnitType[]>(null);
+  const [subSchedule, setSubSchedule] = useState<ScheduleUnitType[]>(null);
   const [searched, setSearched] = useState(false);
 
   useEffect(() => {
@@ -32,33 +32,14 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date,
         date: moment(date).toISOString(),
       },
     }).then((data: any) => {
-      setSchedule(data.data.schedule);
+      const primary = data.data.schedule.filter((unit: ScheduleUnitType) => unit.type === ScheduleUnitTypeT.PRIMARY);
+      const substitutions = data.data.schedule
+        .filter((unit: ScheduleUnitType) => unit.type === ScheduleUnitTypeT.SUBSTITUTION);
+
+      setSchedule(primary);
+      setSubSchedule(substitutions);
     });
   }, []);
-
-  const mappedSchedule = (schedule: ScheduleUnitType[]): ScheduleUnitType[] => {
-    let res = []
-    const data = schedule.slice()
-      .sort(
-        (a: ScheduleUnitType, b: ScheduleUnitType) =>
-          parseInt(a.from) - parseInt(b.from)
-      );
-    let lastItemEnd = WORKING_DAY_START + ':00';
-    for (let item of data) {
-      const spacerData = {
-        from: lastItemEnd,
-        to: item.from
-      }
-      const spacer = scheduleUnitSize(spacerData as ScheduleUnitType);
-      if (spacer) {
-        res.push(spacerData);
-      }
-      lastItemEnd = item.to;
-      res.push(item);
-    }
-    res.push(WORKING_DAY_END - parseFloat(data[data.length - 1].to));
-    return res as ScheduleUnitType[];
-  }
 
   useEffect(() => {
     if (schedule) {
@@ -80,48 +61,17 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date,
     });
   };
 
-  if (!schedule?.length) return <></>;
+  if (!schedule?.length && !subSchedule?.length) return <></>;
 
   return schedule && schedule.length && searched && (
     <div className={styles.scheduleRowWrapper}>
       <span>{classroomName}</span>
-      <ul
-        style={{
-          gridTemplateColumns: document.body.clientWidth >= 1024 ? getScheduleUnitSize(schedule
-              .slice()
-              .sort(
-                (a: ScheduleUnitType, b: ScheduleUnitType) =>
-                  parseInt(a.from) - parseInt(b.from)
-              ))
-            : "100%"
-        }}
-        className={styles.scheduleRow}
-      >
-        {!!schedule.length && mappedSchedule(schedule)
-          .map((unit: ScheduleUnitType) => (
-            <li>
-              {unit?.user && (
-                <Button
-                  onClick={() => handleClick(unit)}
-                  style={{
-                    height: "2rem",
-                    width: "100%",
-                    //@ts-ignore
-                    backgroundColor: ActivityTypes[unit.activity],
-                    //@ts-ignore
-                    border: `1px solid ${ActivityTypes[unit.activity]}`,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                  title={fullName(unit.user, true) + " " + unit.from + " - " + unit.to}
-                >
-                  {fullName(unit.user, true) + " " + unit.from + " - " + unit.to}
-                </Button>
-              )}
-            </li>
-          ))}
-      </ul>
+      <div className={styles.listsContainer}>
+        <div className={styles.absoluteWrapper}>
+          <ScheduleUnitList units={subSchedule} onClick={handleClick} withoutGrid/>
+        </div>
+        <ScheduleUnitList units={schedule} onClick={handleClick}/>
+      </div>
     </div>
   );
 };

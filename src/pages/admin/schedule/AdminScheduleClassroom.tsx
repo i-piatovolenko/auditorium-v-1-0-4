@@ -20,6 +20,7 @@ const AdminScheduleClassroom = () => {
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
   const {data, refetch} = useQuery(GET_SCHEDULE_UNITS, {
+    fetchPolicy: 'network-only',
     variables: {
       where: {
         classroom: {
@@ -71,6 +72,7 @@ const AdminScheduleClassroom = () => {
           allUnits={data?.scheduleUnits}
           selectedDay={chosenDay}
           classroomName={classroomName}
+          refetch={refetch}
         />
       ),
       footer: ''
@@ -94,6 +96,7 @@ const AdminScheduleClassroom = () => {
           units={data?.scheduleUnits || []}
           selectedDay={chosenDay}
           classroomName={classroomName}
+          refetch={refetch}
         />
       </div>
     </div>

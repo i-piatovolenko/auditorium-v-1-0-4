@@ -1,5 +1,7 @@
 import moment from "moment";
 import {ScheduleUnitType} from "../models/models";
+import {WORKING_DAY_END, WORKING_DAY_START} from "./constants";
+import {scheduleUnitSize} from "./helpers";
 
 export const isDateInRange = (date: any, dateFrom: string, dateTo: string) => {
   const momentDateFrom = moment(dateFrom);
@@ -134,5 +136,29 @@ export const hasOverlappedUnits = (
   units: ScheduleUnitType[]
 ) => {
   const result = units?.map(unit => isOverlaps(dateStart, dateEnd, timeFrom, timeTo, unit)).filter(unit => unit);
-  return result.length ? result : false;
+  return result?.length ? result : false;
 };
+
+export const mappedSchedule = (schedule: ScheduleUnitType[]): ScheduleUnitType[] => {
+  let res = []
+  const data = schedule.slice()
+    .sort(
+      (a: ScheduleUnitType, b: ScheduleUnitType) =>
+        parseInt(a.from) - parseInt(b.from)
+    );
+  let lastItemEnd = WORKING_DAY_START + ':00';
+  for (let item of data) {
+    const spacerData = {
+      from: lastItemEnd,
+      to: item.from
+    }
+    const spacer = scheduleUnitSize(spacerData as ScheduleUnitType);
+    if (spacer) {
+      res.push(spacerData);
+    }
+    lastItemEnd = item.to;
+    res.push(item);
+  }
+  res.push(WORKING_DAY_END - parseFloat(data[data.length - 1].to));
+  return res as ScheduleUnitType[];
+}

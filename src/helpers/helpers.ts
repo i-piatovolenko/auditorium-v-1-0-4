@@ -154,8 +154,6 @@ export const scheduleUnitSize = (unit: ScheduleUnitType) => {
   const diff = to.diff(from);
   return diff / 1000 / 60 / 60
 }
-
-//get schedule units size in fr units for grids
 export const getScheduleUnitSize = (
   units: Array<ScheduleUnitType>,
   fillEmpty = true
@@ -187,6 +185,8 @@ export const getScheduleUnitSize = (
 
   return items.map((item) => `${(item / percent).toFixed(1)}%`).join(" ");
 };
+//get schedule units size in fr units for grids
+
 
 export const ISODateString = (d: Date) => {
   function pad(n: any) {
