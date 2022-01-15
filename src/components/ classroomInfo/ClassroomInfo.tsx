@@ -115,7 +115,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({
       <ClassroomSchedule classroomName={classroom.name} dispatchPopupWindow={dispatchPopupWindow}/>
       {instruments?.length > 0 && (
         <>
-          <Title title="Розклад на сьогодні"/>
+          <Title title="Інструменти"/>
           <Instruments expanded instruments={instruments}/>
         </>
       )}
