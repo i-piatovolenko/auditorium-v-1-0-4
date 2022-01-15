@@ -63,7 +63,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
       query: GET_SCHEDULE_UNIT,
       variables: {
         classroomName,
-        date: moment().toISOString(),
+        date: moment().endOf('day').toISOString(),
       }
     }).then(({data: schedule}) => {
       setScheduleUnits(schedule);

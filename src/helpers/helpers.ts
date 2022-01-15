@@ -341,3 +341,22 @@ export const formatTimeWithZero = (time: string) => {
   const formattedMM = mm.length === 1 ? '0' + mm : mm;
   return `${formattedHH}:${formattedMM}`;
 }
+
+export const getBriefString = (str: string) => {
+  if (!str) return '';
+  if (str.length < 16) return str;
+
+  const words = str.split(' ');
+
+  const briefWords = words.map(word => {
+    if (word[3] === 'о' || word[3] === 'е' || word[3] === 'і' || word[3] === 'ї'
+      || word[3] === 'а' || word[3] === 'у'|| word[3] === 'и') {
+
+      return word.slice(0, 3) + (word.length > 3 ? '.' : '');
+    }
+
+    return word.slice(0, 4) + (word.length > 4 ? '.' : '');
+  });
+
+  return briefWords.join(' ');
+};

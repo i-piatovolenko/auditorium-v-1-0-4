@@ -12,7 +12,7 @@ import Button from "../../../../components/button/Button";
 import {
   hasOverlappedUnits,
   hasUnitDateTimeIntersection,
-  isBiggerThanSubstitutions,
+  isBiggerThanSubstitutions, scheduleUnitToString,
   withinPrimaryUnitBoundaries
 } from "../../../../helpers/scheduleHelpers";
 import {client} from "../../../../api/client";
@@ -498,40 +498,29 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
                 styles={{menuPortal: base => ({...base, zIndex: 9999})}}
               />
             </label>
-            {!!dateError && dateError.map((error: ScheduleUnitType) => (
+            {!!dateError && dateError.map((unit: ScheduleUnitType) => (
               <p className={styles.errorMessage}>
-                Накладається на відрізок [ {
-                fullName(error.user, true) + ' | '
-                + moment(error.dateStart).format('DD.MM.YY') + ' - '
-                + moment(error.dateEnd).format('DD.MM.YY') + ' | '
-                + error.from + ' - ' + error.to
-              } ]
+                Накладається на відрізок <span className={styles.subListItem}>{scheduleUnitToString(unit)}</span>
               </p>
             ))
             }
             {!!overlapsError && !dateError && (overlapsError as unknown as ScheduleUnitType[])
-              .map((error: ScheduleUnitType) => (
+              .map((unit: ScheduleUnitType) => (
                 <p className={styles.errorMessage}>
-                  Перекриває відрізок [ {
-                  fullName(error.user, true) + ' | '
-                  + moment(error.dateStart).format('DD.MM.YY') + ' - '
-                  + moment(error.dateEnd).format('DD.MM.YY') + ' | '
-                  + error.from + ' - ' + error.to
-                } ]
+                  Перекриває відрізок <span className={styles.subListItem}>{scheduleUnitToString(unit)}</span>
                 </p>
               ))
             }
             {updatePrimaryError && (
-              <p className={styles.errorMessage}>Тимчасові відрізки не можуть виходити за рамки постійного відрізку.</p>
+              <p className={styles.errorMessage}>
+                Тимчасові відрізки не можуть виходити за рамки постійного відрізку.
+              </p>
             )}
             {substitutionError && (
-              <p className={styles.errorMessage}>Тимчасовий відрізок не може бути більшим за постійний відрізок [ {
-                fullName(primaryUnit.user, true)} | {
-                moment(primaryUnit.dateStart).format('DD.MM.YYYY') + ' - ' +
-                moment(primaryUnit.dateEnd).format('DD.MM.YYYY')
-              } | {
-                primaryUnit.from + ' - ' + primaryUnit.to
-              }]</p>
+              <p className={styles.errorMessage}>
+                Тимчасовий відрізок не може бути більшим за постійний відрізок <span
+                className={styles.subListItem}>{scheduleUnitToString(primaryUnit)}</span>
+              </p>
             )}
           </div>
         )}
@@ -541,10 +530,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
               <span>Заміни: </span>
               <ul className={styles.subList}>
                 {substitutions.map((sub: ScheduleUnitType) => (
-                  <li className={styles.subListItem}>
-                    {fullName(sub.user, true)} | {moment(sub.dateStart).format('DD.MM.YYYY')
-                  + ' - ' + moment(sub.dateEnd).format('DD.MM.YYYY')} | {sub.from + ' - ' + sub.to}
-                  </li>
+                  <li className={styles.subListItem}>{scheduleUnitToString(sub)}</li>
                 ))}
               </ul>
             </div>

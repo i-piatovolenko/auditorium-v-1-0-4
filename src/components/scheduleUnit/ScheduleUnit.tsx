@@ -27,14 +27,13 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, color, userNameSearch
     client.query({
       query: GET_SCHEDULE_UNIT,
       variables: {
-        classroomName: classroomName,
+        classroomName,
         date: moment(date).set("h", 12).toISOString(),
       },
     }).then((data: any) => {
       const primary = data.data.schedule.filter((unit: ScheduleUnitType) => unit.type === ScheduleUnitTypeT.PRIMARY);
       const substitutions = data.data.schedule
         .filter((unit: ScheduleUnitType) => unit.type === ScheduleUnitTypeT.SUBSTITUTION);
-
       setSchedule(primary);
       setSubSchedule(substitutions);
     });

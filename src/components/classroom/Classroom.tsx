@@ -13,7 +13,7 @@ import {
 } from "../../models/models";
 import {
   defineOccupyStatus,
-  fullName,
+  fullName, getBriefString,
   isClassroomNotFree,
   shouldOccupiedByTeacher,
   typeStyle
@@ -52,7 +52,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
 
   const header = (
     <>
-      <h1>{`Аудиторія ${name}`}</h1>
+      <h1>{`Аудиторія ${name}${chair?.name ? ', ' + getBriefString(chair.name) : ''}`}</h1>
       {isWing && <Tag body="Флігель"/>}
       {isOperaStudio && <Tag body="Оперна студія"/>}
     </>
@@ -125,7 +125,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
 
   const handleClick = () => {
     dispatchPopupWindow({
-      header: header,
+      header,
       //@ts-ignore
       body: <ClassroomInfo
         classroom={classroom}

@@ -1,7 +1,7 @@
 import moment from "moment";
 import {ScheduleUnitType} from "../models/models";
 import {WORKING_DAY_END, WORKING_DAY_START} from "./constants";
-import {scheduleUnitSize} from "./helpers";
+import {fullName, scheduleUnitSize} from "./helpers";
 
 export const isDateInRange = (date: any, dateFrom: string, dateTo: string) => {
   const momentDateFrom = moment(dateFrom);
@@ -166,3 +166,14 @@ export const mappedSchedule = (schedule: ScheduleUnitType[]): ScheduleUnitType[]
   res.push(WORKING_DAY_END - parseFloat(data[data.length - 1].to));
   return res as ScheduleUnitType[];
 }
+
+export const scheduleUnitToString = (unit: ScheduleUnitType) => {
+  return (
+    fullName(unit.user, true)
+    + ' | '
+    + moment(unit.dateStart).format('DD.MM.YYYY') + ' - '
+    + moment(unit.dateEnd).format('DD.MM.YYYY')
+    + ' | '
+    + unit.from + ' - ' + unit.to
+  );
+};

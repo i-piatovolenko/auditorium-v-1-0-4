@@ -1,4 +1,4 @@
-import React, {FC, useRef} from 'react';
+import React, {FC} from 'react';
 import styles from './scheduleUnitRow.module.css';
 import {ScheduleUnitType, ScheduleUnitTypeT} from "../../../../models/models";
 import {fullName} from "../../../../helpers/helpers";
@@ -65,7 +65,7 @@ const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay, refe
         const cssStyles = {
           left: `${startPos}%`,
           width: `${width}%`,
-          height: 20 * (amountOfWeeks - vertStart),
+          height: 20 * (amountOfWeeks),
           top: vertStart < 0 ? -(vertStart * 20) : 0,
           backgroundColor: unit.type === ScheduleUnitTypeT.PRIMARY ? '#00a6ff' : '#ff8c00',
           zIndex: unit.type === ScheduleUnitTypeT.PRIMARY ? 1 : 2,
@@ -77,7 +77,7 @@ const ScheduleUnitRow: FC<PropTypes> = ({units, classroomName, selectedDay, refe
             style={cssStyles}
             onClick={() => handleClick(unit as ScheduleUnitType)}
           >
-            <span>{fullName(user, true)} | {from} - {to} | {moment(dateStart).format('DD.MM.YY')} - {moment(dateEnd).format('DD.MM.YY')}</span>
+            <span style={{position: 'sticky', top: 2}}>{fullName(user, true)} | {from} - {to} | {moment(dateStart).format('DD.MM.YY')} - {moment(dateEnd).format('DD.MM.YY')}</span>
           </div>
         )
       })}

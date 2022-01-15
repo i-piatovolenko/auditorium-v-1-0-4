@@ -11,8 +11,8 @@ import {client} from "../../api/client";
 import {GET_CLASSROOM} from "../../api/operations/queries/classroom";
 import moment from "moment";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
-import handleOperation from "../../helpers/handleOperation";
 import ScheduleUnit from "../scheduleUnit/ScheduleUnit";
+import ClassroomSchedule from "../classroomSchedule/ClassroomSchedule";
 
 interface PropTypes {
   classroom: ClassroomType;
@@ -28,6 +28,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({
   const {name, instruments, description, chair, occupied, id} = classroom;
   const [queueSize, setQueueSize] = useState(0);
   const [isOccupiedOverdue, setIsOccupiedOverdue] = useState(false);
+  const [date, setDate] = useState(moment().endOf('day').toISOString());
   const {data: {isPassed}} = useQuery(gql`
     query isPassed {
       isPassed @client
@@ -89,7 +90,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({
     if (queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
       && queuePolicy.queueAllowedDepartments.length) {
       return <>
-        <span>Аудиторія доступна для студентів: </span>
+        <span>Тільки для студентів: </span>
         {queuePolicy.queueAllowedDepartments.map(({department: {name}}) => {
           return <span className={styles.specialChair}>{name}</span>
         })}
@@ -108,14 +109,16 @@ const ClassroomInfo: React.FC<PropTypes> = ({
 
   return (
     <div>
-      <p className={styles.description}>
-        {chair ? chair.name + ". " + description : description}
-      </p>
-      <p>Черга за цією аудиторію: {queueSize ? `${queueSize} люд.` : 'відсутня'}</p>
+      {!!queueSize && <p>Черга за цією аудиторію: {queueSize} люд.</p>}
       {defineStatus()}
       <Title title="Розклад на сьогодні"/>
-      <ScheduleUnit classroomName={name}/>
-      {instruments?.length > 0 && <Instruments expanded instruments={instruments}/>}
+      <ClassroomSchedule classroomName={classroom.name} dispatchPopupWindow={dispatchPopupWindow}/>
+      {instruments?.length > 0 && (
+        <>
+          <Title title="Розклад на сьогодні"/>
+          <Instruments expanded instruments={instruments}/>
+        </>
+      )}
       {isClassroomNotFree(occupied) && !isPassed ? (
         <OccupantInfo occupied={occupied}/>
       ) : (
