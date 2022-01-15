@@ -1,14 +1,12 @@
 import React, {useEffect, useState} from "react";
 import styles from "./scheduleUnit.module.css";
 import {GET_SCHEDULE_UNIT} from "../../api/operations/queries/schedule";
-import {fullName, getScheduleUnitSize, scheduleUnitSize,} from "../../helpers/helpers";
-import {ActivityTypes, ScheduleUnitType, ScheduleUnitTypeT} from "../../models/models";
-import Button from "../button/Button";
+import {fullName} from "../../helpers/helpers";
+import {ScheduleUnitType, ScheduleUnitTypeT} from "../../models/models";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import UserProfile from "../userProfile/UserProfile";
 import moment from "moment";
 import {client} from "../../api/client";
-import {WORKING_DAY_END, WORKING_DAY_START} from "../../helpers/constants";
 import ScheduleUnitList from "../../pages/schedule/ScheduleUnitList";
 
 interface PropTypes {
@@ -16,9 +14,10 @@ interface PropTypes {
   userNameSearch?: string;
   date?: string;
   showEmpty?: boolean;
+  color?: string;
 }
 
-const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date, showEmpty}) => {
+const ScheduleUnit: React.FC<PropTypes> = ({classroomName, color, userNameSearch, date, showEmpty}) => {
 
   const [schedule, setSchedule] = useState<ScheduleUnitType[]>(null);
   const [subSchedule, setSubSchedule] = useState<ScheduleUnitType[]>(null);
@@ -29,7 +28,7 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date,
       query: GET_SCHEDULE_UNIT,
       variables: {
         classroomName: classroomName,
-        date: moment(date).toISOString(),
+        date: moment(date).set("h", 12).toISOString(),
       },
     }).then((data: any) => {
       const primary = data.data.schedule.filter((unit: ScheduleUnitType) => unit.type === ScheduleUnitTypeT.PRIMARY);
@@ -65,7 +64,7 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, userNameSearch, date,
 
   return schedule && schedule.length && searched && (
     <div className={styles.scheduleRowWrapper}>
-      <span>{classroomName}</span>
+      <span style={{backgroundColor: color + '55'}}>{classroomName}</span>
       <div className={styles.listsContainer}>
         <div className={styles.absoluteWrapper}>
           <ScheduleUnitList units={subSchedule} onClick={handleClick} withoutGrid/>

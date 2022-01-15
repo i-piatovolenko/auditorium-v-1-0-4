@@ -24,6 +24,7 @@ import VerifyButton from "./verifyButton/VerifyButton";
 import HeaderCheckbox from "../../../components/headerCheckBox/HeaderCheckbox";
 import Loader from "../../../components/loader/Loader";
 import Edit from "../../../components/icons/edit/Edit";
+import Back from "../../../components/icons/back/Back";
 
 const categories: CategoryType[] = [
   {
@@ -179,6 +180,7 @@ const AdminUsers = () => {
   return (
     <div>
       <Header>
+        <Back/>
         <h1>Управління користувачами</h1>
         <input
           type="text"

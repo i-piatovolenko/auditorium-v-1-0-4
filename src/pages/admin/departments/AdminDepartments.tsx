@@ -13,6 +13,7 @@ import styles from './adminDepartments.module.css';
 import {useMutation} from "@apollo/client";
 import {DELETE_DEPARTMENT} from "../../../api/operations/mutations/deleteDepartment";
 import {useNotification} from "../../../components/notification/NotificationProvider";
+import Back from "../../../components/icons/back/Back";
 
 const listHeader = ['ID', 'Назва'];
 
@@ -70,6 +71,7 @@ const AdminDepartments = () => {
   return (
     <div>
       <Header>
+        <Back/>
         <h1>Управління кафедрами</h1>
         <Add onClick={() => handleAdd()}/>
       </Header>

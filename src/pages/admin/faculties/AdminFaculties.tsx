@@ -13,6 +13,7 @@ import useFaculties from "../../../hooks/useFaculties";
 import Button from "../../../components/button/Button";
 import CreateFacultyPopupBody from "./createFacultyPopupBody/CreateFacultyPopupBody";
 import {DELETE_FACULTY} from "../../../api/operations/mutations/deleteFaculty";
+import Back from "../../../components/icons/back/Back";
 
 const listHeader = ['ID', 'Назва'];
 
@@ -73,6 +74,7 @@ const AdminFaculties = () => {
   return (
     <div>
       <Header>
+        <Back/>
         <h1>Управління факультетами</h1>
         <Add onClick={() => handleAdd()}/>
       </Header>

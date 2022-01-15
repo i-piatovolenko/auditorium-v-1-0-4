@@ -1,6 +1,6 @@
 import React, {ChangeEvent, FC, useEffect, useState} from 'react';
 import {ScheduleUnitActivityT, ScheduleUnitType, ScheduleUnitTypeT} from "../../../../models/models";
-import {fullName} from "../../../../helpers/helpers";
+import {formatTimeWithZero, fullName} from "../../../../helpers/helpers";
 import Select from "react-select";
 import useUsers from "../../../../hooks/useUsers";
 import editIcon from '../../../../assets/images/edit.svg';
@@ -18,7 +18,6 @@ import {
 import {client} from "../../../../api/client";
 import {DELETE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/deleteScheduleUnit";
 import handleOperation from "../../../../helpers/handleOperation";
-import {GET_SCHEDULE_UNITS} from "../../../../api/operations/queries/scheduleUnits";
 import {UPDATE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/updateScheduleUnit";
 import {CREATE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/createScheduleUnit";
 import {GET_SCHEDULE_SUBSTITUTIONS_UNITS} from "../../../../api/operations/queries/scheduleSubUnits";
@@ -60,8 +59,8 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
 ) => {
   const primaryCreateMode = primary && !unit;
   const substitutionCreateMode = !primary && !unit;
-  const primaryUpdateMode = unit && unit.type === ScheduleUnitTypeT.PRIMARY;
-  const substitutionUpdateMode = unit && unit.type === ScheduleUnitTypeT.SUBSTITUTION;
+  const primaryUpdateMode = unit?.type === ScheduleUnitTypeT.PRIMARY;
+  const substitutionUpdateMode = unit?.type === ScheduleUnitTypeT.SUBSTITUTION;
 
   const [editMode, setEditMode] = useState(false);
   const [selectUserData, setSelectUserdata] = useState([]);
@@ -76,11 +75,20 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
   const [updatePrimaryError, setUpdatePrimaryError] = useState(false);
   const [substitutionError, setSubstitutionError] = useState(false);
   const [overlapsError, setOverLapsError] = useState(false);
-  const [dateStart, setDateStart] = useState(moment(unit?.dateStart).format('YYYY-MM-DD'));
-  const [dateEnd, setDateEnd] = useState(moment(unit?.dateEnd).format('YYYY-MM-DD'));
-  const [timeFrom, setTimeFrom] = useState(unit?.from || moment().set('h', 8).set('m', 0).format('HH:mm'));
-  const [timeTo, setTimeTo] = useState(unit?.to || moment().set('h', 15).set('m', 0).format('HH:mm'));
+  const [dateStart, setDateStart] = useState(moment().format('YYYY-MM-DD'));
+  const [dateEnd, setDateEnd] = useState(moment().format('YYYY-MM-DD'));
+  const [timeFrom, setTimeFrom] = useState('08:00');
+  const [timeTo, setTimeTo] = useState('15:00');
   const [substitutions, setSubstitutions] = useState(null);
+
+  useEffect(() => {
+    if (primaryUnit) {
+      setTimeFrom(formatTimeWithZero(primaryUnit.from));
+      setTimeTo(formatTimeWithZero(primaryUnit.to));
+      setDateStart(moment(primaryUnit.dateStart).format('YYYY-MM-DD'));
+      setDateEnd(moment(primaryUnit.dateEnd).format('YYYY-MM-DD'));
+    }
+  }, [primaryUnit]);
 
   useEffect(() => {
     const error = hasOverlappedUnits(dateStart, dateEnd, timeFrom, timeTo, allUnits)
@@ -100,15 +108,23 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
     }
   }, [users]);
 
-  useEffect(() => {
+  const checkForErrors = () => {
     const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
 
     const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, timeFrom, timeTo)
-      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, timeTo, timeTo)
-      || hasOverlappedUnits(dateStart, dateEnd, timeFrom, timeTo, allUnits);
+      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, timeFrom, timeTo)
+      || hasOverlappedUnits(dateStart, dateEnd, timeFrom, timeTo, units);
     setDateError(isError);
     isPrimaryUnitUpdateError(undefined, undefined, undefined, undefined);
     isSubstitutionUpdateOrCreateError(undefined, undefined, undefined, undefined);
+  }
+
+  useEffect(() => {
+    checkForErrors()
+  }, [dateStart, dateEnd, timeFrom, timeTo]);
+
+  useEffect(() => {
+    checkForErrors();
 
     if (unit) {
       client.query({
@@ -204,7 +220,6 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
     const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, timeFrom, e.target.value)
       || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, timeFrom, e.target.value)
       || hasOverlappedUnits(dateStart, dateEnd, timeFrom, e.target.value, units);
-    ;
     setDateError(isError);
     isPrimaryUnitUpdateError(undefined, undefined, undefined, e.target.value);
     isSubstitutionUpdateOrCreateError(undefined, undefined, undefined, e.target.value);
@@ -212,7 +227,11 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
 
   const handleCreateUnit = () => {
     dispatchPopupWindow({
-      header: <ScheduleUnitPopupHeader title='Створити новий тимчасовий відрізок'/>,
+      header: (
+        <ScheduleUnitPopupHeader
+          title={`Створити тимчасову заміну для ${fullName(unit.user, true)}`}
+        />
+      ),
       body: (
         <ScheduleUnitPopupBody
           dispatchPopupWindow={dispatchPopupWindow}
@@ -337,7 +356,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
                 .set('milliseconds', 0).toISOString(),
               dateEnd: moment(dateEnd).set('hours', 0).set('minutes', 0).set('seconds', 0)
                 .set('milliseconds', 0).toISOString(),
-              dayOfWeek: selectedDay,
+              dayOfWeek: selectedDay === 6 ? 0 : selectedDay + 1,
               from: timeFrom,
               to: timeTo,
               activity: selectedType.value,
@@ -372,7 +391,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
                     .set('milliseconds', 0).toISOString(),
                   dateEnd: moment(dateEnd).set('hours', 0).set('minutes', 0).set('seconds', 0)
                     .set('milliseconds', 0).toISOString(),
-                  dayOfWeek: selectedDay,
+                  dayOfWeek: selectedDay === 6 ? 0 : selectedDay + 1,
                   from: timeFrom,
                   to: timeTo,
                   activity: selectedType.value,
@@ -392,7 +411,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
           }
         });
         await handleOperation(result, 'createOneScheduleUnit', dispatchNotification, dispatch,
-          'Тимчасовий відрізок створено');
+          'Тимчасову заміну створено');
         await refetch();
       }
     } catch (e: any) {
@@ -411,22 +430,6 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
       {/*{primaryUpdateMode && <p>primaryUpdateMode</p>}*/}
       {/*{substitutionUpdateMode && <p>substitutionUpdateMode</p>}*/}
       <div className={styles.controlButtons}>
-        {primaryUpdateMode && !editMode && (
-          <img
-            src={addIcon}
-            alt="create"
-            className={styles.controlIcon}
-            title='Додати відрізок'
-            onClick={handleCreateUnit}
-          />
-        )}
-        <img
-          src={removeIcon}
-          alt="delete"
-          className={styles.controlIcon}
-          title='Видалити'
-          onClick={handleConfirmRemoveUnit}
-        />
         {!editMode && (
           <img
             src={editIcon}
@@ -436,6 +439,13 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
             title='Редагувати'
           />
         )}
+        <img
+          src={removeIcon}
+          alt="delete"
+          className={styles.controlIcon}
+          title='Видалити'
+          onClick={handleConfirmRemoveUnit}
+        />
       </div>
       <div>
         {!editMode && !!unit ? (
@@ -501,21 +511,21 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
             }
             {!!overlapsError && !dateError && (overlapsError as unknown as ScheduleUnitType[])
               .map((error: ScheduleUnitType) => (
-              <p className={styles.errorMessage}>
-                Перекриває відрізок [ {
-                fullName(error.user, true) + ' | '
-                + moment(error.dateStart).format('DD.MM.YY') + ' - '
-                + moment(error.dateEnd).format('DD.MM.YY') + ' | '
-                + error.from + ' - ' + error.to
-              } ]
-              </p>
-            ))
+                <p className={styles.errorMessage}>
+                  Перекриває відрізок [ {
+                  fullName(error.user, true) + ' | '
+                  + moment(error.dateStart).format('DD.MM.YY') + ' - '
+                  + moment(error.dateEnd).format('DD.MM.YY') + ' | '
+                  + error.from + ' - ' + error.to
+                } ]
+                </p>
+              ))
             }
             {updatePrimaryError && (
               <p className={styles.errorMessage}>Тимчасові відрізки не можуть виходити за рамки постійного відрізку.</p>
             )}
             {substitutionError && (
-              <p className={styles.errorMessage}>Тимчасовий відрізок не може бути більшим за постйний відрізок [ {
+              <p className={styles.errorMessage}>Тимчасовий відрізок не може бути більшим за постійний відрізок [ {
                 fullName(primaryUnit.user, true)} | {
                 moment(primaryUnit.dateStart).format('DD.MM.YYYY') + ' - ' +
                 moment(primaryUnit.dateEnd).format('DD.MM.YYYY')
@@ -523,6 +533,21 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
                 primaryUnit.from + ' - ' + primaryUnit.to
               }]</p>
             )}
+          </div>
+        )}
+        {!!substitutions?.length && (
+          <div className={styles.unitData}>
+            <div>
+              <span>Заміни: </span>
+              <ul className={styles.subList}>
+                {substitutions.map((sub: ScheduleUnitType) => (
+                  <li className={styles.subListItem}>
+                    {fullName(sub.user, true)} | {moment(sub.dateStart).format('DD.MM.YYYY')
+                  + ' - ' + moment(sub.dateEnd).format('DD.MM.YYYY')} | {sub.from + ' - ' + sub.to}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
         <div className={styles.buttons}>
@@ -549,6 +574,17 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
             </>
           )}
         </div>
+        {primaryUpdateMode && !editMode && (
+          <Button onClick={handleCreateUnit}>
+            Створити тимчасову заміну
+            <img
+              src={addIcon}
+              alt="create"
+              className={styles.addIcon}
+              title='Додати відрізок'
+            />
+          </Button>
+        )}
       </div>
     </>
   );

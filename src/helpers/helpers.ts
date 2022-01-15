@@ -332,3 +332,12 @@ export const defineOccupyStatus = (classroom: ClassroomType, scheduleUnits: Sche
   if (isClassroomNotFree(occupied)) return OccupiedStateUa[occupied?.state as OccupiedState];
   return shouldOccupiedByTeacher(classroom.name, scheduleUnits)
 };
+
+export const formatTimeWithZero = (time: string) => {
+  if (!time) return;
+
+  const [hh, mm] = time.split(':');
+  const formattedHH = hh.length === 1 ? '0' + hh : hh;
+  const formattedMM = mm.length === 1 ? '0' + mm : mm;
+  return `${formattedHH}:${formattedMM}`;
+}

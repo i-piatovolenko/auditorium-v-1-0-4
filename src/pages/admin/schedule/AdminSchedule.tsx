@@ -4,6 +4,8 @@ import DataList from "../../../components/dataList/DataList";
 import useClassrooms from "../../../hooks/useClassrooms";
 import {ClassroomType} from "../../../models/models";
 import {useHistory} from "react-router-dom";
+import Back from "../../../components/icons/back/Back";
+import styles from './scheduleAdmin.module.css';
 
 const listHeader = ['Виберіть аудиторію', ''];
 
@@ -14,8 +16,17 @@ const AdminSchedule = () => {
 
   const listDataItem = (item: ClassroomType) => (
     <>
-      <span key={item.id} onClick={() => navToChosenClassroom(item.name)}>Аудиторія {item.name}</span>
-      <span></span>
+      <div className={styles.classroomListItemContainer}>
+        <div className={styles.classroomListItemMark} style={{backgroundColor: item.color}}/>
+        <span
+          key={item.id}
+          onClick={() => navToChosenClassroom(item.name)}
+          className={styles.classroomListItem}
+        >
+        Аудиторія {item.name}
+      </span>
+      </div>
+      <span/>
     </>
   );
 
@@ -33,6 +44,7 @@ const AdminSchedule = () => {
   return (
     <div>
       <Header>
+        <Back/>
         <h1>Управління розкладом</h1>
       </Header>
       <DataList header={listHeader} data={listData} gridTemplateColumns=' 200px 1fr'/>

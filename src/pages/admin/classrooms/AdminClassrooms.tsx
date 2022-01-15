@@ -14,6 +14,7 @@ import DataList from "../../../components/dataList/DataList";
 import Button from "../../../components/button/Button";
 import BrowseClassroomPopupBody from "./browseClassroomPopupBody/BrowseClassroomPopupBody";
 import {GET_CLASSROOMS} from "../../../api/operations/queries/classrooms";
+import Back from "../../../components/icons/back/Back";
 
 const listHeader = ['Назва', 'Кафедра', 'Прихована', 'Відключена', 'Спец.', 'Оп. студія', 'Флігель'];
 
@@ -143,6 +144,7 @@ const AdminClassrooms = () => {
   return (
     <div>
       <Header>
+        <Back/>
         <h1>Редагування аудиторій</h1>
         <Add onClick={() => handleCreate()}/>
       </Header>

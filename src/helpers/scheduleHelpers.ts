@@ -47,12 +47,12 @@ class Interval implements IntervalI {
 }
 
 export const hasUnitDateIntersection = (dateTime: string, currentUnitId: number, allUnits: ScheduleUnitType[]) => {
-  const currentDate = moment(dateTime);
+  const currentDate = moment(dateTime).startOf('day');
   const units = currentUnitId !== -1 ? allUnits.filter(({id}) => id !== currentUnitId) : allUnits;
 
   return units.filter(unit => {
-    const unitDateStart = moment(unit.dateStart);
-    const unitDateEnd = moment(unit.dateEnd);
+    const unitDateStart = moment(unit.dateStart).startOf('day');
+    const unitDateEnd = moment(unit.dateEnd).startOf('day');
 
     return currentDate.isBetween(unitDateStart, unitDateEnd);
   });
@@ -93,25 +93,29 @@ export const withinPrimaryUnitBoundaries = (subUnit: ScheduleUnitType, primaryUn
   const primaryTo = getMinutesFromHHMM(primaryUnit.to);
 
   return (
-    moment(subUnit.dateStart).isAfter(moment(primaryUnit.dateStart)) &&
-    moment(subUnit.dateEnd).isBefore(moment(primaryUnit.dateEnd)) &&
-    subFrom > primaryFrom && subTo < primaryTo
+    moment(subUnit.dateStart).startOf('day')
+      .isSameOrAfter(moment(primaryUnit.dateStart).startOf('day')) &&
+    moment(subUnit.dateEnd).startOf('day')
+      .isSameOrBefore(moment(primaryUnit.dateEnd).startOf('day')) &&
+    subFrom >= primaryFrom && subTo <= primaryTo
   );
 };
 
 export const isBiggerThanSubstitutions = (primaryUnit: ScheduleUnitType, substitutions: ScheduleUnitType[] = []) => {
   if (!substitutions?.length) return true;
 
-  const subStartDateMin = moment.min(substitutions.map(unit => moment(unit.dateStart)));
-  const subStartDateMax = moment.max(substitutions.map(unit => moment(unit.dateEnd)));
+  const subStartDateMin = moment
+    .min(substitutions.map(unit => moment(unit.dateStart).startOf('day'))).startOf('day');
+  const subStartDateMax = moment
+    .max(substitutions.map(unit => moment(unit.dateEnd).startOf('day'))).startOf('day');
   const subFromMin = Math.min(...substitutions.map(unit => getMinutesFromHHMM(unit.from)));
   const subToMax = Math.max(...substitutions.map(unit => getMinutesFromHHMM(unit.to)));
   const primaryFrom = getMinutesFromHHMM(primaryUnit.from);
   const primaryTo = getMinutesFromHHMM(primaryUnit.to);
 
   return (
-    moment(primaryUnit.dateStart).isBefore(subStartDateMin) &&
-    moment(primaryUnit.dateEnd).isAfter(subStartDateMax) &&
+    moment(primaryUnit.dateStart).startOf('day').isBefore(subStartDateMin) &&
+    moment(primaryUnit.dateEnd).startOf('day').isAfter(subStartDateMax) &&
     subFromMin > primaryFrom && subToMax < primaryTo
   );
 };
@@ -120,11 +124,11 @@ export const isOverlaps = (
   dateStart: string, dateEnd: string, timeFrom: string, timeTo: string,
   unit: ScheduleUnitType
 ) => {
-  const r1Start = moment(dateStart);
-  const r1End = moment(dateEnd);
-  const r2Start = moment(unit.dateStart);
-  const r2End = moment(unit.dateEnd);
-  if (r1Start.isBefore(r2Start) && r1End.isAfter(r2End)) {
+  const r1Start = moment(dateStart).startOf('day');
+  const r1End = moment(dateEnd).startOf('day');
+  const r2Start = moment(unit.dateStart).startOf('day');
+  const r2End = moment(unit.dateEnd).startOf('day');
+  if (r1Start.isSameOrBefore(r2Start) && r1End.isSameOrAfter(r2End)) {
     return hasUnitTimeIntersection(unit, timeFrom, timeTo);
   } else {
     return false;

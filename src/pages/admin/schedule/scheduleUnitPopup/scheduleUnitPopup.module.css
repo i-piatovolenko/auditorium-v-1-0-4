@@ -2,7 +2,7 @@
     position: absolute;
     right: 16px;
     display: grid;
-    grid-template-columns: 24px 24px 24px;
+    grid-template-columns: 24px 24px;
     grid-gap: 8px;
 }
 
@@ -10,6 +10,15 @@
     width: 24px;
     height: 24px;
     cursor: pointer;
+}
+
+.addIcon {
+    width: 12px;
+    height: 12px;
+    filter: invert();
+    margin-left: 10px;
+    margin-right: 2px;
+    margin-bottom: -2px;
 }
 
 .unitData div {
@@ -50,4 +59,18 @@
     grid-template-columns: 100px 100px;
     grid-gap: 8px;
     padding-top: 16px;
+}
+
+.subList {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.subListItem {
+    padding: 4px 8px;
+    border: 1px solid #cccccc55;
+    border-radius: 4px;
+    margin: 0 0 8px 0;
+    width: fit-content;
 }

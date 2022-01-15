@@ -14,6 +14,7 @@ import {useMutation} from "@apollo/client";
 import {DELETE_INSTRUMENT} from "../../../api/operations/mutations/deleteInstrument";
 import {InstrumentType, InstrumentTypesE, InstrumentTypesEUa} from "../../../models/models";
 import BrowseInstrumentPopupBody from "./browseInstrumentPopupBody/BrowseInstrumentPopupBody";
+import Back from "../../../components/icons/back/Back";
 
 const dataHeader = ['ID', 'Назва', 'Тип', 'Рейтинг', 'Ауд.', 'Інв. номер'];
 
@@ -99,6 +100,7 @@ const AdminInstruments = () => {
   return (
     <div>
       <Header>
+        <Back/>
         <h1>Управління інструментами</h1>
         <Add onClick={handleAdd}/>
       </Header>

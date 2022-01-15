@@ -1,0 +1,10 @@
+.backIcon {
+    width: 24px;
+    height: 24px;
+    filter: invert(1) contrast(200%);
+    cursor: pointer;
+}
+
+.backIcon:hover {
+    filter: invert(57%) sepia(50%) saturate(5894%) hue-rotate(176deg) brightness(103%) contrast(107%);
+}

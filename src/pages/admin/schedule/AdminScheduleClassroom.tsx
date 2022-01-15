@@ -10,6 +10,7 @@ import {usePopupWindow} from "../../../components/popupWindow/PopupWindowProvide
 import ScheduleUnitPopup from './scheduleUnitPopup/ScheduleUnitPopup';
 import {useNotification} from "../../../components/notification/NotificationProvider";
 import {useQuery} from "@apollo/client";
+import Back from "../../../components/icons/back/Back";
 
 const DAY_OF_WEEKS = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота', 'Неділя'];
 
@@ -29,7 +30,7 @@ const AdminScheduleClassroom = () => {
           }
         },
         dayOfWeek: {
-          equals: chosenDay
+          equals: chosenDay + 1
         },
       }
     }
@@ -45,7 +46,7 @@ const AdminScheduleClassroom = () => {
             }
           },
           dayOfWeek: {
-            equals: chosenDay
+            equals: chosenDay === 6 ? 0 : chosenDay + 1
           },
         }
       });
@@ -64,7 +65,7 @@ const AdminScheduleClassroom = () => {
 
   const handleCreateUnit = () => {
     dispatchPopupWindow({
-      header: <ScheduleUnitPopup.Header title='Створити новий відрізок'/>,
+      header: <ScheduleUnitPopup.Header title='Створити новий відрізок для'/>,
       body: (
         <ScheduleUnitPopup.Body
           dispatchPopupWindow={dispatchPopupWindow}
@@ -82,6 +83,7 @@ const AdminScheduleClassroom = () => {
   return (
     <div>
       <Header>
+        <Back/>
         <h1>Управління розкладом в аудиторії {classroomName}</h1>
         <Add onClick={handleCreateUnit}/>
       </Header>

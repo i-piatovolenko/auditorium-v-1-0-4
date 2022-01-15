@@ -99,6 +99,7 @@ const Schedule = () => {
               classroomName={classroom.name}
               userNameSearch={userNameSearch}
               date={date}
+              color={classroom.color}
             />
           </div>)}
         </div>

@@ -8,7 +8,6 @@ import {ACCESS_RIGHTS, StudentAccountStatus, User} from "../../../models/models"
 import CountUp from "react-countup";
 import {useLocal} from "../../../hooks/useLocal";
 import Button from "../../../components/button/Button";
-import {client, isLoggedVar} from "../../../api/client";
 import {handleLogout} from "../../../helpers/logout";
 
 const Admin = () => {
@@ -44,9 +43,9 @@ const Admin = () => {
               <li><NavLink to='/adminDepartments'>Кафедри</NavLink></li>
               <li><NavLink to='/adminFaculties'>Факультети</NavLink></li>
               <li><NavLink to='/adminDegrees'>Навчальні ступені</NavLink></li>
-              <li><NavLink to='/adminSchedule'>Розклад</NavLink></li>
             </>
           )}
+          <li><NavLink to='/adminSchedule'>Розклад</NavLink></li>
         </ul>
         <div className={styles.settings}>
           <Button onClick={handleLogout}>Вийти з профілю</Button>
