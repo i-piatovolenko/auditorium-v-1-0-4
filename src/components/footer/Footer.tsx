@@ -333,12 +333,12 @@ const Footer: React.FC<PropTypes> = ({
 
     return (
       <div className={styles.footer}>
-        {(isOverdue || isOccupiedOverdue) && <span className={styles.sanctions}>
-                <label>З застосуванням санкцій</label>
-                <input type='checkbox' checked={confirmSanctions}
-                       onChange={e => setConfirmSanction(e.target.checked)}
-                />
-            </span>}
+        {/*{(isOverdue || isOccupiedOverdue) && <span className={styles.sanctions}>*/}
+        {/*        <label>З застосуванням санкцій</label>*/}
+        {/*        <input type='checkbox' checked={confirmSanctions}*/}
+        {/*               onChange={e => setConfirmSanction(e.target.checked)}*/}
+        {/*        />*/}
+        {/*    </span>}*/}
         {isClassroomNotFree(occupied) && !isPassed ? (
           <>
             <DisabledButton/>
