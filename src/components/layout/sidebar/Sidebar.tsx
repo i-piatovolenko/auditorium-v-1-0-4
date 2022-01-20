@@ -128,7 +128,7 @@ const Sidebar = () => {
 
   return (
     <div
-      onMouseEnter={() => setCollapsed(false)}
+      // onMouseEnter={() => setCollapsed(false)}
       onMouseLeave={() => setCollapsed(true)}
       className={[styles[collapsed.toString()], styles.navigation].join(" ")}
     >
@@ -138,7 +138,7 @@ const Sidebar = () => {
           <Button color='red' onClick={handleLogout}>Вийти з акаунту</Button>
         </div>
       )}
-      <div className={styles.logoWrapper}>
+      <div className={styles.logoWrapper} onClick={() => setCollapsed(prev => !prev)}>
         <Logo
           title={collapsed ? "Au" : "Auditorium"}
           description="Система управління видачею аудиторій"
