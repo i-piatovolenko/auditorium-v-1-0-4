@@ -164,10 +164,12 @@ function Dashboard() {
       </Header>
       <div className={styles.container}>
         <div>
-          <h1 className={styles.noQueue}>{
-            /*@ts-ignore*/
-            (strings[lang]).noQueue
-          }</h1>
+          {data && !data.generalQueue.length && (
+            <h1 className={styles.noQueue}>{
+              /*@ts-ignore*/
+              (strings[lang]).noQueue}
+            </h1>
+          )}
           <ul className={styles.generalQueue}>
             {data && data.generalQueue
               .slice(0, 10)

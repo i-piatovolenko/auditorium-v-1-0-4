@@ -12,7 +12,6 @@ import {client} from "./api/client";
 import PopupWindowProvider from "./components/popupWindow/PopupWindowProvider";
 import NotificationProvider from "./components/notification/NotificationProvider";
 import {BrowserRouter, HashRouter} from "react-router-dom";
-import ErrorHandler from "./components/errorHandler/ErrorHandler";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -20,9 +19,7 @@ ReactDOM.render(
       <ApolloProvider client={client}>
         <PopupWindowProvider>
           <NotificationProvider>
-            <ErrorHandler>
-              <App/>
-            </ErrorHandler>
+            <App/>
           </NotificationProvider>
         </PopupWindowProvider>
       </ApolloProvider>

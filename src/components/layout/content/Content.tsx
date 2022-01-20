@@ -20,6 +20,7 @@ import {User, UserTypes} from "../../../models/models";
 import DispatcherSettings from "../../../pages/admin/dispatcherSettings/DispatcherSettings";
 import AdminSchedule from "../../../pages/admin/schedule/AdminSchedule";
 import AdminScheduleClassroom from "../../../pages/admin/schedule/AdminScheduleClassroom";
+import ErrorHandler from "../../errorHandler/ErrorHandler";
 
 interface PropTypes {
   isLogged: boolean;
@@ -33,30 +34,34 @@ const Content: React.FC<PropTypes> = ({isLogged}) => {
       {!isLogged
         ? (
           <Switch>
-            <Route path="/" component={Login}/>
+            <ErrorHandler>
+              <Route path="/" component={Login}/>
+            </ErrorHandler>
           </Switch>
         )
 
         : user && (user.type === UserTypes.ADMIN || user.type === UserTypes.DISPATCHER) ? (
           <Switch>
-            <Route exact path="/" component={Classrooms}/>
-            <Route path="/classrooms/:classroomName?" component={Classrooms}/>
-            <Route path="/registry/:userId?" component={Registry}/>
-            <Route path="/schedule" component={Schedule}/>
-            <Route path="/users:userId?" component={Users}/>
-            <Route path="/profile" component={Profile}/>
-            <Route path="/admin" component={Admin}/>
-            <Route path="/adminClassrooms" component={AdminClassrooms}/>
-            <Route path="/adminUsers" component={AdminUsers}/>
-            <Route path="/adminInstruments" component={AdminInstruments}/>
-            <Route path="/adminDepartments" component={AdminDepartments}/>
-            <Route path="/adminFaculties" component={AdminFaculties}/>
-            <Route path="/adminDegrees" component={AdminDegrees}/>
-            <Route exact path="/adminSchedule" component={AdminSchedule}/>
-            <Route path="/adminSchedule/classroom/:classroomName?" component={AdminScheduleClassroom}/>
-            <Route path="/dashboard" component={Dashboard}/>
-            <Route path="/queue" component={Queue}/>
-            <Route path="/dispatcherSettings" component={DispatcherSettings}/>
+            <ErrorHandler>
+              <Route exact path="/" component={Classrooms}/>
+              <Route path="/classrooms/:classroomName?" component={Classrooms}/>
+              <Route path="/registry/:userId?" component={Registry}/>
+              <Route path="/schedule" component={Schedule}/>
+              <Route path="/users:userId?" component={Users}/>
+              <Route path="/profile" component={Profile}/>
+              <Route path="/admin" component={Admin}/>
+              <Route path="/adminClassrooms" component={AdminClassrooms}/>
+              <Route path="/adminUsers" component={AdminUsers}/>
+              <Route path="/adminInstruments" component={AdminInstruments}/>
+              <Route path="/adminDepartments" component={AdminDepartments}/>
+              <Route path="/adminFaculties" component={AdminFaculties}/>
+              <Route path="/adminDegrees" component={AdminDegrees}/>
+              <Route exact path="/adminSchedule" component={AdminSchedule}/>
+              <Route path="/adminSchedule/classroom/:classroomName?" component={AdminScheduleClassroom}/>
+              <Route path="/dashboard" component={Dashboard}/>
+              <Route path="/queue" component={Queue}/>
+              <Route path="/dispatcherSettings" component={DispatcherSettings}/>
+            </ErrorHandler>
           </Switch>
         ) : (
           <Switch>
