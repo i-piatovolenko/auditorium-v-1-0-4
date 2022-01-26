@@ -1,6 +1,13 @@
 import React, {useEffect, useState} from "react";
 import styles from "./classroomInfo.module.css";
-import {ClassroomType, DisabledState, OccupiedState, QueuePolicyTypes, UserTypes} from "../../models/models";
+import {
+  ClassroomType,
+  DisabledState,
+  OccupiedState,
+  QueuePolicyTypes, QueueRecord,
+  QueueState, QueueType,
+  UserTypes
+} from "../../models/models";
 import Instruments from "../instruments/Instruments";
 import Title from "../title/Title";
 import OccupantInfo from "./occupantInfo/OccupantInfo";
@@ -11,7 +18,6 @@ import {client} from "../../api/client";
 import {GET_CLASSROOM} from "../../api/operations/queries/classroom";
 import moment from "moment";
 import {FREE_CLASSROOM} from "../../api/operations/mutations/freeClassroom";
-import ScheduleUnit from "../scheduleUnit/ScheduleUnit";
 import ClassroomSchedule from "../classroomSchedule/ClassroomSchedule";
 
 interface PropTypes {
@@ -66,7 +72,7 @@ const ClassroomInfo: React.FC<PropTypes> = ({
         },
         fetchPolicy: 'network-only'
       }).then(res => {
-        setQueueSize(res.data.classroom.queue?.length);
+        setQueueSize(res.data.classroom.queue?.map((unit:  QueueRecord) => unit.state === QueueState.ACTIVE).length);
       });
     } catch (e) {
       console.log(e);

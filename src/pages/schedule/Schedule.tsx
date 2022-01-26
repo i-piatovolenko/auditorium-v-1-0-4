@@ -83,7 +83,7 @@ const Schedule = () => {
           onChange={handleChangeSearch}
           className={mainStyles.headerDateInput}
         />
-        {accessRights === ACCESS_RIGHTS.ADMIN && <Edit path='/adminSchedule'/>}
+        <Edit path='/adminSchedule'/>
       </Header>
       <div className={styles.wrapper}>
         <div className={styles.scheduleHeader}>

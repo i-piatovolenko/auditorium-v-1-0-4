@@ -82,11 +82,11 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
   const [substitutions, setSubstitutions] = useState(null);
 
   useEffect(() => {
-    if (primaryUnit) {
-      setTimeFrom(formatTimeWithZero(primaryUnit.from));
-      setTimeTo(formatTimeWithZero(primaryUnit.to));
-      setDateStart(moment(primaryUnit.dateStart).format('YYYY-MM-DD'));
-      setDateEnd(moment(primaryUnit.dateEnd).format('YYYY-MM-DD'));
+    if (primaryUnit || unit) {
+      setTimeFrom(formatTimeWithZero((primaryUnit || unit).from));
+      setTimeTo(formatTimeWithZero((primaryUnit || unit).to));
+      setDateStart(moment((primaryUnit || unit).dateStart).format('YYYY-MM-DD'));
+      setDateEnd(moment((primaryUnit || unit).dateEnd).format('YYYY-MM-DD'));
     }
   }, [primaryUnit]);
 
@@ -541,7 +541,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
             <>
               <Button onClick={() => setEditMode(false)} color='red'>Відміна</Button>
               <Button
-                disabled={!!dateError || !!overlapsError || !selectedUser}
+                disabled={!selectedUser}
                 onClick={handleSaveChanges}
               >
                 Зберегти
@@ -552,7 +552,7 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
             <>
               <Button onClick={() => dispatch({type: 'POP_POPUP_WINDOW'})} color='red'>Відміна</Button>
               <Button
-                disabled={!!dateError || !!overlapsError || !selectedUser}
+                disabled={!selectedUser}
                 onClick={submitCreateUnit}
               >
                 Створити
