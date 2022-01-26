@@ -21,6 +21,13 @@ import handleOperation from "../../../../helpers/handleOperation";
 import {UPDATE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/updateScheduleUnit";
 import {CREATE_SCHEDULE_UNIT} from "../../../../api/operations/mutations/createScheduleUnit";
 import {GET_SCHEDULE_SUBSTITUTIONS_UNITS} from "../../../../api/operations/queries/scheduleSubUnits";
+import {
+  CONSTANTLY_END_DATE,
+  CONSTANTLY_START_DATE,
+  FIRST_SEMESTER_END_DATE,
+  FIRST_SEMESTER_START_DATE, SECOND_SEMESTER_END_DATE,
+  SECOND_SEMESTER_START_DATE
+} from "../../../../helpers/constants";
 
 type HeaderPropTypes = {
   title: string
@@ -75,8 +82,8 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
   const [updatePrimaryError, setUpdatePrimaryError] = useState(false);
   const [substitutionError, setSubstitutionError] = useState(false);
   const [overlapsError, setOverLapsError] = useState(false);
-  const [dateStart, setDateStart] = useState(moment().format('YYYY-MM-DD'));
-  const [dateEnd, setDateEnd] = useState(moment().format('YYYY-MM-DD'));
+  const [dateStart, setDateStart] = useState(CONSTANTLY_START_DATE);
+  const [dateEnd, setDateEnd] = useState(CONSTANTLY_END_DATE);
   const [timeFrom, setTimeFrom] = useState('08:00');
   const [timeTo, setTimeTo] = useState('15:00');
   const [substitutions, setSubstitutions] = useState(null);
@@ -423,6 +430,21 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
     }
   };
 
+  const setFirstSemester = () => {
+    setDateStart(FIRST_SEMESTER_START_DATE);
+    setDateEnd(FIRST_SEMESTER_END_DATE);
+  };
+
+  const setSecondSemester = () => {
+    setDateStart(SECOND_SEMESTER_START_DATE);
+    setDateEnd(SECOND_SEMESTER_END_DATE);
+  };
+
+  const setConstantly = () => {
+    setDateStart(CONSTANTLY_START_DATE);
+    setDateEnd(CONSTANTLY_END_DATE);
+  };
+
   return (
     <>
       {/*{primaryCreateMode && <p>primaryCreateMode</p>}*/}
@@ -471,6 +493,31 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
                 menuPortalTarget={document.body}
                 styles={{menuPortal: base => ({...base, zIndex: 9999})}}
               />
+            </label>
+            <label>
+              <span/>
+              <div className={styles.dataHints}>
+                <div>
+                  <Button
+                    onClick={setConstantly}
+                    disabled={dateStart === CONSTANTLY_START_DATE && dateEnd === CONSTANTLY_END_DATE}
+                  >
+                    Постійно (до 2099р.)
+                  </Button>
+                  <Button
+                    onClick={setFirstSemester}
+                    disabled={dateStart === FIRST_SEMESTER_START_DATE && dateEnd === FIRST_SEMESTER_END_DATE}
+                  >
+                    1-й семестр {moment().format('YYYY') + 'р.'}
+                  </Button>
+                  <Button
+                    onClick={setSecondSemester}
+                    disabled={dateStart === SECOND_SEMESTER_START_DATE && dateEnd === SECOND_SEMESTER_END_DATE}
+                  >
+                    2-й семестр {moment().format('YYYY') + 'р.'}
+                  </Button>
+                </div>
+              </div>
             </label>
             <label>
               Дата (від):

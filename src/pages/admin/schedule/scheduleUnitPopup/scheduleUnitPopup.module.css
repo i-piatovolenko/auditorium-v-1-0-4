@@ -76,3 +76,19 @@
     width: fit-content;
     white-space: nowrap;
 }
+
+.dataHints {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dataHints div {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 8px;
+}
+
+.dataHints div button {
+    height: 30px;
+}

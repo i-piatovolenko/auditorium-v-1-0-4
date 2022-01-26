@@ -11,12 +11,13 @@ import ScheduleUnitPopup from './scheduleUnitPopup/ScheduleUnitPopup';
 import {useNotification} from "../../../components/notification/NotificationProvider";
 import {useQuery} from "@apollo/client";
 import Back from "../../../components/icons/back/Back";
+import moment from "moment";
 
 const DAY_OF_WEEKS = ['Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота', 'Неділя'];
 
 const AdminScheduleClassroom = () => {
   const {classroomName}: any = useParams();
-  const [chosenDay, setChosenDay] = useState(0);
+  const [chosenDay, setChosenDay] = useState(moment().weekday() - 1);
   const days = new Array(24).fill(null);
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
