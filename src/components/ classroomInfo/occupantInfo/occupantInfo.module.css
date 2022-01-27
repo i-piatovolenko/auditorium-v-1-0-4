@@ -7,6 +7,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
+    min-height: 120px;
   }
 }
 
@@ -18,7 +19,13 @@
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    min-height: 120px;
+    margin-right: 8px;
   }
+}
+
+.cards {
+  display: flex;
 }
 
 .occupantType {
@@ -71,4 +78,30 @@
   margin: 0;
   padding: 5px 0 0 0;
   font-family: "Roboto Light";
+}
+
+.keyHolderStatus {
+  background-color: #f91354;
+  width: 130px;
+  margin: 4px 0 8px;
+  border-radius: 6px;
+  padding: 2px 5px;
+  font-size: .9rem;
+  color: #ffffff;
+  overflow: hidden;
+  position: relative;
+}
+
+.keyHolderStatus::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 130px;
+  height: 100%;
+  background-image: url("../../../assets/images/key.png");
+  background-repeat: no-repeat;
+  background-size: 16px;
+  background-position: right center;
+  filter: invert(1);
 }

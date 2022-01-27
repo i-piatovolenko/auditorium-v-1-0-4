@@ -114,6 +114,8 @@ export type EmployeeInfo = {
 export type OccupiedInfo = {
   id: number;
   user: User | null;
+  keyHolder: User | null;
+  keyHolderId: number;
   until: string;
   state: OccupiedState;
   classroom: ClassroomType;

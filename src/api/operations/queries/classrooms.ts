@@ -29,6 +29,19 @@ export const GET_CLASSROOMS = gql`
               name
           }
         }
+          keyHolder {
+          id
+          firstName
+          patronymic
+          lastName
+          type
+          nameTemp
+          email
+          phoneNumber
+          department {
+              name
+          }
+        }
         until
         state
       }

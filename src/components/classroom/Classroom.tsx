@@ -1,23 +1,17 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import styles from "./classroom.module.css";
 import {
   ClassroomType,
   DisabledState,
   OccupiedInfo,
   OccupiedState,
-  OccupiedStateUa,
-  QueuePolicyTypes, ScheduleUnitType,
+  QueuePolicyTypes,
+  ScheduleUnitType,
   User,
   UserTypes,
   UserTypesUa,
 } from "../../models/models";
-import {
-  defineOccupyStatus,
-  fullName, getBriefString,
-  isClassroomNotFree,
-  shouldOccupiedByTeacher,
-  typeStyle
-} from "../../helpers/helpers";
+import {defineOccupyStatus, fullName, getBriefString, isClassroomNotFree, typeStyle} from "../../helpers/helpers";
 import Instruments from "../instruments/Instruments";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
@@ -43,7 +37,9 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
     id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
     isHidden, disabled, queueInfo: {queuePolicy: {policy, queueAllowedDepartments}}
   } = classroom;
-  const userFullName = fullName(occupied.user as User, true);
+  const occupiedUser = occupied.state === OccupiedState.RESERVED ? occupied.user :  occupied.keyHolder
+    ? occupied.keyHolder : occupied.user;
+  const userFullName = fullName(occupiedUser as User, true);
   const dispatchPopupWindow = usePopupWindow();
   const [isOverdue, setIsOverDue] = useState(false);
   // const occupiedOnSchedule = isOccupiedOnSchedule(schedule);
@@ -168,7 +164,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
           variables: {
             input: {
               classroomName: String(name),
-              until: moment().add(1, 'hours').toISOString(),
+              until: moment().set('hours', 23).set('minutes', 59).toISOString(),
               comment: 'За розкладом'
             }
           }
@@ -197,7 +193,7 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
               src={disabled?.state === DisabledState.DISABLED ? lockIcon : unlockIcon}
               alt={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати'}
               className={disabled?.state === DisabledState.DISABLED ? styles.lockIcon : styles.unlockIcon}
-              title={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати за розкладом на 1 год.'}
+              title={disabled?.state === DisabledState.DISABLED ? 'Разблокувати' : 'Заблокувати за до кінця дня'}
               onClick={toggleDisable}
             />
           )}
@@ -206,8 +202,8 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
           {isClassroomNotFree(occupied) && (
             <div className={styles.occupantInfo}>
               <p className={styles.occupantName} title={userFullName}>{userFullName}</p>
-              <p style={typeStyle(occupied as OccupiedInfo)} className={styles.occupantType}>
-                {UserTypesUa[occupied.user?.type as UserTypes]}
+              <p style={typeStyle(occupiedUser as User)} className={styles.occupantType}>
+                {UserTypesUa[occupiedUser?.type as UserTypes]}
               </p>
             </div>
           )}

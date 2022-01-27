@@ -40,6 +40,8 @@ const Footer: React.FC<PropTypes> = ({
                                      }) => {
     const [confirmSanctions, setConfirmSanction] = useState(false);
     const [isOccupiedOverdue, setIsOccupiedOverdue] = useState(false);
+    const occupiedUser = occupied.state === OccupiedState.RESERVED ? occupied.user : occupied.keyHolder
+      ? occupied.keyHolder : occupied.user;
     const [freeClassroom] = useMutation(FREE_CLASSROOM, {
       variables: {
         input: {
@@ -75,9 +77,9 @@ const Footer: React.FC<PropTypes> = ({
 
     useEffect(() => {
       const isOverdueByStudent = occupied.state === OccupiedState.OCCUPIED &&
-        isStudent(occupied.user.type as UserTypes) && isTimeout(occupied.until);
+        isStudent(occupiedUser.type as UserTypes) && isTimeout(occupied.until);
       setIsOccupiedOverdue(isOverdueByStudent as boolean);
-    }, [occupied.state, occupied.user, occupied.until]);
+    }, [occupied.state, occupiedUser, occupied.until]);
 
     const handleFreeClassroom = async (name: string, freeMutationOnly = true) => {
       const {data: {disabledTime}} = await client.query({
@@ -160,47 +162,47 @@ const Footer: React.FC<PropTypes> = ({
     };
 
     const submitDisable = async (comment: string, until: string) => {
-        try {
-          const result = await client.mutate({
-            mutation: DISABLE_CLASSROOM,
-            variables: {
-              input: {
-                classroomName: String(classroomName),
-                comment: comment || 'За розкладом',
-                until: moment(until).toISOString()
-              }
-            },
-          });
-          if (result.data.disableClassroom.userErrors.length) {
-            result.data.disableClassroom.userErrors.forEach(({message}: any) => {
-              dispatchNotification({
-                header: "Помилка",
-                message,
-                type: "alert",
-              });
-            })
-          } else {
+      try {
+        const result = await client.mutate({
+          mutation: DISABLE_CLASSROOM,
+          variables: {
+            input: {
+              classroomName: String(classroomName),
+              comment: comment || 'За розкладом',
+              until: moment(until).toISOString()
+            }
+          },
+        });
+        if (result.data.disableClassroom.userErrors.length) {
+          result.data.disableClassroom.userErrors.forEach(({message}: any) => {
             dispatchNotification({
-              header: "Успішно!",
-              message: `Аудиторія ${classroomName} заблокована.`,
-              type: "ok",
+              header: "Помилка",
+              message,
+              type: "alert",
             });
-          }
-          //@ts-ignore
-          props.dispatch({
-            type: "POP_POPUP_WINDOW",
-          });
-          //@ts-ignore
-          props.dispatch({
-            type: "POP_POPUP_WINDOW",
-          });
-        } catch (e: any) {
+          })
+        } else {
           dispatchNotification({
-            header: "Помилка!",
-            message: e.message,
-            type: "alert",
+            header: "Успішно!",
+            message: `Аудиторія ${classroomName} заблокована.`,
+            type: "ok",
           });
         }
+        //@ts-ignore
+        props.dispatch({
+          type: "POP_POPUP_WINDOW",
+        });
+        //@ts-ignore
+        props.dispatch({
+          type: "POP_POPUP_WINDOW",
+        });
+      } catch (e: any) {
+        dispatchNotification({
+          header: "Помилка!",
+          message: e.message,
+          type: "alert",
+        });
+      }
     };
 
     const handleDisableClassroom = () => {
@@ -254,7 +256,7 @@ const Footer: React.FC<PropTypes> = ({
         query: GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID,
         variables: {
           where: {
-            id: occupied.user.id
+            id: occupiedUser.id
           }
         }
       })
@@ -272,7 +274,7 @@ const Footer: React.FC<PropTypes> = ({
             </>
           ) :
           (
-            <span>{`Підтвердіть видачу ключа для ${fullName(occupied.user, true)}`}</span>
+            <span>{`Підтвердіть видачу ключа для ${fullName(occupiedUser, true)}`}</span>
           ),
         footer: <ConfirmFooter onOk={() => handleGiveOutKey(occupiedClassroom)}/>,
         isConfirm: true
@@ -346,17 +348,16 @@ const Footer: React.FC<PropTypes> = ({
               <Button onClick={handlePassClassroom}>
                 Передати
               </Button>
-              <Button onClick={confirmFreeClassroom} disabled={disabled} color='red'>
-                Звільнити {confirmSanctions ? '(з санкціями)' : ''}
-              </Button>
+              {!(occupied.state === OccupiedState.RESERVED && occupied.keyHolder) && (
+                <Button onClick={confirmFreeClassroom} disabled={disabled} color='red'>
+                  Звільнити {confirmSanctions ? '(з санкціями)' : ''}
+                </Button>
+              )}
               {occupied.state === OccupiedState.RESERVED && (
-                <>
-                  <Button onClick={confirmGiveOutKey} disabled={disabled}
-                          style={{padding: '0 40px', height: '2.5rem'}}>
-                    Видати ключ
-                  </Button>
-
-                </>
+                <Button onClick={confirmGiveOutKey} disabled={disabled}
+                        style={{padding: '0 40px', height: '2.5rem'}}>
+                  Видати ключ
+                </Button>
               )}
             </div>
           </>

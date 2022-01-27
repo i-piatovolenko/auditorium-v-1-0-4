@@ -126,7 +126,12 @@ const ClassroomInfo: React.FC<PropTypes> = ({
         </>
       )}
       {isClassroomNotFree(occupied) && !isPassed ? (
-        <OccupantInfo occupied={occupied}/>
+        <OccupantInfo
+          occupied={occupied}
+          classroomName={name}
+          dispatchNotification={dispatchNotification}
+          dispatch={dispatch}
+        />
       ) : (
         <>
           <Title title="Запис в аудиторію"/>

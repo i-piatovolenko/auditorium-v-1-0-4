@@ -1,8 +1,12 @@
 import {HOUR, MINUTE, TIME_SNIPPETS, WORKING_DAY_END, WORKING_DAY_START,} from "./constants";
 import {
-  ACCESS_RIGHTS, ClassroomType, DisabledState,
+  ACCESS_RIGHTS,
+  ClassroomType,
+  DisabledState,
   OccupiedInfo,
-  OccupiedState, OccupiedStateUa, QueuePolicyTypes,
+  OccupiedState,
+  OccupiedStateUa,
+  QueuePolicyTypes,
   ScheduleUnitType,
   StudentAccountStatus,
   User,
@@ -93,15 +97,15 @@ export const fullName = (user: User, withInitials = false) => {
   return "";
 };
 
-export const typeStyle = (occupied: OccupiedInfo) => {
+export const typeStyle = (occupiedUser: User) => {
   const student = {backgroundColor: "rgba(46,40,124)", color: "#fff"};
   const employee = {backgroundColor: "#ffc000", color: "#fff"};
   const vacant = {
     backgroundColor: "transparent",
     color: "#000",
   };
-  if (occupied !== null) {
-    switch (occupied.user?.type) {
+  if (occupiedUser !== null) {
+    switch (occupiedUser?.type) {
       case UserTypes.STUDENT:
         return student;
       case UserTypes.POST_GRADUATE:
@@ -186,7 +190,6 @@ export const getScheduleUnitSize = (
   return items.map((item) => `${(item / percent).toFixed(1)}%`).join(" ");
 };
 //get schedule units size in fr units for grids
-
 
 export const ISODateString = (d: Date) => {
   function pad(n: any) {
@@ -329,8 +332,14 @@ export const defineOccupyStatus = (classroom: ClassroomType, scheduleUnits: Sche
   if (disabled?.state === DisabledState.DISABLED) {
     return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');
   }
-  if (isClassroomNotFree(occupied)) return OccupiedStateUa[occupied?.state as OccupiedState];
-  return shouldOccupiedByTeacher(classroom.name, scheduleUnits)
+  if (isClassroomNotFree(occupied)) {
+    if (occupied.state === OccupiedState.RESERVED && occupied.keyHolder) {
+     return OccupiedStateUa[occupied?.state as OccupiedState]
+       + ` (ключ в класі у ${fullName(occupied.keyHolder, true)})`;
+    }
+    return OccupiedStateUa[occupied?.state as OccupiedState];
+  }
+  return shouldOccupiedByTeacher(classroom.name, scheduleUnits);
 };
 
 export const formatTimeWithZero = (time: string) => {

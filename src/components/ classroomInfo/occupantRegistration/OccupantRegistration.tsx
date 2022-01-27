@@ -193,9 +193,10 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         variables: {
           input: {
             classroomName: classroomName.toString(),
-            until: !isStudent(chosenUserType.value) || until === -1
-              ? moment().set('hours', 23).set('minutes', 59).set('seconds', 59).toISOString()
-              : moment().add(until, 'hours').toISOString(),
+            until: moment().add('minutes', 1).toISOString(),
+            // until: !isStudent(chosenUserType.value) || until === -1
+            //   ? moment().set('hours', 23).set('minutes', 59).set('seconds', 59).toISOString()
+            //   : moment().add(until, 'hours').toISOString(),
             ...occupant
           }
         }
