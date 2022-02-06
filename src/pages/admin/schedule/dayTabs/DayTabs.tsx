@@ -1,5 +1,6 @@
 import React, {FC} from 'react';
 import styles from './dayTabs.module.css';
+import moment from "moment";
 
 type PropTypes = {
   chosenDay: number,

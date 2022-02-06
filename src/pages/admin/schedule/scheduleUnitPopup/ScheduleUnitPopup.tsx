@@ -28,6 +28,7 @@ import {
   FIRST_SEMESTER_START_DATE, SECOND_SEMESTER_END_DATE,
   SECOND_SEMESTER_START_DATE
 } from "../../../../helpers/constants";
+import {type} from "os";
 
 type HeaderPropTypes = {
   title: string
@@ -186,50 +187,54 @@ const ScheduleUnitPopupBody: FC<BodyPropTypes> = (
   };
 
   const handleDateStartChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDateStart(e.target.value);
+    const newValue = e.target.value || dateStart;
+    setDateStart(newValue);
 
     const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
-    const error = hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, units, timeFrom, timeTo)
-      || hasOverlappedUnits(e.target.value, dateEnd, timeFrom, timeTo, units);
+    const error = hasUnitDateTimeIntersection(newValue, unit?.id || -1, units, timeFrom, timeTo)
+      || hasOverlappedUnits(newValue, dateEnd, timeFrom, timeTo, units);
     setDateError(error);
-    isPrimaryUnitUpdateError(e.target.value, undefined, undefined, undefined);
-    isSubstitutionUpdateOrCreateError(e.target.value, undefined, undefined, undefined);
+    isPrimaryUnitUpdateError(newValue, undefined, undefined, undefined);
+    isSubstitutionUpdateOrCreateError(newValue, undefined, undefined, undefined);
   };
 
   const handleDateEndChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDateEnd(e.target.value);
+    const newValue = e.target.value || dateEnd;
+    setDateEnd(newValue);
 
     const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
-    const error = hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, units, timeFrom, timeTo)
-      || hasOverlappedUnits(dateStart, e.target.value, timeFrom, timeTo, units);
+    const error = hasUnitDateTimeIntersection(newValue, unit?.id || -1, units, timeFrom, timeTo)
+      || hasOverlappedUnits(dateStart, newValue, timeFrom, timeTo, units);
     setDateError(error);
-    setDateError(hasUnitDateTimeIntersection(e.target.value, unit?.id || -1, units, timeFrom, timeTo));
-    isPrimaryUnitUpdateError(undefined, e.target.value, undefined, undefined);
-    isSubstitutionUpdateOrCreateError(undefined, e.target.value, undefined, undefined);
+    setDateError(hasUnitDateTimeIntersection(newValue, unit?.id || -1, units, timeFrom, timeTo));
+    isPrimaryUnitUpdateError(undefined, newValue, undefined, undefined);
+    isSubstitutionUpdateOrCreateError(undefined, newValue, undefined, undefined);
   };
 
   const handleFromTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTimeFrom(e.target.value);
+    const newValue = e.target.value || timeFrom;
+    setTimeFrom(newValue);
 
     const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
-    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, e.target.value, timeTo)
-      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, e.target.value, timeTo)
-      || hasOverlappedUnits(dateStart, dateEnd, e.target.value, timeTo, units);
+    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, newValue, timeTo)
+      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, newValue, timeTo)
+      || hasOverlappedUnits(dateStart, dateEnd, newValue, timeTo, units);
     setDateError(isError);
-    isPrimaryUnitUpdateError(undefined, undefined, e.target.value, undefined);
-    isSubstitutionUpdateOrCreateError(undefined, undefined, e.target.value, undefined);
+    isPrimaryUnitUpdateError(undefined, undefined, newValue, undefined);
+    isSubstitutionUpdateOrCreateError(undefined, undefined, newValue, undefined);
   };
 
   const handleToTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTimeTo(e.target.value);
+    const newValue = e.target.value || timeTo;
+    setTimeTo(newValue);
 
     const units = primaryUpdateMode || primaryCreateMode ? allUnits : substitutions;
-    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, timeFrom, e.target.value)
-      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, timeFrom, e.target.value)
-      || hasOverlappedUnits(dateStart, dateEnd, timeFrom, e.target.value, units);
+    const isError = hasUnitDateTimeIntersection(dateStart, unit?.id || -1, units, timeFrom, newValue)
+      || hasUnitDateTimeIntersection(dateEnd, unit?.id || -1, units, timeFrom, newValue)
+      || hasOverlappedUnits(dateStart, dateEnd, timeFrom, newValue, units);
     setDateError(isError);
-    isPrimaryUnitUpdateError(undefined, undefined, undefined, e.target.value);
-    isSubstitutionUpdateOrCreateError(undefined, undefined, undefined, e.target.value);
+    isPrimaryUnitUpdateError(undefined, undefined, undefined, newValue);
+    isSubstitutionUpdateOrCreateError(undefined, undefined, undefined, newValue);
   };
 
   const handleCreateUnit = () => {

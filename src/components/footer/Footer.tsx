@@ -353,7 +353,7 @@ const Footer: React.FC<PropTypes> = ({
                   Звільнити {confirmSanctions ? '(з санкціями)' : ''}
                 </Button>
               )}
-              {occupied.state === OccupiedState.RESERVED && (
+              {occupied.state === OccupiedState.RESERVED && !(occupied.keyHolder) && (
                 <Button onClick={confirmGiveOutKey} disabled={disabled}
                         style={{padding: '0 40px', height: '2.5rem'}}>
                   Видати ключ

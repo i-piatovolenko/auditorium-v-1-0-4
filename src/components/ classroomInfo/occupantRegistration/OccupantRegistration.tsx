@@ -193,7 +193,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         variables: {
           input: {
             classroomName: classroomName.toString(),
-            until: moment().add('minutes', 1).toISOString(),
+            until: moment().add('seconds', 30).toISOString(),
             // until: !isStudent(chosenUserType.value) || until === -1
             //   ? moment().set('hours', 23).set('minutes', 59).set('seconds', 59).toISOString()
             //   : moment().add(until, 'hours').toISOString(),
@@ -230,6 +230,18 @@ const OccupantRegistration: React.FC<PropTypes> = ({
     }
   };
 
+  const filterOption = (option: {value: string, label: string}, inputValue:string) => {
+    const strings = option.label.split(' ');
+    const id = strings[0].trim().toLowerCase();
+    const lastName = strings[1].trim().toLowerCase();
+    let exceptLastName = strings;
+    exceptLastName.splice(1, 1);
+    const input = inputValue.trim().toLowerCase();
+
+    return id.includes(input) || lastName.includes(input)
+      // || exceptLastName.join(' ').toLowerCase().includes(input);
+  };
+
   return (
     <div>
       <form
@@ -244,6 +256,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
           styles={{menuPortal: base => ({...base, zIndex: 9999})}}
           menuPortalTarget={document.body}
           onChange={handleExistingUser}
+          filterOption={filterOption}
           onFocus={handleReset}
           ref={existingUserInput}
         />

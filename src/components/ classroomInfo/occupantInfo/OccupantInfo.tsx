@@ -1,11 +1,6 @@
 import React, {FC} from "react";
 import styles from "./occupantInfo.module.css";
-import {
-  OccupiedInfo, OccupiedState,
-  OccupiedStateUa, User,
-  UserTypes,
-  UserTypesUa,
-} from "../../../models/models";
+import {OccupiedInfo, OccupiedState, OccupiedStateUa, User, UserTypes, UserTypesUa,} from "../../../models/models";
 import Title from "../../title/Title";
 import {fullName, typeStyle} from "../../../helpers/helpers";
 import {usePopupWindow} from "../../popupWindow/PopupWindowProvider";
@@ -14,7 +9,7 @@ import Button from "../../button/Button";
 import {FREE_CLASSROOM} from "../../../api/operations/mutations/freeClassroom";
 import {client} from "../../../api/client";
 import handleOperation from "../../../helpers/handleOperation";
-import {GET_KEY_FROM_KEY_HOLDER} from "../../../api/operations/mutations/getKeyFromKeyHolder";
+import {RELEASE_KEY_HOLDER} from "../../../api/operations/mutations/releaseKeyHolder";
 
 type PropTypes = {
   occupied: OccupiedInfo;
@@ -38,17 +33,17 @@ const OccupantInfo: FC<PropTypes> = ({occupied, classroomName, dispatchNotificat
     });
   };
 
-  const getClassroomKeyFromKeyHolder = async () => {
+  const releaseKeyHolder = async () => {
     try {
       const result = await client.mutate({
-        mutation: GET_KEY_FROM_KEY_HOLDER,
+        mutation: RELEASE_KEY_HOLDER,
         variables: {
           input: {
             classroomName: String(classroomName)
           }
         }
       });
-      handleOperation(result, 'getKeyFromKeyHolder', dispatchNotification, dispatch,
+      handleOperation(result, 'ReleaseKeyHolder', dispatchNotification, dispatch,
         `Користувач віддав ключ.`);
     } catch (e: any) {
       dispatchNotification({
@@ -82,30 +77,34 @@ const OccupantInfo: FC<PropTypes> = ({occupied, classroomName, dispatchNotificat
 
   const UserCard: FC<UserCardPropTypes> = ({user, isKeyHolder = false}) => (
     <div onClick={() => onClick(user)} className={styles.occupantCard}>
-      <div className={styles.occupantName}>
-        <div className={styles.icon}/>
-        <p>{fullName(user)}</p>
-      </div>
-      <p style={typeStyle(user)} className={styles.occupantType}>
-        {UserTypesUa[user.type as UserTypes]}
-      </p>
-      {!isKeyHolder ? (
+      <div>
+        <div className={styles.occupantName}>
+          <div className={styles.icon}/>
+          <p>{fullName(user)}</p>
+        </div>
+        <p style={typeStyle(user)} className={styles.occupantType}>
+          {UserTypesUa[user.type as UserTypes]}
+        </p>
         <p className={styles.state}>
-          Статус: {OccupiedStateUa[occupied.state].toLowerCase()}
+          Статус: {isKeyHolder ? 'власник ключа' : OccupiedStateUa[occupied.state].toLowerCase()}
         </p>
-      ) : (
-        <p className={styles.keyHolderStatus}>
-          Власник ключа
-        </p>
-      )}
+      </div>
       {isKeyHolder ? (
-        <Button onClick={getClassroomKeyFromKeyHolder}>
-          Здав ключ
-        </Button>
-      ) : occupied.state === OccupiedState.RESERVED && occupied.keyHolder && (
-        <Button onClick={freeClassroom}>
-          Звільнити
-        </Button>
+        <div className={styles.controlButtons}>
+          <Button onClick={releaseKeyHolder} color="red">
+            Звільнити (здає ключ)
+          </Button>
+        </div>
+      ) : (occupied.state === OccupiedState.RESERVED ||
+        occupied.state === OccupiedState.PENDING) && occupied.keyHolder && (
+        <div className={styles.controlButtons}>
+          <Button onClick={freeClassroom} color="red">
+            Звільнити
+          </Button>
+          <Button onClick={freeClassroom}>
+            Видати ключ
+          </Button>
+        </div>
       )}
     </div>
   )
@@ -114,11 +113,12 @@ const OccupantInfo: FC<PropTypes> = ({occupied, classroomName, dispatchNotificat
     <>
       <Title title="Ким зайнято"/>
       <div className={styles.cards}>
+        {!!occupied.keyHolder && (occupied.state === OccupiedState.RESERVED ||
+          occupied.state === OccupiedState.PENDING) && (
+          <UserCard user={occupied.keyHolder} isKeyHolder/>
+        )}
         {!!occupied.user && (
           <UserCard user={occupied.user}/>
-        )}
-        {!!occupied.keyHolder && occupied.state === OccupiedState.RESERVED && (
-          <UserCard user={occupied.keyHolder} isKeyHolder/>
         )}
       </div>
     </>
