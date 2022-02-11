@@ -337,6 +337,10 @@ export const defineOccupyStatus = (classroom: ClassroomType, scheduleUnits: Sche
      return OccupiedStateUa[occupied?.state as OccupiedState]
        + ` (ключ в класі у ${fullName(occupied.keyHolder, true)})`;
     }
+    if (occupied.state === OccupiedState.PENDING && occupied.keyHolder) {
+      return OccupiedStateUa[occupied?.state as OccupiedState]
+        + ` (ключ в класі у ${fullName(occupied.keyHolder, true)})`;
+    }
     return OccupiedStateUa[occupied?.state as OccupiedState];
   }
   return shouldOccupiedByTeacher(classroom.name, scheduleUnits);

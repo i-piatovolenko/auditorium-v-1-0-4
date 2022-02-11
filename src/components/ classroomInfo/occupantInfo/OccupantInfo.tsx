@@ -6,10 +6,7 @@ import {fullName, typeStyle} from "../../../helpers/helpers";
 import {usePopupWindow} from "../../popupWindow/PopupWindowProvider";
 import UserProfile from "../../userProfile/UserProfile";
 import Button from "../../button/Button";
-import {FREE_CLASSROOM} from "../../../api/operations/mutations/freeClassroom";
-import {client} from "../../../api/client";
-import handleOperation from "../../../helpers/handleOperation";
-import {RELEASE_KEY_HOLDER} from "../../../api/operations/mutations/releaseKeyHolder";
+import {useClassroomActions} from "../../../helpers/useClassroomActions";
 
 type PropTypes = {
   occupied: OccupiedInfo;
@@ -25,54 +22,17 @@ type UserCardPropTypes = {
 
 const OccupantInfo: FC<PropTypes> = ({occupied, classroomName, dispatchNotification, dispatch}) => {
   const dispatchPopupWindow = usePopupWindow();
+  const {
+    releaseKeyHolder,
+    confirmFree,
+    confirmGiveOutKey
+  } = useClassroomActions(classroomName, dispatchNotification, dispatchPopupWindow, dispatch);
 
   const onClick = (user: User) => {
     dispatchPopupWindow({
       header: <h1>{fullName(user)}</h1>,
       body: <UserProfile userId={user.id}/>,
     });
-  };
-
-  const releaseKeyHolder = async () => {
-    try {
-      const result = await client.mutate({
-        mutation: RELEASE_KEY_HOLDER,
-        variables: {
-          input: {
-            classroomName: String(classroomName)
-          }
-        }
-      });
-      handleOperation(result, 'ReleaseKeyHolder', dispatchNotification, dispatch,
-        `Користувач віддав ключ.`);
-    } catch (e: any) {
-      dispatchNotification({
-        header: "Помилка",
-        message: e.message,
-        type: "alert",
-      });
-    }
-  };
-
-  const freeClassroom = async () => {
-    try {
-      const result = await client.mutate({
-        mutation: FREE_CLASSROOM,
-        variables: {
-          input: {
-            classroomName: String(classroomName)
-          }
-        }
-      });
-      handleOperation(result, 'freeClassroom', dispatchNotification, dispatch,
-        `Аудиторія ${classroomName} звільнена.`);
-    } catch (e: any) {
-      dispatchNotification({
-        header: "Помилка",
-        message: e.message,
-        type: "alert",
-      });
-    }
   };
 
   const UserCard: FC<UserCardPropTypes> = ({user, isKeyHolder = false}) => (
@@ -91,19 +51,30 @@ const OccupantInfo: FC<PropTypes> = ({occupied, classroomName, dispatchNotificat
       </div>
       {isKeyHolder ? (
         <div className={styles.controlButtons}>
-          <Button onClick={releaseKeyHolder} color="red">
+          <Button onClick={(e) => {
+            e.stopPropagation();
+            releaseKeyHolder();
+          }} color="red">
             Звільнити (здає ключ)
           </Button>
         </div>
       ) : (occupied.state === OccupiedState.RESERVED ||
         occupied.state === OccupiedState.PENDING) && occupied.keyHolder && (
         <div className={styles.controlButtons}>
-          <Button onClick={freeClassroom} color="red">
+          <Button onClick={(e) => {
+            e.stopPropagation();
+            confirmFree();
+          }} color="red">
             Звільнити
           </Button>
-          <Button onClick={freeClassroom}>
-            Видати ключ
-          </Button>
+          {occupied.state !== OccupiedState.PENDING && (
+            <Button onClick={(e) => {
+              e.stopPropagation();
+              confirmGiveOutKey(occupied.user);
+            }}>
+              Видати ключ
+            </Button>
+          )}
         </div>
       )}
     </div>

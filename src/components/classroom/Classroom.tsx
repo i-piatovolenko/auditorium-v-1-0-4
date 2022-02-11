@@ -3,7 +3,6 @@ import styles from "./classroom.module.css";
 import {
   ClassroomType,
   DisabledState,
-  OccupiedInfo,
   OccupiedState,
   QueuePolicyTypes,
   ScheduleUnitType,
@@ -37,7 +36,8 @@ const Classroom: React.FC<PropTypes> = ({classroom, dispatchNotification, index}
     id, name, occupied, instruments, isWing, isOperaStudio, special, schedule, chair,
     isHidden, disabled, queueInfo: {queuePolicy: {policy, queueAllowedDepartments}}
   } = classroom;
-  const occupiedUser = occupied.state === OccupiedState.RESERVED ? occupied.user : occupied.keyHolder
+  const occupiedUser = (occupied.state === OccupiedState.RESERVED
+    || occupied.state === OccupiedState.PENDING) ? occupied.user : occupied.keyHolder
     ? occupied.keyHolder : occupied.user;
   const userFullName = fullName(occupiedUser as User, true);
   const dispatchPopupWindow = usePopupWindow();
