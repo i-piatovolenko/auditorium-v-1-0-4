@@ -6,7 +6,7 @@ import {getMainDefinition} from "@apollo/client/utilities";
 import {onError} from "@apollo/client/link/error";
 
 const wsLink: any = new WebSocketLink({
-  uri: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_WSS_BASE_URL : process.env.REACT_APP_STG_WSS_BASE_URL,
+  uri: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_WSS_BASE_URL : process.env.REACT_APP_PROD_WSS_BASE_URL,
   options: {
     reconnect: true,
     lazy: true,
@@ -30,7 +30,7 @@ const subscriptionMiddleware = {
 wsLink.subscriptionClient.use([subscriptionMiddleware]);
 
 const httpLink = createHttpLink({
-  uri: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_HTTPS_BASE_URL : process.env.REACT_APP_STG_HTTPS_BASE_URL
+  uri: process.env.NODE_ENV === 'production' ? process.env.REACT_APP_PROD_HTTPS_BASE_URL : process.env.REACT_APP_PROD_HTTPS_BASE_URL
 });
 
 const authLink = setContext((_, {headers}) => {
