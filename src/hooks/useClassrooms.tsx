@@ -8,13 +8,12 @@ const useClassrooms = (): [Array<ClassroomType>, any] => {
   const {data, loading, error, subscribeToMore} = useQuery(GET_CLASSROOMS);
 
   useEffect(() => {
-    // if(error && JSON.stringify(error).includes('BAD_TOKEN')) handleLogout();
     !loading && !error && setClassrooms(
       data.classrooms
         .slice()
         .sort(
           (a: ClassroomType, b: ClassroomType) =>
-            a.name.localeCompare(b.name, undefined, {numeric: true, sensitivity: 'base'})
+            parseInt(a.name) - parseInt(b.name)
         )
     );
 }, [data, loading, error]);

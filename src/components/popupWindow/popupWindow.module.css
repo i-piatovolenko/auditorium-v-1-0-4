@@ -18,14 +18,7 @@
     box-shadow: 0px 0px 10px 10px rgba(0, 0, 0, 0.07);
     overflow-x: hidden;
     overflow-y: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
   }
-
-  .modal::-webkit-scrollbar {
-    display: none;
-  }
-
   .sider {
     display: none;
   }
@@ -60,16 +53,9 @@
     overflow: hidden;
     overflow-x: hidden;
     overflow-y: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
   }
-
-  .modal::-webkit-scrollbar {
-    display: none;
-  }
-
   .confirm {
-    width: 450px !important;
+    width: 350px !important;
   }
   .sider {
     width: 300px;

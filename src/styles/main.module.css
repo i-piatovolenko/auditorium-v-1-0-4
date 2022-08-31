@@ -24,7 +24,6 @@
     padding: 8px;
     border-radius: 8px;
     width: 160px;
-    height: 18px;
 }
 
 .headerDateInput::-webkit-calendar-picker-indicator {

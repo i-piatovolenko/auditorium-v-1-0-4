@@ -8,7 +8,7 @@ import {ACCESS_RIGHTS, StudentAccountStatus, User} from "../../../models/models"
 import CountUp from "react-countup";
 import {useLocal} from "../../../hooks/useLocal";
 import Button from "../../../components/button/Button";
-import {handleLogout} from "../../../helpers/logout";
+import {isLoggedVar} from "../../../api/client";
 
 const Admin = () => {
     const {data, loading, error} = useQuery(GET_USERS);
@@ -26,26 +26,29 @@ const Admin = () => {
       }
     }, [data]);
 
+    const handleLogout = () => {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      isLoggedVar(false);
+    };
+
     return (
       <div>
         <Header><h1>Налаштування</h1></Header>
         <ul className={styles.list}>
-          <li><NavLink to='/dispatcherSettings'>Налаштування</NavLink></li>
           {accessRights === ACCESS_RIGHTS.ADMIN && <li><NavLink to='/adminClassrooms'>Аудиторії</NavLink>
           </li>}
           <li><NavLink to='/adminUsers'>Користувачі
             {unverifiedCounter !== 0 && <span className={styles.unverified} title="Неверифіковані">
             <CountUp end={unverifiedCounter} duration={1}/></span>}
           </NavLink></li>
-          {accessRights === ACCESS_RIGHTS.ADMIN && (
-            <>
+          {accessRights === ACCESS_RIGHTS.ADMIN && <>
               <li><NavLink to='/adminInstruments'>Інструменти</NavLink></li>
               <li><NavLink to='/adminDepartments'>Кафедри</NavLink></li>
               <li><NavLink to='/adminFaculties'>Факультети</NavLink></li>
               <li><NavLink to='/adminDegrees'>Навчальні ступені</NavLink></li>
-            </>
-          )}
-          <li><NavLink to='/adminSchedule'>Розклад</NavLink></li>
+            {/*<li><NavLink to='/adminSchedule'>Розклад</NavLink></li>*/}
+          </>}
         </ul>
         <div className={styles.settings}>
           <Button onClick={handleLogout}>Вийти з профілю</Button>

@@ -2,16 +2,3 @@
     margin: 0;
     padding: 0;
 }
-
-.specialChair {
-    background: #eee;
-    border-radius: 4px;
-    margin: 4px;
-    line-height: 2;
-    padding: 2px 8px;
-}
-
-.overdue {
-    color: #f91354;
-    font-weight: bold;
-}

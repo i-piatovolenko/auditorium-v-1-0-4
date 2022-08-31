@@ -55,13 +55,3 @@
   margin: 0;
   padding: 0;
 }
-
-.time {
-  display: flex;
-  align-items: center;
-}
-
-.time img {
-  cursor: pointer;
-  margin-right: 16px;
-}

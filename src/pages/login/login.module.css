@@ -10,6 +10,7 @@
   .loginContainer {
     display: flex;
     justify-content: space-around;
+    align-items: center;
     flex-direction: column;
     width: 95vw;
   }
@@ -19,8 +20,8 @@
   .loginContainer {
     display: flex;
     justify-content: space-around;
+    align-items: center;
     flex-direction: column;
-    width: 400px
   }
 }
 
@@ -32,7 +33,7 @@
   font-family: "Roboto Thin";
   font-weight: normal;
   font-size: 1rem;
-  margin: 16px 0 32px 0;
+  margin: 16px 0;
   animation-duration: 1.8s;
   background: linear-gradient(-45deg, #2e287c, #f91354, #2b5dff, #2e287c);
   background-size: 600% 600%;

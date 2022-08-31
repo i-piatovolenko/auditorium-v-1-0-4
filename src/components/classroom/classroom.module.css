@@ -11,10 +11,6 @@
   cursor: pointer;
 }
 
-.classroomsListItem:focus {
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-}
-
 .header {
   position: relative;
   display: flex;
@@ -30,20 +26,7 @@
   top: 0;
 }
 
-.footer {
-  position: relative;
-  width: 100%;
-  display: grid;
-  justify-content: end;
-  grid-template-columns: 1fr auto;
-}
-
-.footer > button {
-  margin-left: 16px;
-  width: fit-content;
-}
-
-.footer div > button{
+.footer > button{
   margin-left: 8px;
 }
 
@@ -100,8 +83,17 @@
   margin: 8px 0;
 }
 
+.spinner {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  top: 25px;
+  left: 14px;
+  margin-left: -20px;
+}
+
 .isDepartment {
-  color: #ff3c00;
+  color: #ff8c00;
 }
 
 .reserved {
@@ -119,14 +111,7 @@
   left: 16px;
 }
 
-.disableClassroomInput {
-  display: grid;
-  grid-template-columns: .4fr 1fr .2fr .2fr;
-  grid-gap: 8px;
-}
-
 .disableClassroomInput input{
-  height: 20px;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #656565;
@@ -139,9 +124,6 @@
 .sanctions {
   display: flex;
   justify-content: flex-end;
-  position: absolute;
-  right: 0;
-  bottom: 50px;
 }
 
 .sanctions label {
@@ -152,98 +134,4 @@
 
 .sanctions input {
   border: 2px solid #f91354 !important;
-}
-
-.confirmText {
-  text-align: center;
-  color: #484848;
-}
-
-.timeButtonActive {
-  background: #00a6ff;
-  color: #fff;
-  border: none;
-  padding: 4px;
-  margin-right: 2px;
-  cursor: pointer;
-}
-
-.timeButton {
-  background: #ccc;
-  color: #000;
-  border: none;
-  padding: 4px;
-  margin-right: 2px;
-  cursor: pointer;
-}
-
-.customTimeInput, .customTimeInputActive {
-  display: inline-block;
-  position: relative;
-}
-
-.customTimeInput input {
-  padding: 4px 32px 4px 4px;
-  border: none;
-  background: #ccc;
-}
-
-.customTimeInputActive input {
-  padding: 4px 32px 4px 4px;
-  border: none;
-  background: #00a6ff;
-  color: #fff;
-}
-
-.customTimeInput span {
-  position: absolute;
-  right: 2px;
-  top: 4px;
-  font-size: 13px;
-}
-
-.customTimeInputActive span {
-  position: absolute;
-  right: 2px;
-  top: 4px;
-  font-size: 13px;
-  color: #fff;
-}
-
-.disableOptions {
-  padding-top: 16px;
-}
-
-.buttonsRow {
-  padding-left: 24%;
-  margin-bottom: 32px;
-  margin-top: -4px;
-}
-
-.buttonsRow button {
-  margin: 4px 4px 0 0;
-  font-size: 12px;
-  height: 24px;
-}
-
-.unlockIcon {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  width: 14px;
-  opacity: .2;
-  cursor: pointer;
-  transition: all .1s linear;
-}
-
-.unlockIcon:hover {
-  opacity: .7;
-}
-
-.lockIcon {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  width: 14px;
-  cursor: pointer;
 }

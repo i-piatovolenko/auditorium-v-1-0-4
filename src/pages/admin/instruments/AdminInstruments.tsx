@@ -12,14 +12,15 @@ import CreateInstrumentPopupBody from "./createInstrumentPopupBody/CreateInstrum
 import Button from "../../../components/button/Button";
 import {useMutation} from "@apollo/client";
 import {DELETE_INSTRUMENT} from "../../../api/operations/mutations/deleteInstrument";
-import {InstrumentType, InstrumentTypesE, InstrumentTypesEUa} from "../../../models/models";
+import {ClassroomType, InstrumentType} from "../../../models/models";
+import BrowseClassroomPopupBody from "../classrooms/browseClassroomPopupBody/BrowseClassroomPopupBody";
 import BrowseInstrumentPopupBody from "./browseInstrumentPopupBody/BrowseInstrumentPopupBody";
-import Back from "../../../components/icons/back/Back";
 
-const dataHeader = ['ID', 'Назва', 'Тип', 'Рейтинг', 'Ауд.', 'Інв. номер'];
+const dataHeader = ['ID', 'Назва', 'Рейтинг', 'Ауд.', 'Інв. номер'];
 
 const AdminInstruments = () => {
-  const instruments = useInstruments();
+  const [updateList, setUpdateList] = useState(false);
+  const instruments = useInstruments(updateList);
   const [listData, setListData] = useState<Array<any>>([]);
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
@@ -27,7 +28,6 @@ const AdminInstruments = () => {
   const instrument = (item: InstrumentType) => <>
     <span className={styles.alignText}>{item.id}</span>
     <span>{item.name}</span>
-    <span  className={styles.alignText}>{InstrumentTypesEUa[item.type as InstrumentTypesE]}</span>
     <span className={styles.alignText}>{item.rate.toFixed(1)}</span>
     <span className={styles.alignText}>{item.classroom?.name}</span>
     <span className={styles.alignText}>{item.persNumber}</span>
@@ -60,6 +60,7 @@ const AdminInstruments = () => {
           message: `Інструмент видалено.`,
           type: "ok",
         });
+        setUpdateList(prevState => !prevState);
       } catch (e) {
         console.log(e)
         dispatchNotification({
@@ -71,10 +72,14 @@ const AdminInstruments = () => {
     }
   };
 
+  const handleUpdate = () => {
+    setUpdateList(prevState => !prevState);
+  };
+
   const handleAdd = (item: InstrumentType | null = null, isEditMode = false) => {
     dispatchPopupWindow({
       header: <h1>{isEditMode ? 'Редагувати інструмент' : 'Створити інструмент'}</h1>,
-      body: <CreateInstrumentPopupBody dispatchNotification={dispatchNotification}
+      body: <CreateInstrumentPopupBody dispatchNotification={dispatchNotification} onUpdate={handleUpdate}
           addInstrument={addInstrument} instrument={item} isEditMode={isEditMode}
           handleErrorDetails={handleErrorDetails}
       />,
@@ -100,12 +105,11 @@ const AdminInstruments = () => {
   return (
     <div>
       <Header>
-        <Back/>
         <h1>Управління інструментами</h1>
         <Add onClick={handleAdd}/>
       </Header>
       <DataList header={dataHeader} data={listData}
-                gridTemplateColumns={'40px 250px 100px 100px 100px 1fr 30px 30px'}
+                gridTemplateColumns={'40px 250px 100px 100px 1fr 30px 30px'}
                 handleItemClick={handleItemClick}
       />
     </div>

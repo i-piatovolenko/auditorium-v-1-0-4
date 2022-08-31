@@ -9,7 +9,6 @@ export const GET_USERS = gql`
       lastName
       type
       department {
-        id
         name
       }
       occupiedClassrooms {
@@ -24,13 +23,8 @@ export const GET_USERS = gql`
       phoneNumber
       extraPhoneNumbers
       nameTemp
-      expireDate
-      queueInfo {
-        sanctionedUntil
-      }
       studentInfo {
         degree {
-          id
           name
         }
         startYear
@@ -39,7 +33,6 @@ export const GET_USERS = gql`
       employeeInfo {
         employmentType
         accountStatus
-        isInUsage
       }
     }
   }
@@ -54,17 +47,14 @@ export const GET_USER_BY_ID = gql`
       lastName
       type
       department {
-        id
         name
       }
       email
       phoneNumber
       extraPhoneNumbers
       nameTemp
-      expireDate
       studentInfo {
         degree {
-          id
           name
         }
         startYear
@@ -88,6 +78,7 @@ export const GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID = gql`
         classroom {
           id
           name
+          
         }
       }
      }

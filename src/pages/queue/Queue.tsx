@@ -4,8 +4,8 @@ import Header from "../../components/header/Header";
 import Select from "react-select";
 import {
   ClassroomType,
+  DisabledState,
   EnqueuedBy,
-  OccupiedState,
   QueueType,
   StudentAccountStatus,
   User,
@@ -84,7 +84,7 @@ const Queue = () => {
   const getInLine = async () => {
     setDisabled(true);
     const data = classrooms
-      .filter(classroom => !classroom.isHidden && classroom.occupied.state !== OccupiedState.FREE)
+      .filter(classroom => !classroom.isHidden && classroom.disabled.state === DisabledState.NOT_DISABLED)
       .filter(classroom => withInstrument ? classroom.instruments.length : true)
       .map(({id}) => ({
         classroomId: id,
@@ -165,7 +165,7 @@ const Queue = () => {
             options={users.filter(user => {
               return !user.occupiedClassrooms.length
                 && (user.type === UserTypes.POST_GRADUATE || user.type === UserTypes.STUDENT) &&
-                user?.studentInfo?.accountStatus === StudentAccountStatus.ACTIVE
+                user.studentInfo.accountStatus === StudentAccountStatus.ACTIVE
             }).map((user: User) => ({
                 label: user.id + ": " + fullName(user),
                 value: user.id as number,
