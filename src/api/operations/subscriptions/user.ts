@@ -1,8 +1,8 @@
 import {gql} from "@apollo/client/core";
 
-export const FOLLOW_USERS = gql`
- subscription allUsersUpdate {
-    allUsersUpdate {
+export const FOLLOW_USER = gql`
+ subscription userUpdate($userId: Int!) {
+    userUpdate(userId: $userId) {
     user {
       id
       occupiedClassrooms {
@@ -27,6 +27,7 @@ export const FOLLOW_USERS = gql`
           id
           state
           skips
+          generalQueuePosition
         }
       }
     }

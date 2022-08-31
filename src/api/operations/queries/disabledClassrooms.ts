@@ -8,7 +8,6 @@ export const GET_DISABLED_CLASSROOMS = gql`
       disabled {
         comment
         until
-        warning
       }
     }
   }

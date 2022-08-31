@@ -69,7 +69,7 @@ const Login = () => {
             history.push('/dashboard')
           }
         }
-      } catch (e: any) {
+      } catch (e) {
         dispatchNotification({
           header: 'Помилка!',
           message: e.message,
@@ -100,7 +100,7 @@ const Login = () => {
           </p>
           <form className={styles.loginForm} onSubmit={handleSubmit} id="loginForm">
             <CustomInput
-              label="Логін:"
+              label="E-mail або логін:"
               name="login"
               id="login"
               placeholder="Наприклад: aud1@knmau.ua"
@@ -111,7 +111,7 @@ const Login = () => {
               label="Пароль:"
               name="password"
               id="password"
-              withEyeSwitcher
+              type="password"
               value={passwordValue}
               onChange={handleChange}
             />
@@ -127,7 +127,7 @@ const Login = () => {
             Національна Музична Академія України ім. П. і. Чайковського
           </a>
           <p>
-            Auditorium &copy; 2021 | v 1.4.2 Ivan Piatovolenko & Vladislav
+            Auditorium &copy; 2021 | v 1.0.4 Ivan Piatovolenko & Vladislav
             Nazarenko
           </p>
         </footer>

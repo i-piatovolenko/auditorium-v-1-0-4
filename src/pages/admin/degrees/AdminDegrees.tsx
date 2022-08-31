@@ -13,7 +13,6 @@ import Button from "../../../components/button/Button";
 import CreateDegreePopupBody from "./createDegreePopupBody/CreateDegreePopupBody";
 import useDegrees from "../../../hooks/useDegrees";
 import {DELETE_DEGREE} from "../../../api/operations/mutations/deleteDegree";
-import Back from "../../../components/icons/back/Back";
 
 const listHeader = ['ID', 'Назва'];
 
@@ -88,7 +87,6 @@ const AdminDegrees = () => {
   return (
     <div>
       <Header>
-        <Back/>
         <h1>Управління учбовими ступенями</h1>
         <Add onClick={() => handleAdd()}/>
       </Header>

@@ -1,54 +1,26 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import styles from "./scheduleUnit.module.css";
-import {GET_SCHEDULE_UNIT} from "../../api/operations/queries/schedule";
-import {fullName} from "../../helpers/helpers";
-import {ScheduleUnitType, ScheduleUnitTypeT} from "../../models/models";
+import { useQuery } from "@apollo/client";
+import { GET_SCHEDULE_UNIT } from "../../api/operations/queries/schedule";
+import {fullName, getScheduleUnitSize} from "../../helpers/helpers";
+import {ActivityTypes, ScheduleUnitType} from "../../models/models";
+import Button from "../button/Button";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import UserProfile from "../userProfile/UserProfile";
 import moment from "moment";
-import {client} from "../../api/client";
-import ScheduleUnitList from "../../pages/schedule/ScheduleUnitList";
 
 interface PropTypes {
   classroomName: string;
-  userNameSearch?: string;
-  date?: string;
-  showEmpty?: boolean;
-  color?: string;
 }
 
-const ScheduleUnit: React.FC<PropTypes> = ({classroomName, color, userNameSearch, date, showEmpty}) => {
+const ScheduleUnit: React.FC<PropTypes> = ({ classroomName }) => {
 
-  const [schedule, setSchedule] = useState<ScheduleUnitType[]>(null);
-  const [subSchedule, setSubSchedule] = useState<ScheduleUnitType[]>(null);
-  const [searched, setSearched] = useState(false);
-
-  useEffect(() => {
-    client.query({
-      query: GET_SCHEDULE_UNIT,
-      variables: {
-        classroomName,
-        date: moment(date).set("h", 12).toISOString(),
-      },
-    }).then((data: any) => {
-      const primary = data.data.schedule.filter((unit: ScheduleUnitType) => unit.type === ScheduleUnitTypeT.PRIMARY);
-      const substitutions = data.data.schedule
-        .filter((unit: ScheduleUnitType) => unit.type === ScheduleUnitTypeT.SUBSTITUTION);
-      setSchedule(primary);
-      setSubSchedule(substitutions);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (schedule) {
-      const allUserNames = schedule.map(unit => fullName(unit.user)?.toLowerCase()).join('');
-      if (allUserNames.includes(userNameSearch?.toLowerCase())) {
-        setSearched(true);
-      } else {
-        setSearched(false);
-      }
-    }
-  }, [userNameSearch, schedule])
+  const { data, loading, error } = useQuery(GET_SCHEDULE_UNIT, {
+    variables: {
+      classroomName: classroomName,
+      date: moment().toISOString(),
+    },
+  });
 
   const dispatchPopupWindow = usePopupWindow();
 
@@ -59,19 +31,48 @@ const ScheduleUnit: React.FC<PropTypes> = ({classroomName, color, userNameSearch
     });
   };
 
-  if (!schedule?.length && !subSchedule?.length) return <></>;
-
-  return schedule && schedule.length && searched && (
-    <div className={styles.scheduleRowWrapper}>
-      <span style={{backgroundColor: color + '55'}}>{classroomName}</span>
-      <div className={styles.listsContainer}>
-        <div className={styles.absoluteWrapper}>
-          <ScheduleUnitList units={subSchedule} onClick={handleClick} withoutGrid/>
-        </div>
-        <ScheduleUnitList units={schedule} onClick={handleClick}/>
-      </div>
-    </div>
-  );
+  if (!loading && !error)
+    return (
+      <ul
+        style={{
+          gridTemplateColumns: document.body.clientWidth >= 1024 ? getScheduleUnitSize(
+            data.schedule
+              .slice()
+              .sort(
+                (a: ScheduleUnitType, b: ScheduleUnitType) =>
+                  parseInt(a.from) - parseInt(b.from)
+              ),
+            false
+          ):"1fr"
+        }}
+        className={styles.scheduleRow}
+      >
+        {data.schedule
+          .slice()
+          .sort(
+            (a: ScheduleUnitType, b: ScheduleUnitType) =>
+              parseInt(a.from) - parseInt(b.from)
+          )
+          .map((unit: ScheduleUnitType) => (
+            <li>
+              <Button
+                onClick={() => handleClick(unit)}
+                style={{
+                  height: "2rem",
+                  width: "100%",
+                //@ts-ignore
+                  backgroundColor: ActivityTypes[unit.activity],
+                  //@ts-ignore
+                  border: `1px solid ${ActivityTypes[unit.activity]}`
+                }}
+              >
+                {unit.from + " - " + unit.to + " " + fullName(unit.user, true)}
+              </Button>
+            </li>
+          ))}
+      </ul>
+    );
+  return <p></p>;
 };
 
 export default ScheduleUnit;

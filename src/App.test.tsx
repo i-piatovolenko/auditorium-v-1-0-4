@@ -1,8 +1,9 @@
 import React from 'react';
-import moment from "moment";
-import {isTimeout} from "./helpers/helpers";
+import { render, screen } from '@testing-library/react';
+import App from './App';
 
-test('is overdue', () => {
-  const outerTime = moment().subtract(2, 'hours').toISOString();
-  expect(isTimeout(outerTime)).toBeFalsy();
+test('renders learn react link', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/learn react/i);
+  expect(linkElement).toBeInTheDocument();
 });

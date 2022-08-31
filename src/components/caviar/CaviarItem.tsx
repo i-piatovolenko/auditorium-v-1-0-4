@@ -1,25 +1,23 @@
-import React, {CSSProperties, useEffect, useRef, useState} from 'react';
-import {ClassroomType, DisabledState, OccupiedState, QueuePolicyTypes, UserTypes} from "../../models/models";
+import React, {CSSProperties, useEffect, useState} from 'react';
+import {ClassroomType, DisabledState, OccupiedState} from "../../models/models";
 import Tag from "../tag/Tag";
 import ClassroomInfo from "../ classroomInfo/ClassroomInfo";
 import Footer from "../footer/Footer";
 import {usePopupWindow} from "../popupWindow/PopupWindowProvider";
 import moment from "moment";
-import {useLocal} from "../../hooks/useLocal";
 
 type PropTypes = {
   classroom: ClassroomType;
   dispatchNotification: (value: string) => void;
 }
 
-const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
+const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) =>  {
   const dispatchPopupWindow = usePopupWindow();
   const [isOverdue, setIsOverDue] = useState(false);
-
-  let timeout = useRef(null);
+  let timeout: ReturnType<typeof setTimeout>;
 
   useEffect(() => {
-    return () => clearTimeout(timeout.current);
+    return () => clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
@@ -27,9 +25,9 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
       const untilString: string = classroom.occupied.until as unknown as string;
       const diffInMs = moment(untilString).diff(moment());
 
-      if (diffInMs >= 0 && !timeout.current) {
-        timeout.current = setTimeout(() => setIsOverDue(true), diffInMs);
-      } else if (diffInMs <= 0) {
+      if (diffInMs >= 0 && classroom.occupied.state === OccupiedState.RESERVED && !timeout) {
+        timeout = setTimeout(() => setIsOverDue(true), diffInMs);
+      } else if (diffInMs <= 0 && classroom.occupied.state === OccupiedState.RESERVED) {
         setIsOverDue(true);
       } else {
         setIsOverDue(false);
@@ -37,30 +35,22 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
     } else {
       setIsOverDue(false);
     }
-    if (classroom.occupied.state !== OccupiedState.RESERVED && timeout.current) {
-      clearTimeout(timeout.current);
-    }
-  }, [classroom]);
+    if (classroom.occupied.state !== OccupiedState.RESERVED && timeout) clearTimeout(timeout);
+  }, [classroom.occupied.state]);
 
   const calcStyle = (classroom: ClassroomType) => {
     const resStyles: CSSProperties = {};
     if (classroom.isHidden) resStyles.opacity = .5;
-    if (classroom.disabled.state === DisabledState.DISABLED
-      || (classroom.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
-        && !classroom.queueInfo.queuePolicy.queueAllowedDepartments.length)) {
+    if (classroom.disabled.state === DisabledState.DISABLED) {
       resStyles.background = '#b1b1b1';
     } else {
       classroom.occupied.state === OccupiedState.FREE ?
-        resStyles.background = '#76e286' : resStyles.background = '#fff';
+        resStyles.background = '#4bfd63' : resStyles.background = '#fff';
       if (isOverdue) {
         resStyles.background = '#f91354';
         resStyles.color = '#fff';
       }
     }
-    if (classroom.disabled.warning) {
-      resStyles.background = '#f91354';
-      resStyles.color = '#fff'
-    };
     return resStyles
   };
 
@@ -97,7 +87,7 @@ const CaviarItem: React.FC<PropTypes> = ({classroom, dispatchNotification}) => {
   return (
     <li
       onClick={() => handleClick(classroom)}
-      style={{...calcStyle(classroom)}}
+      style={calcStyle(classroom)}
     >
       {classroom.name}
     </li>

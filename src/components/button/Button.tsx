@@ -2,14 +2,13 @@ import React, {CSSProperties} from "react";
 import styles from "./button.module.css";
 
 interface PropTypes {
-  onClick?: (e: any) => any;
+  onClick?: () => void;
   kind?: "default" | "primary";
-  type?: "button" | "submit" | "reset";
+  type?: "button" | "submit" | "reset"
   color?: "white" | "blue" | "red" | "orange";
-  disabled?: boolean;
-  style?: CSSProperties | undefined;
-  form?: string;
-  title?: string;
+  disabled?: boolean
+  style?: CSSProperties | undefined,
+  form?: string
 }
 
 const Button: React.FC<PropTypes> = ({
@@ -20,12 +19,10 @@ const Button: React.FC<PropTypes> = ({
   color = "blue",
   disabled = false,
   style = undefined,
-  form= "",
-  title,
+  form= ""
 }) => {
   return (
     <button
-      title={title}
       form={form}
       style={style}
       disabled={disabled}

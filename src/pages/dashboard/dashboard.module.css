@@ -21,7 +21,7 @@
     font-family: Roboto;
     font-weight: 900;
     text-transform: uppercase;
-    /*animation: swing-in-top-fwd 15s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;*/
+    animation: swing-in-top-fwd 15s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
     animation-iteration-count: infinite;
 }
 
@@ -101,7 +101,7 @@
     padding: 10px 0 0 0;
     margin: 0;
     font-size: 25px;
-    /*animation: swing-in-top-fwd 15s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;*/
+    animation: swing-in-top-fwd 15s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
     animation-iteration-count: infinite;
     text-align: right;
 }
@@ -137,11 +137,6 @@
 
 .hiddenLogout:hover {
     opacity: 1;
-}
-
-.noQueue {
-    padding-left: 16px;
-    color: #ccc;
 }
 
 @keyframes swing-in-top-fwd {

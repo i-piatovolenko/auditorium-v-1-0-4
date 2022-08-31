@@ -1,12 +1,8 @@
 import {HOUR, MINUTE, TIME_SNIPPETS, WORKING_DAY_END, WORKING_DAY_START,} from "./constants";
 import {
   ACCESS_RIGHTS,
-  ClassroomType,
-  DisabledState,
   OccupiedInfo,
   OccupiedState,
-  OccupiedStateUa,
-  QueuePolicyTypes,
   ScheduleUnitType,
   StudentAccountStatus,
   User,
@@ -74,16 +70,9 @@ export const formatMinutesToMM = (value: number) => {
   else return value;
 };
 
-export const formatTempName = (tempName: string) => {
-  const withSpaces = tempName.toLowerCase().replaceAll(/\./gmi, '. ')
-  const words = withSpaces.split(' ');
-  const capitalizedWords = words.map(word => word[0]?.toUpperCase() === undefined ? '' : word[0].toUpperCase() + word.slice(1, word.length))
-  return capitalizedWords.join(' ')
-};
-
 export const fullName = (user: User, withInitials = false) => {
   if (user) {
-    if (user.nameTemp) return user.nameTemp;
+    if (user.nameTemp) return user.nameTemp
     if (withInitials) {
       return `${user.lastName} ${user.firstName.charAt(0)}. ${
         user.patronymic ? user.patronymic.charAt(0) + "." : ""
@@ -97,15 +86,15 @@ export const fullName = (user: User, withInitials = false) => {
   return "";
 };
 
-export const typeStyle = (occupiedUser: User) => {
+export const typeStyle = (occupied: OccupiedInfo) => {
   const student = {backgroundColor: "rgba(46,40,124)", color: "#fff"};
   const employee = {backgroundColor: "#ffc000", color: "#fff"};
   const vacant = {
     backgroundColor: "transparent",
     color: "#000",
   };
-  if (occupiedUser !== null) {
-    switch (occupiedUser?.type) {
+  if (occupied !== null) {
+    switch (occupied.user?.type) {
       case UserTypes.STUDENT:
         return student;
       case UserTypes.POST_GRADUATE:
@@ -142,54 +131,26 @@ const simpleIntFromScheduleUnit = (time: string) => {
     .reduce(reducer);
 };
 
-export const isFirstScheduleUnitEmpty = (units: Array<ScheduleUnitType>) => {
-  const firstItem = {
-    from: WORKING_DAY_START + ':00',
-    to: units[0].from,
-  }
-  return scheduleUnitSize(firstItem as ScheduleUnitType) > 0
-}
-
-export const scheduleUnitSize = (unit: ScheduleUnitType) => {
-  const fromArr = unit.from.split(':');
-  const toArr = unit.to.split(':');
-  const from = moment().set('hours', parseInt(fromArr[0])).set('minutes', parseInt(fromArr[1]));
-  const to = moment().set('hours', parseInt(toArr[0])).set('minutes', parseInt(toArr[1]));
-  const diff = to.diff(from);
-  return diff / 1000 / 60 / 60
-}
+//get schedule units size in fr units for grids
 export const getScheduleUnitSize = (
   units: Array<ScheduleUnitType>,
   fillEmpty = true
 ) => {
-  if (!units.length) return '';
   const items = [];
-
-  let lastPeriodEnd = WORKING_DAY_START + ':00';
-
-  for (let item of units) {
-    const spaceItem = {
-      from: lastPeriodEnd,
-      to: item.from
-    }
-    const spaceSize = scheduleUnitSize(spaceItem as ScheduleUnitType);
-    spaceSize && items.push(spaceSize);
-
-    const time = scheduleUnitSize(item);
-    items.push(time);
-
-    lastPeriodEnd = item.to;
-  }
-
   if (fillEmpty) {
-    items.push(WORKING_DAY_END - parseFloat(units[units.length - 1].to));
+    items.push(parseInt(units[0].from) - WORKING_DAY_START);
+  }
+  for (let item of units) {
+    const from = simpleIntFromScheduleUnit(item.from);
+    const to = simpleIntFromScheduleUnit(item.to);
+    items.push((to as number) - (from as number));
+  }
+  if (fillEmpty) {
+    items.push(WORKING_DAY_END - parseInt(units[units.length - 1].to));
   }
 
-  const percent = (WORKING_DAY_END - WORKING_DAY_START) / 100
-
-  return items.map((item) => `${(item / percent).toFixed(1)}%`).join(" ");
+  return items.map((item) => `${item}fr`).join(" ");
 };
-//get schedule units size in fr units for grids
 
 export const ISODateString = (d: Date) => {
   function pad(n: any) {
@@ -276,100 +237,4 @@ export const isClassroomNotFree = (occupied: OccupiedInfo) => {
 export const checkVerified = (user: User) => {
   if (!user.studentInfo) return true;
   return user.studentInfo.accountStatus !== StudentAccountStatus.UNVERIFIED;
-};
-
-export const isStudent = (type: UserTypes) => {
-  return type === UserTypes.STUDENT || type === UserTypes.POST_GRADUATE;
-}
-
-export const isTimeout = (time: string, returnDiffInMs = false) => {
-  const outerTime = moment(time);
-  const currentTime = moment();
-  if (returnDiffInMs) return currentTime.diff(outerTime);
-  return currentTime.diff(outerTime) > 0;
-}
-
-export const shouldOccupiedByTeacherDate = (classroomName: string, scheduleUnits: ScheduleUnitType[]) => {
-  let endH = moment().set('hours', WORKING_DAY_END).set('minutes', 0).set('seconds', 0);
-  if (!scheduleUnits.length) return endH;
-  const occupiedOnSchedule = scheduleUnits.some(scheduleUnit => {
-    const [fromH, fromM] = scheduleUnit.from.split(':');
-    const [toH, toM] = scheduleUnit.to.split(':');
-    const fromDate = moment().set('hours', +fromH).set('minutes', +fromM);
-    const toDate = moment().set('hours', +toH).set('minutes', +toM);
-    const currentDate = moment();
-
-    const hasIntersection = currentDate.isBetween(fromDate, toDate)
-    if (hasIntersection) endH = fromDate;
-    return endH;
-  });
-}
-
-export const shouldOccupiedByTeacher = (classroomName: string, scheduleUnits: ScheduleUnitType[]) => {
-  if (!scheduleUnits.length) return 'Вільно'
-  const occupiedOnSchedule = scheduleUnits.some(scheduleUnit => {
-    const [fromH, fromM] = scheduleUnit.from.split(':');
-    const [toH, toM] = scheduleUnit.to.split(':');
-    const fromDate = moment().set('hours', +fromH).set('minutes', +fromM);
-    const toDate = moment().set('hours', +toH).set('minutes', +toM);
-    const currentDate = moment();
-
-    const hasIntersection = currentDate.isBetween(fromDate, toDate)
-
-    return hasIntersection;
-  });
-  if (occupiedOnSchedule) return 'Зайнято за розкладом';
-  return 'Вільно';
-};
-
-export const defineOccupyStatus = (classroom: ClassroomType, scheduleUnits: ScheduleUnitType[], isOverdue: boolean) => {
-  const {queueInfo: {queuePolicy: {policy, queueAllowedDepartments}}, disabled, occupied} = classroom;
-
-  if (policy === QueuePolicyTypes.SELECTED_DEPARTMENTS && !queueAllowedDepartments.length) {
-    return 'Обмежений доступ';
-  }
-  if (isOverdue) return 'Резервація прострочена!';
-  if (disabled?.state === DisabledState.DISABLED) {
-    return disabled?.comment + ' до ' + moment(disabled.until).format('DD-MM-YYYY HH:mm');
-  }
-  if (isClassroomNotFree(occupied)) {
-    if (occupied.state === OccupiedState.RESERVED && occupied.keyHolder) {
-     return OccupiedStateUa[occupied?.state as OccupiedState]
-       + ` (ключ в класі у ${fullName(occupied.keyHolder, true)})`;
-    }
-    if (occupied.state === OccupiedState.PENDING && occupied.keyHolder) {
-      return OccupiedStateUa[occupied?.state as OccupiedState]
-        + ` (ключ в класі у ${fullName(occupied.keyHolder, true)})`;
-    }
-    return OccupiedStateUa[occupied?.state as OccupiedState];
-  }
-  return shouldOccupiedByTeacher(classroom.name, scheduleUnits);
-};
-
-export const formatTimeWithZero = (time: string) => {
-  if (!time) return;
-
-  const [hh, mm] = time.split(':');
-  const formattedHH = hh.length === 1 ? '0' + hh : hh;
-  const formattedMM = mm.length === 1 ? '0' + mm : mm;
-  return `${formattedHH}:${formattedMM}`;
-}
-
-export const getBriefString = (str: string) => {
-  if (!str) return '';
-  if (str.length < 16) return str;
-
-  const words = str.split(' ');
-
-  const briefWords = words.map(word => {
-    if (word[3] === 'о' || word[3] === 'е' || word[3] === 'і' || word[3] === 'ї'
-      || word[3] === 'а' || word[3] === 'у'|| word[3] === 'и') {
-
-      return word.slice(0, 3) + (word.length > 3 ? '.' : '');
-    }
-
-    return word.slice(0, 4) + (word.length > 4 ? '.' : '');
-  });
-
-  return briefWords.join(' ');
 };

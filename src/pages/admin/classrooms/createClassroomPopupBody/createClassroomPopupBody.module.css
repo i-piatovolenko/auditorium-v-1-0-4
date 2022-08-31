@@ -29,7 +29,7 @@ input[type='checkbox'] {
 
 label {
     display: grid;
-    grid-template-columns: 24% auto;
+    grid-template-columns: 30% auto;
     align-items: center;
     margin-bottom: 8px;
 }
@@ -45,21 +45,4 @@ label {
     margin-right: 10px;
     opacity: .3;
     width: 12px;
-}
-
-.extraPhoneWrapper {
-    position: relative;
-}
-
-.extraPhoneWrapper img {
-    position: absolute;
-    width: 20px;
-    right: 8px;
-    top: 10px;
-    cursor: pointer;
-    opacity: .5;
-}
-
-.extraPhoneWrapper img:hover {
-    opacity: 1;
 }

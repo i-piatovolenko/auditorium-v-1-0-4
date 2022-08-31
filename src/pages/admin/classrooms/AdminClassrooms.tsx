@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import Header from '../../../components/header/Header';
 import styles from './adminClassrooms.module.css';
-import {ClassroomType, DisabledState, QueuePolicyTypes} from "../../../models/models";
+import {ClassroomType} from "../../../models/models";
+import useClassrooms from "../../../hooks/useClassrooms";
 import {usePopupWindow} from "../../../components/popupWindow/PopupWindowProvider";
 import CreateClassroomPopupBody from "./createClassroomPopupBody/CreateClassroomPopupBody";
 import {useNotification} from "../../../components/notification/NotificationProvider";
-import {useMutation, useQuery} from "@apollo/client";
+import {useMutation} from "@apollo/client";
 import {DELETE_CLASSROOM} from "../../../api/operations/mutations/deleteClassroom";
 import Add from "../../../components/icons/add/Add";
 import Edit from "../../../components/icons/edit/Edit";
@@ -13,47 +14,25 @@ import Delete from "../../../components/icons/delete/Delete";
 import DataList from "../../../components/dataList/DataList";
 import Button from "../../../components/button/Button";
 import BrowseClassroomPopupBody from "./browseClassroomPopupBody/BrowseClassroomPopupBody";
-import {GET_CLASSROOMS} from "../../../api/operations/queries/classrooms";
-import Back from "../../../components/icons/back/Back";
 
-const listHeader = ['Назва', 'Кафедра', 'Прихована', 'Відключена', 'Спец.', 'Оп. студія', 'Флігель'];
+const listHeader = ['ID', 'Назва', 'Кафедра', 'Спец.', 'Оп. студія', 'Флігель'];
 
 const AdminClassrooms = () => {
-  const [classrooms, setClassrooms] = useState<ClassroomType[]>([]);
-  const {data, loading, error} = useQuery(GET_CLASSROOMS);
+  const [classrooms, subscribeToMore]: [ClassroomType[], any] = useClassrooms();
   const [listData, setListData] = useState<any>([]);
   const dispatchPopupWindow = usePopupWindow();
   const dispatchNotification = useNotification();
   const [deleteClassroom] = useMutation(DELETE_CLASSROOM);
   const dataItem = (item: ClassroomType) => <>
-    <span className={styles.centerText}
-          style={{
-            backgroundColor: item?.color ? item.color : '#ffffff00', borderRadius: 6,
-            color: item.color === '#000000' || item.color === '#ff0000' ||
-            item.color === '#0000ff' ? '#ffffff' : '#000000',
-            padding: '2px 0'
-          }}
-    >{item.name}</span>
+    <span className={styles.centerText}>{item.id}</span>
+    <span className={styles.centerText}>{item.name}</span>
     <span>{item.chair?.name}</span>
-    <span className={styles.centerText}>{item.isHidden ? 'Так' : 'Ні'}</span>
-    <span className={styles.centerText}>
-      {item.disabled.state === DisabledState.DISABLED ? 'Тимчасово'
-        : (item.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
-          && !item.queueInfo.queuePolicy.queueAllowedDepartments.length) ? 'Так' :
-          (item.queueInfo.queuePolicy.policy === QueuePolicyTypes.SELECTED_DEPARTMENTS
-            && item.queueInfo.queuePolicy.queueAllowedDepartments.length) ? 'Частково' : 'Ні'}
-    </span>
     <span className={styles.centerText}>{item.special ? 'Так' : 'Ні'}</span>
     <span className={styles.centerText}>{item.isOperaStudio ? 'Так' : 'Ні'}</span>
     <span className={styles.centerText}>{item.isWing ? 'Так' : 'Ні'}</span>
     <Edit dark onClick={() => handleCreate(item)}/>
     <Delete onClick={() => handleDelete(item.id)}/>
   </>;
-
-
-  useEffect(() => {
-    !loading && !error && setClassrooms(data.classrooms);
-  }, [data, loading, error]);
 
   useEffect(() => {
     const data = classrooms.map(item => dataItem(item));
@@ -78,41 +57,18 @@ const AdminClassrooms = () => {
 
     if (confirm) {
       try {
-        const result = await deleteClassroom({
-          variables: {where: {id}},
-          update(cache) {
-            cache.modify({
-              fields: {
-                classrooms(existingClassroomsRefs, {readField}) {
-                  return existingClassroomsRefs.filter(
-                    (classroomRef: any) => id !== readField('id', classroomRef),
-                  );
-                },
-              },
-            })
-          }
+        await deleteClassroom({variables: {where: {id}}});
+        dispatchNotification({
+          header: "Успішно!",
+          message: `Аудиторію видалено.`,
+          type: "ok",
         });
-        if (result.data.deleteOneClassroom.userErrors?.length) {
-          result.data.deleteOneClassroom.userErrors.forEach(({message}: any) => {
-            dispatchNotification({
-              header: "Помилка",
-              message,
-              type: "alert",
-            });
-          })
-        } else {
-          dispatchNotification({
-            header: "Успішно!",
-            message: `Аудиторія видалена.`,
-            type: "ok",
-          });
-        }
       } catch (e) {
         console.log(e)
         dispatchNotification({
           header: "Помилка!",
-          message: <><span>Щось пішло не так.</span><br/>
-            <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline'}}
+          message:  <><span>Щось пішло не так.</span><br/>
+            <span style={{color: '#2b5dff', cursor: 'pointer', textDecoration: 'underline' }}
                   onClick={() => handleErrorDetails && handleErrorDetails(e)}>Деталі</span></>,
           type: "alert",
         });
@@ -131,8 +87,8 @@ const AdminClassrooms = () => {
     });
   };
 
-  const handleItemClick = (name: string) => {
-    const classroom = classrooms?.find(item => item.name === name);
+  const handleItemClick = (id: number) => {
+    const classroom = classrooms?.find(item => item.id === id);
 
     dispatchPopupWindow({
       header: <h1>{`Аудиторія ${classroom?.name}`}</h1>,
@@ -144,12 +100,11 @@ const AdminClassrooms = () => {
   return (
     <div>
       <Header>
-        <Back/>
         <h1>Редагування аудиторій</h1>
         <Add onClick={() => handleCreate()}/>
       </Header>
       <DataList header={listHeader} data={listData} handleItemClick={handleItemClick}
-                gridTemplateColumns={'55px 1fr 100px 100px 100px 80px 80px 40px 40px'}/>
+                gridTemplateColumns={'40px 40px 1fr 100px 80px 80px 40px 40px'}/>
     </div>
   );
 }

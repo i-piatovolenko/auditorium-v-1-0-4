@@ -13,13 +13,13 @@ import styles from './adminDepartments.module.css';
 import {useMutation} from "@apollo/client";
 import {DELETE_DEPARTMENT} from "../../../api/operations/mutations/deleteDepartment";
 import {useNotification} from "../../../components/notification/NotificationProvider";
-import Back from "../../../components/icons/back/Back";
 
 const listHeader = ['ID', 'Назва'];
 
 const AdminDepartments = () => {
   const dispatchPopupWindow = usePopupWindow();
-  const departments = useDepartments();
+  const [updateList, setUpdateList] = useState(false);
+  const departments = useDepartments(updateList);
   const [deleteDepartment] = useMutation(DELETE_DEPARTMENT);
   const dispatchNotification = useNotification();
   const [listData, setListData] = useState<any>([]);
@@ -38,7 +38,7 @@ const AdminDepartments = () => {
   const handleAdd = (item: Department | null = null) => {
     dispatchPopupWindow({
       header: <h1>{item ? 'Редагування кафедри' : 'Створити кафедру'}</h1>,
-      body: <CreateDepartmentPopupBody
+      body: <CreateDepartmentPopupBody setUpdateList={setUpdateList}
               dispatchNotification={dispatchNotification} item={item}/>,
       footer: <Button type='submit' form='createDepartment'>
         {item ? 'Зберегти зміни' : 'Створити'}
@@ -52,6 +52,7 @@ const AdminDepartments = () => {
     if (confirm) {
       try {
         await deleteDepartment({variables: {where: {id}}});
+        setUpdateList(prevState => !prevState);
         dispatchNotification({
           header: "Успішно!",
           message: `Кафедру видалено.`,
@@ -71,7 +72,6 @@ const AdminDepartments = () => {
   return (
     <div>
       <Header>
-        <Back/>
         <h1>Управління кафедрами</h1>
         <Add onClick={() => handleAdd()}/>
       </Header>
