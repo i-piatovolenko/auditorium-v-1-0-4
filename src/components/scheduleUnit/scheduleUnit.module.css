@@ -4,7 +4,19 @@
         padding: 0;
         margin: 0;
         list-style-type: none;
-        grid-gap: 2px;
+        grid-gap: 1px;
+        border-bottom: 1px solid #cccccc33;
+        position: relative;
+    }
+
+    .scheduleSubRow {
+        display: grid;
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+        grid-gap: 1px;
+        border-bottom: 1px solid #cccccc33;
+        position: relative;
     }
 }
 
@@ -14,8 +26,32 @@
         padding: 0;
         margin: 0;
         list-style-type: none;
-        grid-gap: 2px;
+        grid-gap: .5px;
+        box-sizing: content-box;
+        border-bottom: 1px solid #cccccc33;
+        position: relative;
     }
+
+    .scheduleSubRow {
+        display: grid;
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+        grid-gap: .5px;
+        box-sizing: content-box;
+        border-bottom: 1px solid #cccccc33;
+        position: relative;
+    }
+}
+
+
+
+.scheduleRow:hover {
+    background-color: #cccccc77;
+}
+
+.scheduleSubRow:hover {
+    background-color: transparent;
 }
 
 .scheduleRow li {
@@ -25,6 +61,40 @@
     text-align: left;
 }
 
-.scheduleRow li button {
+.scheduleSubRow li {
+    color: transparent;
+    border-radius: 5px;
+    padding: 2px 1px;
     text-align: left;
+}
+
+.scheduleRow li button, .scheduleSubRow li button {
+    text-align: left;
+    pointer-events: all;
+}
+
+.unitTime {
+    font-weight: 900;
+}
+
+.scheduleRowWrapper {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    min-height: 35px;
+}
+
+.scheduleRowWrapper span {
+    box-sizing: border-box;
+    border-bottom: 1px solid #ccc;
+}
+
+.listsContainer {
+    position: relative;
+}
+
+.absoluteWrapper {
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    pointer-events: none;
 }

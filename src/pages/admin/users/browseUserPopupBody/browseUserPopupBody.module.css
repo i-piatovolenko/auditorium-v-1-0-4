@@ -35,3 +35,9 @@
     padding-top: 16px;
     margin: 0;
 }
+
+.sanctioned {
+    color: #ff003b;
+    padding-bottom: 32px;
+    text-align: center;
+}

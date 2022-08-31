@@ -21,6 +21,11 @@ const PopupWindowProvider: React.FC<PropTypes> = ({ children }) => {
         }
         return [...state.slice(0, state.length - 1)];
       }
+      case "POP_ALL_POPUP_WINDOW": {
+          isBlurredVar(false);
+          isPassedVar(false);
+        return [];
+      }
 
       default:
         return state;

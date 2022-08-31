@@ -1,3 +1,5 @@
+import {bool} from "yup";
+
 export enum ACCESS_RIGHTS {
   USER,
   DISPATCHER,
@@ -48,7 +50,7 @@ export enum UserTypesUa {
   PIANO_TUNER = "Настроювач фортепіано",
   STAFF = "Співробітник",
   CONCERTMASTER = "Концертмейстер",
-  ILLUSTRATOR = "Іллюстратор",
+  ILLUSTRATOR = "Ілюстратор",
   OTHER = "Користувач",
 }
 
@@ -106,11 +108,14 @@ export type StudentInfo = {
 export type EmployeeInfo = {
   employmentType: EmploymentTypes;
   accountStatus: string;
+  isInUsage: boolean;
 };
 
 export type OccupiedInfo = {
   id: number;
   user: User | null;
+  keyHolder: User | null;
+  keyHolderId: number;
   until: string;
   state: OccupiedState;
   classroom: ClassroomType;
@@ -143,7 +148,7 @@ export type InstrumentType = {
   type: string;
   name: string;
   rate: number;
-  persNumber: number;
+  persNumber: string;
   comments: Comment | null;
   classroom: ClassroomType;
 };
@@ -157,6 +162,7 @@ export type DisabledInfo = {
   state: DisabledState;
   comment: string;
   until: Date;
+  warning: boolean;
 };
 
 export type ScheduleUnitType = {
@@ -168,8 +174,20 @@ export type ScheduleUnitType = {
   dayOfWeek: number;
   from: string;
   to: string;
-  activity: string;
+  activity: ScheduleUnitActivityT;
+  type: ScheduleUnitTypeT;
+  primaryScheduleUnit: ScheduleUnitType;
 };
+
+export enum ScheduleUnitActivityT {
+  INDIVIDUAL_LESSON = 'Індивідуальні заняття',
+  LECTURE = 'Лекція'
+}
+
+export enum ScheduleUnitTypeT {
+  PRIMARY = 'PRIMARY',
+  SUBSTITUTION = 'SUBSTITUTION'
+}
 
 export type ClassroomType = {
   id: number;
@@ -185,7 +203,25 @@ export type ClassroomType = {
   disabled: DisabledInfo | null;
   schedule: Array<ScheduleUnitType>;
   isHidden: boolean;
+  queueInfo: ClassroomQueueInfo;
+  color: string;
 };
+
+export type ClassroomQueueInfo = {
+  classroom: ClassroomType;
+  queuePolicy: QueuePolicyInfo;
+}
+
+export type QueuePolicyInfo = {
+  classroomQueueInfo: ClassroomQueueInfo;
+  policy: QueuePolicyTypes;
+  queueAllowedDepartments: ExclusivelyQueueAllowedDepartmentsInfo[];
+}
+
+export type ExclusivelyQueueAllowedDepartmentsInfo = {
+  department: Department;
+  queuePolicyInfo: QueuePolicyInfo;
+}
 
 export type RegisterUnit = {
   id: number;
@@ -293,4 +329,30 @@ export enum StudentAccountStatus {
 export enum EmployeeAccountStatus {
   ACTIVE = 'ACTIVE',
   FROZEN = 'FROZEN'
+}
+
+export enum QueuePolicyTypes {
+  ALL_DEPARTMENTS = 'ALL_DEPARTMENTS',
+  SELECTED_DEPARTMENTS = 'SELECTED_DEPARTMENTS'
+}
+
+export enum SpecialClassroomTypes {
+  PIANO = 'PIANO'
+}
+
+export enum InstrumentTypesE {
+  UpRightPiano = 'UpRightPiano',
+  GrandPiano = 'GrandPiano'
+}
+
+export enum InstrumentTypesEUa {
+  UpRightPiano = 'Піаніно',
+  GrandPiano = 'Рояль'
+}
+
+export type CrashModeT = {
+  isActive: boolean;
+  comment: string;
+  until: Date | null;
+  globalMessage?: string;
 }

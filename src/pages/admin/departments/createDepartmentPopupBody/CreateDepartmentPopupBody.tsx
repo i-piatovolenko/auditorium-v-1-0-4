@@ -11,13 +11,12 @@ import {UPDATE_DEPARTMENT} from "../../../../api/operations/mutations/updateDepa
 import {Department, Faculty} from "../../../../models/models";
 
 interface PropTypes {
-  setUpdateList: (value: any) => void;
   dispatchNotification: (value: any) => void;
   dispatch?: (value: any) => void;
   item: Department | null
 }
 
-const CreateDepartmentPopupBody: React.FC<PropTypes> = ({setUpdateList, dispatchNotification, dispatch,
+const CreateDepartmentPopupBody: React.FC<PropTypes> = ({dispatchNotification, dispatch,
         item}) => {
   const faculties = useFaculties();
   const [createDepartment] = useMutation(CREATE_DEPARTMENT);
@@ -57,7 +56,6 @@ const CreateDepartmentPopupBody: React.FC<PropTypes> = ({setUpdateList, dispatch
           message: `Дані збережено.`,
           type: "ok",
         });
-        setUpdateList((prevState: any) => !prevState);
         dispatch && dispatch({
           type: "POP_POPUP_WINDOW",
         });
@@ -86,7 +84,6 @@ const CreateDepartmentPopupBody: React.FC<PropTypes> = ({setUpdateList, dispatch
           message: `Кафедру створено.`,
           type: "ok",
         });
-        setUpdateList((prevState: any) => !prevState);
         dispatch && dispatch({
           type: "POP_POPUP_WINDOW",
         });

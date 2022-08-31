@@ -10,6 +10,7 @@ export const GET_CLASSROOMS = gql`
       special
       isHidden
       chair {
+          id
           name
       }
       isWing
@@ -28,10 +29,24 @@ export const GET_CLASSROOMS = gql`
               name
           }
         }
+          keyHolder {
+          id
+          firstName
+          patronymic
+          lastName
+          type
+          nameTemp
+          email
+          phoneNumber
+          department {
+              name
+          }
+        }
         until
         state
       }
       instruments {
+        id
         name
         type
         rate
@@ -40,7 +55,23 @@ export const GET_CLASSROOMS = gql`
         comment
         until
         state
+        warning
       }
+      color
+      queue {
+        id
+      }
+      queueInfo {
+        queuePolicy {
+          policy
+          queueAllowedDepartments {
+            department {
+              id
+              name
+            }
+          }
+          }
+        }
     }
   }
 `;

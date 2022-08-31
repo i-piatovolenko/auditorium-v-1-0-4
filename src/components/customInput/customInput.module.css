@@ -37,6 +37,7 @@
     font-family: "Roboto Light";
     font-size: 1rem;
     margin: 8px 0;
+    position: relative;
 }
 
 .light {
@@ -45,4 +46,10 @@
 
 .dark {
     color: #656565;
+}
+
+.eye {
+    position: absolute;
+    right: 16px;
+    top: 8px;
 }

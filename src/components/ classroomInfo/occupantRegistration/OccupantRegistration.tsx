@@ -2,12 +2,12 @@ import React, {FormEvent, useEffect, useRef, useState,} from "react";
 import styles from "./occupantRegistration.module.css";
 import {useMutation, useQuery} from "@apollo/client";
 import {GET_USER_OCCUPIED_CLASSROOMS_BY_USER_ID, GET_USERS} from "../../../api/operations/queries/users";
-import {fullName} from "../../../helpers/helpers";
+import {formatTempName, fullName, isStudent} from "../../../helpers/helpers";
 import Title from "../../title/Title";
 import Select from 'react-select';
 import {
   EmployeeAccountStatus,
-  OccupiedState,
+  OccupiedState, ScheduleUnitType,
   StudentAccountStatus,
   User,
   UserTypes,
@@ -17,6 +17,10 @@ import {OCCUPY_CLASSROOM} from "../../../api/operations/mutations/occupyClassroo
 import {client, isButtonDisabledVar} from "../../../api/client";
 import ConfirmFooter from "../../footer/ConfirmFooter";
 import moment from "moment";
+import {GET_SCHEDULE_UNIT} from "../../../api/operations/queries/schedule";
+import Button from "../../button/Button";
+import clockIcon from "../../../assets/images/clock.svg";
+import ChooseTime from "./chooseTime/ChooseTime";
 
 interface PropTypes {
   dispatchNotification: (value: any) => void;
@@ -37,6 +41,9 @@ const OccupantRegistration: React.FC<PropTypes> = ({
   const {data, loading, error} = useQuery(GET_USERS);
   const [occupyClassroom] = useMutation(OCCUPY_CLASSROOM);
   const [users, setUsers] = useState();
+  const [scheduleUsers, setScheduleUsers] = useState([]);
+  const [scheduleUnits, setScheduleUnits] = useState<ScheduleUnitType[]>([]);
+  const [until, setUntil] = useState(3);
   const newUserTypes: any = [
     {value: UserTypes.STUDENT, label: UserTypesUa.STUDENT},
     {value: UserTypes.POST_GRADUATE, label: UserTypesUa.POST_GRADUATE},
@@ -47,22 +54,52 @@ const OccupantRegistration: React.FC<PropTypes> = ({
     {value: UserTypes.STAFF, label: UserTypesUa.STAFF},
     {value: UserTypes.OTHER, label: UserTypesUa.OTHER},
   ];
-  const [chosenUserType, setChosenUserType] = useState(newUserTypes[0]);
+  const [chosenUserType, setChosenUserType] = useState(newUserTypes[7]);
   const existingUserInput = useRef(null);
 
   //@ts-ignore
-  useEffect(() => existingUserInput.current.focus(), []);
+  useEffect(() => {
+    client.query({
+      query: GET_SCHEDULE_UNIT,
+      variables: {
+        classroomName,
+        date: moment().endOf('day').toISOString(),
+      }
+    }).then(({data: schedule}) => {
+      setScheduleUnits(schedule);
+      setScheduleUsers(schedule.schedule.filter((unit: ScheduleUnitType) => {
+        const date = moment().format('YYYY-MM-DD');
+        const diff = moment(date + ' ' + unit.to).diff(moment());
+        return diff > 0;
+      })
+        .map((unit: ScheduleUnitType) => {
+          return ({name: fullName(unit.user, true), id: unit.user.id});
+        }));
+    });
+    existingUserInput.current.focus();
+  }, []);
 
   useEffect(() => {
     if (!loading && !error) {
-      setUsers(data.users.filter(({studentInfo, employeeInfo, nameTemp}: User) => {
-        return (studentInfo && studentInfo.accountStatus === StudentAccountStatus.ACTIVE) ||
-          (employeeInfo && employeeInfo.accountStatus === EmployeeAccountStatus.ACTIVE) &&
-          !nameTemp
-      })
+      setUsers(data.users.slice()
+        .sort((a: User, b: User) => a.id - b.id)
+        .filter(({studentInfo, employeeInfo, nameTemp}: User) => {
+          return (studentInfo && studentInfo.accountStatus === StudentAccountStatus.ACTIVE) ||
+            (employeeInfo && employeeInfo.accountStatus === EmployeeAccountStatus.ACTIVE) &&
+            !nameTemp
+        })
         .map((user: User) => ({label: user.id + ": " + fullName(user), value: user.id})));
     }
   }, [data, error, loading]);
+
+  const handleTimeSettingsModalShow = () => {
+    dispatchPopupWindow({
+      header: <ChooseTime.Header/>,
+      body: <ChooseTime.Body until={until} setUntil={setUntil}/>,
+      footer: <ChooseTime.Footer/>,
+      isConfirm: true
+    });
+  };
 
   const handleReset = () => {
     setExistingUserValue(null);
@@ -80,7 +117,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
 
   const handleNewUser = (e: any) => {
     if (e.target.value.length === 1) {
-      setChosenUserType(newUserTypes[0]);
+      setChosenUserType(newUserTypes[7]);
     }
 
     setChosenUserId(-1);
@@ -144,7 +181,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
     const newUser = {
       userId: chosenUserId,
       tempUser: {
-        name: chosenUserName,
+        name: formatTempName(chosenUserName),
         type: chosenUserType.value
       }
     };
@@ -156,7 +193,10 @@ const OccupantRegistration: React.FC<PropTypes> = ({
         variables: {
           input: {
             classroomName: classroomName.toString(),
-            until: moment().add(3, 'hours').toISOString(),
+            // until: moment().add('seconds', 30).toISOString(),
+            until: !isStudent(chosenUserType.value) || until === -1
+              ? moment().set('hours', 23).set('minutes', 59).set('seconds', 59).toISOString()
+              : moment().add(until, 'hours').toISOString(),
             ...occupant
           }
         }
@@ -190,6 +230,18 @@ const OccupantRegistration: React.FC<PropTypes> = ({
     }
   };
 
+  const filterOption = (option: {value: string, label: string}, inputValue:string) => {
+    const strings = option.label.split(' ');
+    const id = strings[0].trim().toLowerCase();
+    const lastName = strings[1].trim().toLowerCase();
+    let exceptLastName = strings;
+    exceptLastName.splice(1, 1);
+    const input = inputValue.trim().toLowerCase();
+
+    return id.includes(input) || lastName.includes(input)
+      // || exceptLastName.join(' ').toLowerCase().includes(input);
+  };
+
   return (
     <div>
       <form
@@ -204,6 +256,7 @@ const OccupantRegistration: React.FC<PropTypes> = ({
           styles={{menuPortal: base => ({...base, zIndex: 9999})}}
           menuPortalTarget={document.body}
           onChange={handleExistingUser}
+          filterOption={filterOption}
           onFocus={handleReset}
           ref={existingUserInput}
         />
@@ -214,24 +267,44 @@ const OccupantRegistration: React.FC<PropTypes> = ({
             onChange={handleNewUser}
             name="tempUsersInput"
             id="tempUsersInput"
-            placeholder="Новий користувач"
+            placeholder="Тимчасовий користувач"
             className={styles.createUserInput}
             autoComplete="off"
           />
           {value && <Select
               options={newUserTypes}
               value={chosenUserType}
-              placeholder={UserTypesUa.STUDENT}
+              placeholder={UserTypesUa.OTHER}
               onChange={handleTypeSelect}
               menuPortalTarget={document.body}
               styles={{menuPortal: base => ({...base, zIndex: 9999})}}
           />}
         </div>
       </form>
+      <div>
+        {scheduleUsers.map((user: any) => {
+          const data = {value: user.id, label: user.name}
+          return (
+            <Button style={{height: 30, marginRight: 5}} onClick={() => handleExistingUser(data)}>
+              {user.name}
+            </Button>
+          );
+        })}
+      </div>
       <Title title="Вибраний користувач"/>
       <p>П.І.Б.: {chosenUserName}</p>
       {/*@ts-ignore*/}
       <p>Статус: {chosenUserType && chosenUserName?.length !== 0 && UserTypesUa[chosenUserType.value]}</p>
+      <div className={styles.time} onClick={handleTimeSettingsModalShow}>
+        {isStudent(chosenUserType.value) && (
+          <>
+            <img src={clockIcon} width={24} height={24} alt='time'/>
+            <span>До {until !== -1
+              ? moment().add(until, 'hours').format('HH:mm')
+              : 'кінця дня'}</span>
+          </>
+        )}
+      </div>
     </div>
   );
 };

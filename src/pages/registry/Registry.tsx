@@ -12,16 +12,23 @@ import {getDocumentDefinition, getFormattedData} from "./PDFConfig";
 import {fullName, getTimeHHMM} from "../../helpers/helpers";
 import UserProfile from "../../components/userProfile/UserProfile";
 import {usePopupWindow} from "../../components/popupWindow/PopupWindowProvider";
+import moment from "moment";
 
 const Registry = () => {
   const dispatchPopupWindow = usePopupWindow();
-  const [date, setDate] = useState(new Date().toString());
+  const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
   const {data, loading, error} = useQuery(GET_REGISTER, {
     variables: {
       where: {
-        start: {
-          gte: new Date(new Date(date).setHours(0, 0, 0, 0))
-        }
+        AND: [{
+          start: {
+            gte: new Date(new Date(date).setHours(0, 0, 0, 0)).toISOString()
+          },
+        }, {
+          start: {
+            lte: new Date(new Date(date).setHours(23, 59, 59, 0)).toISOString()
+          }
+        }],
       }
     },
     fetchPolicy: "network-only"
@@ -45,8 +52,10 @@ const Registry = () => {
   };
 
   const handleChangeDate = (e: any) => {
-    setDate(e.target.value);
-  }
+    if (e.target.value) {
+      setDate(e.target.value);
+    }
+  };
 
   return (
     <div>
@@ -94,7 +103,9 @@ const Registry = () => {
         <ul className={styles.container}>
           {data?.register?.length === 0 &&
           <p className={styles.noItemsText}>За {readableDate} у журналі відвідувань записи відсутні</p>}
-          {data.register && data.register.map((unit: RegisterUnit) => {
+          {data.register && data.register.slice()
+            .sort((a: RegisterUnit, b: RegisterUnit) => moment(b.start).valueOf() - moment(a.start).valueOf())
+            .map((unit: RegisterUnit) => {
             const userName = unit.nameTemp === null ? fullName(unit.user) : unit.nameTemp;
 
             return <li

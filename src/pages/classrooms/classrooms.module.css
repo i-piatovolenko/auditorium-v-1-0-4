@@ -62,3 +62,53 @@
 .selectClassroomsFilter option:checked {
   background-color: #eee;
 }
+
+.updateDataModal {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, .7);
+}
+
+.popup {
+  border-radius: 16px;
+  box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.07);
+  width: 300px;
+  height: 150px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.crashModeWrapper {
+  margin: 16px;
+  padding: 16px;
+  border-radius: 6px;
+  border: 2px solid #f91354;
+  background-color: #f9135433;
+  color: #f91354;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.crashModeWrapper h1 {
+  margin: 0;
+  padding: 0 0 10px 0;
+  text-align: center;
+}
+
+.crashModeWrapper p {
+  padding: 0 0 10px 0;
+  margin: 0;
+  text-align: center;
+}

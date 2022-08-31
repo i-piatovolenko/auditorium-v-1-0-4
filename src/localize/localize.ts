@@ -6,6 +6,7 @@ const strings = {
     noFreeClassrooms: '',
     generalQueue: 'Загальна черга',
     pendingConfirmation: 'Очікують підтвердження',
+    noQueue: 'Черга відсутня'
   },
   en: {
     queueSize: 'Queue size: ',
@@ -13,7 +14,8 @@ const strings = {
     vilnukhAud: 'Free classrooms: ',
     noFreeClassrooms: 'No free classrooms',
     generalQueue: 'General Queue',
-    pendingConfirmation: 'Confirmation Pending'
+    pendingConfirmation: 'Confirmation Pending',
+    noQueue: 'No queue'
   }
 }
 

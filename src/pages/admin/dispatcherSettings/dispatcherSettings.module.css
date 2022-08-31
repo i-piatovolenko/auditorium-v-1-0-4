@@ -1,0 +1,58 @@
+.sectionTitle {
+    font-size: 26px;
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    margin: 16px;
+    font-family: Roboto;
+    color: #2e287c;
+}
+
+.hintText {
+    border-radius: 6px;
+    margin: 16px;
+    padding: 16px 16px 16px 48px;
+    position: relative;
+    background-color: #00a6ff;
+    color: #fff;
+}
+
+.hintText::before {
+    content: '!';
+    display: block;
+    color: #fff;
+    font-family: Roboto;
+    font-weight: bold;
+    font-size: 36px;
+    position: absolute;
+    left: 20px;
+    top: 30%;
+}
+
+.sectionWrapper {
+    padding-left: 16px;
+}
+
+.inputWrapper {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    align-items: center;
+    grid-gap: 16px;
+    margin-bottom: 16px;
+}
+
+.inputWrapper input {
+    height: 40px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding-left: 16px;
+}
+
+.inputWrapper p {
+    margin: 0;
+    padding: 0;
+}
+
+.buttonWrapper {
+    display: flex;
+    justify-content: flex-end;
+}
